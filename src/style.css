@@ -68,19 +68,36 @@ body{height:100%;margin:0;background:var(--page);color:var(--ink);font-family:"B
   .grid button{font-size:.88rem}
   .head{padding:7px 11px}.head h1{font-size:.95rem}
 }
-.settools{position:absolute;top:14px;left:50%;transform:translateX(-50%);background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:6px 8px 6px 14px;display:flex;align-items:center;gap:6px;font-size:.9rem}
-.settools[hidden]{display:none}
-.settools button{font:inherit;font-size:.88rem;color:var(--ink);background:transparent;border:1px solid var(--line);border-radius:10px;padding:5px 10px;cursor:pointer}
-.settools button:focus-visible{outline:2px solid var(--active);outline-offset:2px}
 .hint{position:absolute;top:14px;right:14px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:8px 12px;font-size:.8rem;color:var(--ink-soft);max-width:220px}
 .err{position:absolute;inset:0;display:none;align-items:center;justify-content:center;padding:24px;text-align:center}
 @media (max-width:640px){.hint{display:none}}
-.walltools{flex:1 0 100%;display:flex;align-items:center;justify-content:center;gap:8px;padding:5px 8px 3px;border-top:1px solid var(--line)}
-.walltools[hidden]{display:none}
-.walltools>span{font-size:.85rem;color:var(--ink-soft);white-space:nowrap}
-.walltools .paint-mode{min-height:34px;padding:0 10px;border-radius:8px}
-.walltools .paint-mode[aria-pressed="true"]{background:var(--active);border-color:var(--active);color:var(--active-ink)}
-.walltools .wall-swatch{flex:0 0 34px;width:34px;height:34px;min-height:34px;padding:0;border-radius:50%;background:var(--swatch);border:1px solid var(--line)}
-.walltools .wall-swatch[aria-pressed="true"]{outline:2px solid var(--ink);outline-offset:2px}
-.walltools input[type="color"]{flex:0 0 40px;width:40px;height:40px;padding:3px;border:1px solid var(--line);border-radius:8px;background:transparent;cursor:pointer}
-@media (max-width:640px){.walltools{justify-content:flex-start;gap:4px;padding-left:4px;padding-right:4px;overflow-x:auto;scrollbar-width:none}.walltools .wall-swatch{flex-basis:30px;width:30px;height:30px;min-height:30px}.walltools input[type="color"]{flex-basis:34px;width:34px;height:34px}}
+/* ---- Einrichtungsmodus ---- */
+.edit{position:absolute;top:14px;left:50%;transform:translateX(-50%);width:min(620px,calc(100% - 28px));max-height:46vh;display:flex;flex-direction:column;background:var(--panel);border:1px solid var(--line);border-radius:16px;box-shadow:0 6px 24px rgba(0,0,0,.16);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);font-size:.9rem;z-index:2}
+.edit[hidden]{display:none}
+.edit button,.edit input,.edit select{font:inherit;font-size:.88rem;color:var(--ink)}
+.edit button{background:transparent;border:1px solid var(--line);border-radius:10px;min-height:36px;padding:0 11px;cursor:pointer;white-space:nowrap}
+.edit button[aria-pressed="true"],.edit button[aria-selected="true"]{background:var(--active);border-color:var(--active);color:var(--active-ink)}
+.edit button:disabled{opacity:.45;cursor:default}
+.edit button:focus-visible,.edit input:focus-visible{outline:2px solid var(--active);outline-offset:2px}
+.edit-tabs{display:flex;gap:5px;padding:7px 7px 6px;overflow-x:auto;scrollbar-width:none;border-bottom:1px solid var(--line)}
+.edit-tabs button{border-radius:999px;flex:0 0 auto}
+.edit-tabs .edit-x{margin-left:auto;min-width:36px;padding:0}
+.edit-body{padding:8px 10px 10px;overflow-y:auto;-webkit-overflow-scrolling:touch;display:flex;flex-direction:column;gap:8px}
+.edit .row{display:flex;flex-wrap:wrap;align-items:center;gap:6px}
+.edit .muted{color:var(--ink-soft);font-size:.82rem}
+.edit .sw{width:32px;height:32px;min-height:32px;padding:0;border-radius:50%;background:var(--swatch);border:1px solid var(--line)}
+.edit .sw[aria-pressed="true"]{outline:2px solid var(--ink);outline-offset:2px;background:var(--swatch)}
+.edit .sw.orig{background:repeating-linear-gradient(45deg,#fff 0 4px,#ddd 4px 8px)}
+.edit input[type="color"]{width:38px;height:36px;padding:2px;border:1px solid var(--line);border-radius:8px;background:transparent;cursor:pointer}
+.edit input[type="number"],.edit input[type="text"]{width:70px;min-height:34px;padding:0 6px;border:1px solid var(--line);border-radius:8px;background:transparent}
+.edit input[type="text"]{width:min(200px,50vw)}
+.edit label.chk{display:flex;align-items:center;gap:5px;cursor:pointer}
+.edit .cat{display:grid;grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:6px}
+.edit .cat button{min-height:40px}
+.edit .sel{border:1px solid var(--active);border-radius:12px;padding:7px 8px;display:flex;flex-direction:column;gap:6px}
+.edit .sel b{font-weight:600}
+.edit .vlist{display:flex;flex-direction:column;gap:5px}
+.edit .vlist>.row{justify-content:space-between;border:1px solid var(--line);border-radius:10px;padding:4px 4px 4px 10px}
+.edit textarea{width:100%;min-height:70px;font:12px/1.3 ui-monospace,monospace;border:1px solid var(--line);border-radius:8px;background:transparent;color:var(--ink)}
+body.editing .head,body.editing .hint{display:none}
+@media (max-width:640px){.edit{top:8px;left:8px;right:8px;width:auto;transform:none;max-height:44vh}.edit-tabs{gap:4px;padding:6px}.edit-tabs button{padding:0 8px;font-size:.8rem;min-height:34px}.edit-tabs .edit-x{min-width:34px}}

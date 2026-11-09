@@ -18,4 +18,5 @@
 - Performance: statische Teile werden am Ende von `main.js` zu wenigen Meshes zusammengefasst.
   Neue bewegliche oder verschiebbare Teile müssen per `clickable`/`anim`/`doors`/`sashes` registriert
   sein (bzw. vom Zusammenfassen ausgenommen werden), sonst sind sie danach nicht mehr einzeln greifbar.
+- Einrichtungsmodus: `src/einrichten.js` (nutzt `window.HAUS` vom Ende von `main.js`).
 - Bilder: Datei nach `src/assets/art/`, Eintrag in `src/art.js`, im Code `window.ART.<schlüssel>`.

@@ -15,28 +15,28 @@
     <h1>Wohnzimmer Walluf</h1>
     <p>Erdgeschoss Mühlstraße</p>
   </div>
-  <div class="settools" id="setTools" hidden><span>Esstisch</span><button id="rotL" aria-label="15 Grad nach links drehen">⟲ 15°</button><button id="rotR" aria-label="15 Grad nach rechts drehen">⟳ 15°</button><button id="setDone">Fertig</button></div>
+  <div class="edit" id="editPanel" role="region" aria-label="Einrichten" hidden>
+    <div class="edit-tabs" role="tablist" aria-label="Werkzeug">
+      <button role="tab" data-tool="paint" aria-selected="true">Streichen</button>
+      <button role="tab" data-tool="move" aria-selected="false">Möbel</button>
+      <button role="tab" data-tool="new" aria-selected="false">Neu</button>
+      <button role="tab" data-tool="measure" aria-selected="false">Maßband</button>
+      <button role="tab" data-tool="vars" aria-selected="false">Varianten</button>
+      <button id="editClose" class="edit-x" aria-label="Einrichten beenden">✕</button>
+    </div>
+    <div class="edit-body" id="editBody"></div>
+  </div>
   <div class="toast" id="toast" aria-live="polite"></div>
-  <div class="hint"><b>Maus</b>: links ziehen = drehen, rechts ziehen = verschieben, Rad = zoomen. <b>Touch</b>: 1 Finger = drehen, 2 Finger = zoomen/verschieben. <b>Doppelklick / Doppeltipp</b>: in einen Raum wechseln oder dorthin gehen, auf einer Treppe hoch bzw. runter. Einfacher Klick öffnet Türen, Fenster, Rollläden, Schränke und Geräte.</div>
+  <div class="hint"><b>Maus</b>: links ziehen = drehen, rechts ziehen = verschieben, Rad = zoomen. <b>Touch</b>: 1 Finger = drehen, 2 Finger = zoomen/verschieben. <b>Doppelklick / Doppeltipp</b>: in einen Raum wechseln oder dorthin gehen, auf einer Treppe hoch bzw. runter. Einfacher Klick öffnet Türen, Fenster, Rollläden, Schränke und Geräte. <b>Einrichten</b>: Wände streichen, Möbel verschieben, neue Möbel, Maßband, Varianten.</div>
   <nav class="dock" aria-label="Ansicht und Optionen">
     <button id="viewBtn" class="viewbtn" aria-haspopup="dialog" aria-expanded="false" aria-controls="viewSheet"><span class="vk">Ansicht</span><span id="viewName">Überblick</span><span class="chev" aria-hidden="true">▴</span></button>
     <div class="seg" role="group" aria-label="Etage"><button data-floor="kg" aria-pressed="false">KG</button><button data-floor="eg" aria-pressed="true">EG</button><button data-floor="og" aria-pressed="false">OG</button><button data-floor="dg" aria-pressed="false">DG</button></div>
     <div class="tog">
       <button id="dims" aria-pressed="false">Maße</button>
       <button id="walls" aria-pressed="false">Wände aus</button>
-      <button id="wallColorBtn" aria-expanded="false" aria-controls="wallColorTools">Wandfarbe</button>
+      <button id="editBtn" aria-pressed="false">Einrichten</button>
       <button id="deco" aria-pressed="false">Deko aus</button><button id="furn" aria-pressed="false">Möbel aus</button>
       <button id="evening" aria-pressed="false">Abend</button>
-    </div>
-    <div class="walltools" id="wallColorTools" role="group" aria-label="Wandfarbe" hidden>
-      <button id="wallPaintMode" class="paint-mode" type="button" aria-pressed="false">Streichen</button>
-      <button class="wall-swatch" type="button" data-wall-color="#F3F0EA" aria-label="Warmweiß" title="Warmweiß" aria-pressed="true" style="--swatch:#F3F0EA"></button>
-      <button class="wall-swatch" type="button" data-wall-color="#FFFFFF" aria-label="Reinweiß" title="Reinweiß" aria-pressed="false" style="--swatch:#FFFFFF"></button>
-      <button class="wall-swatch" type="button" data-wall-color="#D8E6D5" aria-label="Salbei" title="Salbei" aria-pressed="false" style="--swatch:#D8E6D5"></button>
-      <button class="wall-swatch" type="button" data-wall-color="#C9DDE8" aria-label="Nebelblau" title="Nebelblau" aria-pressed="false" style="--swatch:#C9DDE8"></button>
-      <button class="wall-swatch" type="button" data-wall-color="#E8D0C2" aria-label="Altrosa" title="Altrosa" aria-pressed="false" style="--swatch:#E8D0C2"></button>
-      <button class="wall-swatch" type="button" data-wall-color="#D7C8AA" aria-label="Leinen" title="Leinen" aria-pressed="false" style="--swatch:#D7C8AA"></button>
-      <input id="wallColorInput" type="color" value="#f3f0ea" aria-label="Eigene Wandfarbe" title="Eigene Wandfarbe">
     </div>
     <div class="vh-sr"><select id="viewSel" aria-label="Ansicht wählen">
         <optgroup label="Haus">
@@ -134,5 +134,6 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
 <script src="main.js"></script>
+<script src="einrichten.js"></script>
 </body>
 </html>

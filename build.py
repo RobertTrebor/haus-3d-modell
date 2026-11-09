@@ -36,7 +36,10 @@ def build():
     main = read("main.js")
     assert "</script" not in main.lower(), "main.js enthält </script>"
     html = html.replace('<script src="main.js"></script>', "<script>\n" + main + "</script>")
-    for tag in ('href="style.css"', 'src="art.js"', 'src="main.js"'):
+    edit = read("einrichten.js")
+    assert "</script" not in edit.lower(), "einrichten.js enthält </script>"
+    html = html.replace('<script src="einrichten.js"></script>', "<script>\n" + edit + "</script>")
+    for tag in ('href="style.css"', 'src="art.js"', 'src="main.js"', 'src="einrichten.js"'):
         assert tag not in html, f"nicht ersetzt: {tag}"
     return html
 

@@ -1,5 +1,8 @@
 # Übergabe an den Agenten: Einrichtungsmodus
 
+> **Stand v83 (09.11.2026): alle fünf Punkte in einer ersten Fassung umgesetzt** – Details unten unter
+> „Umsetzung v83“. Nächster Schritt: Rückmeldung von Robert einholen und nachbessern.
+
 Stand: 09.11.2026. Bitte zuerst `CLAUDE.md` und `docs/uebergabe.md` lesen.
 
 ## Worum es geht
@@ -74,3 +77,36 @@ Wandfarben im Wohnzimmer (EG): Den Wohnzimmerwänden eigene Materialien geben, s
 ausnehmen, einen Knopf „Einrichten“ ins Dock setzen und im Einrichtungsmodus per Antippen einer Wand eine
 kleine Farbpalette zeigen. Die Wahl in `localStorage` merken. Danach mit Robert abstimmen, bevor es auf
 alle Räume ausgeweitet wird.
+
+## Umsetzung v83
+
+Code: `src/einrichten.js` (eigene Datei, wird von `build.py` mit eingebettet). `main.js` stellt am Ende
+`window.HAUS` bereit (Szene, Kamera, Räume, Listen, Merge-Daten) und hält sich im Einrichtungsmodus
+(`HAUS.editMode`) aus Klicks heraus.
+
+- **Knopf „Einrichten“** im Dock öffnet oben ein Feld mit Reitern: Streichen · Möbel · Neu · Maßband ·
+  Varianten. Außerhalb des Modus verhält sich alles wie vorher.
+- **Wandfarben:** Wände werden nicht mehr einzeln gehalten (vorher je Wand ein Material-Array → ca. 150
+  Zeichenaufrufe mehr). Streichen setzt jetzt **Vertexfarben** in den zusammengefassten Wand-Meshes;
+  das Zusammenfassen merkt sich dafür je Quell-Mesh den Vertex-Bereich und die Flächengruppen
+  (`big.userData.recs`, `HAUS.srcRec`). Wand-IDs (`w0`, `w1`, …) und Speicherformat sind wie vorher,
+  alte Farben aus `haus3d-wall-colors-v1` werden übernommen. Option „ganzer Raum“ (über `ROOMS`),
+  Originalfarbe, „Alle Wände zurück“.
+- **Möbel verschieben/drehen:** Möbelstücke werden erst beim ersten Öffnen von „Möbel“ gebildet
+  (~20 ms): Möbel-Meshes aus `buildFurn()` werden zusammengelegt, wenn sie in derselben verschobenen
+  Gruppe liegen oder sich berühren (bis 1,5 cm Abstand), höchstens 3,3 × 3,3 × 2,5 m. Deko, die auf/in einem
+  Möbelstück steht, wandert mit. Erst beim Greifen wird das Stück aus den zusammengefassten Meshes
+  herausgelöst (eigene Gruppe, kostet nur dann ein paar Zeichenaufrufe). ID = Mittelpunkt in cm.
+  Der Esstisch ist jetzt ein normales Möbelstück (Lampe wandert mit). Ziehen bleibt im Raum,
+  Drehen 15° (Knöpfe oder Q/E), „Zurück an Ursprung“, „Ausblenden“.
+- **Neu (Katalog):** Sofa, Sessel, Bett, Tisch, Stuhl, Schreibtisch, Regal, Schrank, Kommode, TV-Board,
+  Teppich, Pflanze – Maße B/T/H in cm und Farbe änderbar, Duplizieren, Löschen. Je Möbel 1–3 Meshes.
+- **Maßband:** zwei Punkte antippen → Linie und Abstand, im Feld zusätzlich waagerecht/Höhe.
+- **Varianten:** aktueller Stand automatisch in `haus3d-einrichtung-v1`; benannte Varianten in
+  `haus3d-varianten-v1`; Export als JSON-Datei (mit Text zum Kopieren als Ausweichweg), Import per Datei
+  oder eingefügtem Text; „Alles zurücksetzen“ mit Rückfrage.
+
+Bekannte Grenzen: Eine Wandfläche ist eine Quaderseite – lange Wände über zwei Räume färben sich
+ganz. Die Möbel-Erkennung ist heuristisch (z. B. Kapok-Lounge = mehrere Teile, eng stehende Möbel
+können zusammenhängen). Gespeicherte Möbel-IDs hängen an der Ursprungsposition: Wird ein Möbel im
+Code verschoben, verliert die Variante dessen Verschiebung.

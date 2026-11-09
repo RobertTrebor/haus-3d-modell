@@ -18,9 +18,12 @@ Einfahrt), Keller-WC und Kriechkeller (zwischen Vorratsraum und Kellertreppe), W
 Kellertreppe, Garage (Sektionaltor per Klick).
 
 ## Offene Punkte / nächste Schritte
-1. Rückmeldung von Robert zur Performance von v82 auf Handy und PC.
-2. **Einrichtungsmodus** (in Arbeit): Wandfarben je Raum/Wand, Möbel verschieben/drehen (wie Esstisch),
-   Möbelkatalog, Varianten speichern, Maßband.
+1. **Performance**: Robert meldet (09.11.) v82 auf Handy *und* PC noch zäh. Messung im Test (Überblick):
+   ca. 880 Zeichenaufrufe, im OG ca. 1340; 14 Punktlichter mit MeshStandardMaterial. Größter Posten:
+   ~430 Meshes bleiben einzeln, weil sie klickbar/animiert sind (`fixed`). Ansatzpunkte: klickbare Teile je
+   Gruppe zusammenfassen, Punktlichter nur im sichtbaren Bereich, ggf. einfachere Materialien auf dem Handy.
+2. **Einrichtungsmodus** – v83 umgesetzt (`src/einrichten.js`, siehe `docs/aufgabe-einrichtungsmodus.md`).
+   Rückmeldung von Robert abwarten: Möbel-Erkennung (Teile, die zusammengehören), Bedienung am Handy.
 3. Weiteres Gebäude im Garten als eigener Teil. Benötigt: Lage zum Haus, Außenmaße, Höhen, Fotos.
 4. Three.js-Update und Aufteilung von `main.js` in Module (sinnvoll zusammen mit 2./3.).
 5. Kleinigkeiten: dunkle Fläche oben an der linken Gartentreppe glätten; EG/OG-Fenster der Gartenseite
