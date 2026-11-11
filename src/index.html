@@ -29,7 +29,7 @@
     <div class="edit-body" id="editBody"></div>
   </div>
   <div class="toast" id="toast" aria-live="polite"></div>
-  <div class="hint"><b>Maus</b>: links ziehen = drehen, rechts ziehen = verschieben, Rad = zoomen. <b>Touch</b>: 1 Finger = drehen, 2 Finger = zoomen/verschieben. <b>Doppelklick / Doppeltipp</b>: in einen Raum wechseln oder dorthin gehen, auf einer Treppe hoch bzw. runter. Einfacher Klick öffnet Türen, Fenster, Rollläden, Schränke und Geräte. <b>Einrichten</b>: Wände streichen, Möbel verschieben, neue Möbel, Katalog, Türen und Garagentor, Maßband, Varianten.</div>
+  <div class="hint"><b>Maus</b>: links ziehen = drehen, rechts ziehen = verschieben, Rad = zoomen. <b>Touch</b>: 1 Finger = drehen, 2 Finger = zoomen/verschieben. <b>Doppelklick / Doppeltipp</b>: in einen Raum wechseln oder dorthin gehen, auf einer Treppe hoch bzw. runter. Einfacher Klick öffnet Türen, Fenster, Rollläden, Schränke und Geräte. <b>Einrichten</b>: Wände streichen, Möbel verschieben, neue Möbel, Katalog, Türen und Garagentor, Maßband mit Maßregister (gemessen/geschätzt), Varianten.</div>
   <nav class="dock" aria-label="Ansicht und Optionen">
     <button id="viewBtn" class="viewbtn" aria-haspopup="dialog" aria-expanded="false" aria-controls="viewSheet"><span class="vk">Ansicht</span><span id="viewName">Überblick</span><span class="chev" aria-hidden="true">▴</span></button>
     <div class="seg" role="group" aria-label="Etage"><button data-floor="kg" aria-pressed="false">KG</button><button data-floor="eg" aria-pressed="true">EG</button><button data-floor="og" aria-pressed="false">OG</button><button data-floor="dg" aria-pressed="false">DG</button></div>
@@ -136,6 +136,11 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
 <script src="main.js"></script>
+<script src="masse/masse.js"></script>
+<script src="masse/innenwaende.js"></script>
+<script src="masse/aussenwaende.js"></script>
+<script src="masse/tueren.js"></script>
+<script src="masse/moebel.js"></script>
 <script src="katalog.js"></script>
 <script src="einrichten.js"></script>
 </body>

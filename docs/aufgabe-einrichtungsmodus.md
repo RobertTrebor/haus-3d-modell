@@ -140,3 +140,7 @@ Code verschoben, verliert die Variante dessen Verschiebung.
 - Test: Headless-Chrome-Lauf über die gebaute Datei (alle Reiter, Türstile, Tor-Materialien, Katalog-Einfügen,
   Varianten-Rundlauf) ohne Konsolenfehler; 883 Draw-Calls, 141 k Dreiecke im Überblick (Messbasis für den
   Performance-Plan).
+- **Maßregister** (im Reiter „Maßband“): Dateien `src/masse/{masse,innenwaende,aussenwaende,tueren,moebel}.js`
+  halten Maße mit Quelle gemessen/geschätzt/unbekannt; Räume und Türen kommen automatisch aus dem Modell dazu.
+  Nach einer Messung „Als Maß speichern“ mit dem vor Ort gemessenen Wert; Liste mit Abweichung, „Nachmessen“,
+  „Stimmt so“, „Zeigen“; Export/Import als JSON (`haus3d-masse-v1` im localStorage). Ablauf: `docs/masse.md`.

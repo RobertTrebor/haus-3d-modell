@@ -2,7 +2,8 @@
 
 - Antworten auf Deutsch. Robert nutzt Android-Smartphone und Chrome unter Windows.
 - Maße von Robert haben Vorrang vor Schätzungen aus Fotos; Geschätztes immer als geschätzt kennzeichnen.
-  Gesammelte Maße: `docs/uebergabe.md`.
+  Gesammelte Maße: `docs/uebergabe.md` und Maßregister `src/masse/*.js` (gemessen/geschätzt/unbekannt,
+  Ablauf in `docs/masse.md`). Neue Maße von Robert dort eintragen, nicht nur im Code.
 - Gearbeitet wird in `src/`. `dist/` ist generiert (`python build.py`) und nicht im Repo.
 - **Aktuelle Aufgabe: Einrichtungsmodus → `docs/aufgabe-einrichtungsmodus.md`.**
 - Nach jeder größeren Änderung: Commit mit aussagekräftiger Nachricht und push, `python build.py vNN_Kurzname`.

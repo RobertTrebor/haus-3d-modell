@@ -1,0 +1,23 @@
+// Innenwände, Raumhöhen, Räume, Treppen (Stand 09.11.2026 aus docs/uebergabe.md; Modellwerte aus main.js)
+window.MASSE.add('innenwaende',[
+ {id:'wand.innen.dicke',name:'Innenwände – Dicke (inkl. Türrahmen)',raum:'alle',modell:0.18,wert:0.18,quelle:'gemessen',datum:'2026-11-09',notiz:'ca.',konst:'T'},
+ {id:'raum.eg.hoehe',name:'Raumhöhe EG',raum:'EG',modell:2.59,wert:2.59,quelle:'gemessen',datum:'2026-11-09',konst:'H'},
+ {id:'raum.og.hoehe',name:'Raumhöhe OG',raum:'OG',modell:2.59,wert:2.59,quelle:'gemessen',datum:'2026-11-09',konst:'OGH'},
+ {id:'raum.kg.hoehe',name:'Raumhöhe Keller',raum:'Keller',modell:2.20,wert:2.20,quelle:'gemessen',datum:'2026-11-09',konst:'KCH = CF+2.2'},
+ {id:'kg.bogen.scheitel',name:'Bogenzimmer – Scheitelhöhe des Bogens',raum:'Bogenzimmer',modell:1.81,wert:1.81,quelle:'gemessen',datum:'2026-11-09'},
+ {id:'raum.kvest.breite',raum:'Waschküche',wert:2.50,quelle:'gemessen',datum:'2026-11-09',konst:'VX1-VX0'},
+ {id:'raum.kvest.tiefe',raum:'Waschküche',wert:3.63,quelle:'gemessen',datum:'2026-11-09',konst:'WKZ1-VZ0'},
+ {id:'raum.kwc.breite',raum:'Keller-WC',wert:2.00,quelle:'gemessen',datum:'2026-11-09'},
+ {id:'raum.kwc.tiefe',raum:'Keller-WC',wert:0.97,quelle:'gemessen',datum:'2026-11-09'},
+ {id:'kg.buero.fenster_bis_balken',name:'Kellerbüro – Terrassenfensterwand bis Balken',raum:'Kellerbüro',modell:1.50,wert:1.50,quelle:'gemessen',datum:'2026-11-09'},
+ {id:'kg.buero.balken.breite',name:'Kellerbüro – Balken Breite',raum:'Kellerbüro',modell:0.385,wert:0.385,quelle:'gemessen',datum:'2026-11-09'},
+ {id:'kg.buero.balken.tiefe',name:'Kellerbüro – Balken Tiefe',raum:'Kellerbüro',modell:0.15,wert:0.15,quelle:'gemessen',datum:'2026-11-09'},
+ {id:'kg.buero.balken_bis_waschkueche',name:'Kellerbüro – Balken bis Waschküchenwand',raum:'Kellerbüro',modell:2.30,wert:2.30,quelle:'gemessen',datum:'2026-11-09',notiz:'ca.'},
+ {id:'treppe.kg.stufen',name:'Kellertreppe – Stufenzahl',raum:'Kellertreppe',modell:9,wert:9,quelle:'gemessen',einheit:'Stk',datum:'2026-11-09',konst:'KST'},
+ {id:'treppe.kg.stufenhoehe',name:'Kellertreppe – Stufenhöhe',raum:'Kellertreppe',modell:0.19,wert:0.19,quelle:'gemessen',datum:'2026-11-09',notiz:'oberste etwas niedriger'},
+ {id:'raum.slide.breite',raum:'Wohnzimmer',quelle:'unbekannt',notiz:'3,90 m seit v1 im Modell – Herkunft nicht dokumentiert, bitte bestätigen',konst:'W'},
+ {id:'raum.slide.tiefe',raum:'Wohnzimmer',quelle:'unbekannt',notiz:'3,54 m seit v1 im Modell – bitte bestätigen',konst:'D'},
+ {id:'raum.garage.breite',raum:'Garage',quelle:'geschaetzt',notiz:'nach Fotos; nachmessen (uebergabe.md Punkt 5)',konst:'gx1-gx0'},
+ {id:'raum.garage.tiefe',raum:'Garage',quelle:'geschaetzt',notiz:'nach Fotos; nachmessen'},
+ {id:'raum.kcrawl.tiefe',name:'Kriechkeller – Tiefe',raum:'Kriechkeller',quelle:'geschaetzt',notiz:'nach Fotos; nachmessen (uebergabe.md Punkt 5)'},
+]);

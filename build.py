@@ -10,6 +10,8 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
 SRC, DIST = ROOT / "src", ROOT / "dist"
+SCRIPTS = ["main.js", "masse/masse.js", "masse/innenwaende.js", "masse/aussenwaende.js", "masse/tueren.js",
+           "masse/moebel.js", "katalog.js", "einrichten.js"]
 MIME = {".jpg": "image/jpeg", ".jpeg": "image/jpeg", ".png": "image/png", ".webp": "image/webp"}
 
 
@@ -32,17 +34,14 @@ def build():
     html = read("index.html")
     html = html.replace('<link rel="stylesheet" href="style.css">', "<style>\n" + read("style.css") + "</style>")
     html = html.replace('<script src="art.js"></script>', art_script())
-    # main.js darf "</script>" nicht enthalten
-    main = read("main.js")
-    assert "</script" not in main.lower(), "main.js enthält </script>"
-    html = html.replace('<script src="main.js"></script>', "<script>\n" + main + "</script>")
-    kat = read("katalog.js")
-    assert "</script" not in kat.lower(), "katalog.js enthält </script>"
-    html = html.replace('<script src="katalog.js"></script>', "<script>\n" + kat + "</script>")
-    edit = read("einrichten.js")
-    assert "</script" not in edit.lower(), "einrichten.js enthält </script>"
-    html = html.replace('<script src="einrichten.js"></script>', "<script>\n" + edit + "</script>")
-    for tag in ('href="style.css"', 'src="art.js"', 'src="main.js"', 'src="katalog.js"', 'src="einrichten.js"'):
+    # Skripte einbetten (Reihenfolge wie in index.html); keines darf "</script>" enthalten
+    for name in SCRIPTS:
+        js = read(name)
+        assert "</script" not in js.lower(), f"{name} enthält </script>"
+        tag = f'<script src="{name}"></script>'
+        assert tag in html, f"Tag fehlt in index.html: {tag}"
+        html = html.replace(tag, "<script>\n" + js + "</script>")
+    for tag in ('href="style.css"', 'src="art.js"') + tuple(f'src="{n}"' for n in SCRIPTS):
         assert tag not in html, f"nicht ersetzt: {tag}"
     return html
 

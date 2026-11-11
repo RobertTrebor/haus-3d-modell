@@ -230,9 +230,9 @@ function measure(e){const h=firstHit(e);if(!h)return;const p=h.point.clone();
   if(!measA){measA={p,d:dot(p)};H.toast('Zweiten Punkt antippen');return;}
   const a=measA.p;dot(p);const lg=new THREE.BufferGeometry().setFromPoints([a,p]);const ln=new THREE.Line(lg,new THREE.LineBasicMaterial({color:0xC99A2E,depthTest:false,transparent:true}));ln.renderOrder=1000;gMeas.add(ln);
   const d=a.distanceTo(p),dh=Math.hypot(p.x-a.x,p.z-a.z),dy=Math.abs(p.y-a.y);const s=textSprite(fmt(d));s.position.copy(a).add(p).multiplyScalar(0.5).add(new THREE.Vector3(0,0.12,0));gMeas.add(s);
-  measA=null;measN++;lastMeas=fmt(d)+(dy>0.05&&dh>0.05?' (waagerecht '+fmt(dh)+', Höhe '+fmt(dy)+')':'');H.toast(fmt(d));if(tool==='measure')render();}
+  lastMeasObj={a:a.clone(),p:p.clone(),d,dh,dy};measA=null;measN++;lastMeas=fmt(d)+(dy>0.05&&dh>0.05?' (waagerecht '+fmt(dh)+', Höhe '+fmt(dy)+')':'');H.toast(fmt(d));if(tool==='measure')render();}
 let lastMeas='';
-function clearMeas(){while(gMeas.children.length){const o=gMeas.children.pop();o.geometry&&o.geometry.dispose();}measA=null;measN=0;lastMeas='';}
+function clearMeas(){while(gMeas.children.length){const o=gMeas.children.pop();o.geometry&&o.geometry.dispose();}measA=null;measN=0;lastMeas='';lastMeasObj=null;}
 
 // =====================================================================
 // Türen: Design der Drehflügeltüren (Blatt-Material, Kassetten)
@@ -347,6 +347,76 @@ function renderKat(){const list=$('eKList');if(!list)return;const rows=katRows()
     addItem({t:CAT[a.form]?a.form:'schrank',w:a.b,d:a.t,h:a.h,c:f?f[0]:'#CFCBC4',x:+p.x.toFixed(3),y:+p.y.toFixed(3),z:+p.z.toFixed(3),ry:0,p:a.id,n:a.name,mk:a.marke,pr:a.preis},true);H.toast(a.name+' eingefügt');});}
 
 // =====================================================================
+// Maßregister: gemessen / geschätzt / unbekannt (Dateien src/masse/*.js + eigene Nachmessungen)
+// =====================================================================
+const K_MASS='haus3d-masse-v1';
+const MKAT={raeume:'Räume',innenwaende:'Innenwände',aussenwaende:'Außenwände',tueren:'Türen',fenster:'Fenster',moebel:'Möbel',sonstiges:'Sonstiges'};
+const QUELLE={gemessen:'Gemessen',geschaetzt:'Geschätzt',unbekannt:'Unbekannt'};
+let massUser=LS.get(K_MASS,{});if(!massUser||typeof massUser!=='object'||Array.isArray(massUser))massUser={};
+let lastMeasObj=null,massKat='',massQ='',massEdit=null,massOpen=false;
+const massSave=()=>LS.set(K_MASS,massUser);
+// Einträge, deren Modellwert zur Laufzeit aus dem Modell kommt: Räume (ROOMS) und Türen (Türregister)
+function massAuto(){const out=[];
+  rooms().forEach(r=>{out.push({id:'raum.'+r[1]+'.breite',kat:'raeume',name:r[0]+' – Breite (x)',raum:r[0],modell:+(r[3]-r[2]).toFixed(3),quelle:'unbekannt'});out.push({id:'raum.'+r[1]+'.tiefe',kat:'raeume',name:r[0]+' – Tiefe (z)',raum:r[0],modell:+(r[5]-r[4]).toFixed(3),quelle:'unbekannt'});});
+  const s=new THREE.Vector3();buildDoors().forEach(d=>{d.box.getSize(s);const rn=d.name.replace(/^(Schrank)?[Tt]ür( · )?/,'');
+    out.push({id:'tuer.'+d.id+'.breite',kat:'tueren',name:d.name+' – Breite',raum:rn,modell:+Math.max(s.x,s.z).toFixed(3),quelle:'unbekannt'});out.push({id:'tuer.'+d.id+'.hoehe',kat:'tueren',name:d.name+' – Höhe',raum:rn,modell:+s.y.toFixed(3),quelle:'unbekannt'});});
+  return out;}
+function massAll(){const map=new Map();massAuto().forEach(e=>map.set(e.id,e));
+  ((window.MASSE&&window.MASSE.eintraege)||[]).forEach(e=>{if(!e||!e.id)return;map.set(e.id,Object.assign({quelle:'unbekannt'},map.get(e.id)||{},e,{datei:true}));});
+  Object.keys(massUser).forEach(id=>{const u=massUser[id];if(!u||typeof u!=='object')return;map.set(id,Object.assign({quelle:'unbekannt',id},map.get(id)||{},u,{id,eigen:true}));});
+  return [...map.values()];}
+const mUnit=e=>e.einheit||'m';
+const mFmt=(v,e)=>v==null||isNaN(v)?'–':(mUnit(e)==='m'?fmt(v):String(v)+' '+mUnit(e));
+function massPut(id,data){massUser[id]=Object.assign({},massUser[id]||{},data,{datum:new Date().toISOString().slice(0,10)});massSave();}
+function massDelta(e){if(e.wert==null||e.modell==null||mUnit(e)!=='m')return '';const d=Math.round((e.wert-e.modell)*100);return d?' · Δ '+(d>0?'+':'')+d+' cm':' · stimmt';}
+// gespeicherte Strecke wieder einzeichnen und die Kamera dorthin holen
+function massShow(e){if(!e.pts)return;const a=new THREE.Vector3(...e.pts[0]),p=new THREE.Vector3(...e.pts[1]);dot(a);dot(p);
+  const ln=new THREE.Line(new THREE.BufferGeometry().setFromPoints([a,p]),new THREE.LineBasicMaterial({color:0xC99A2E,depthTest:false,transparent:true}));ln.renderOrder=1000;gMeas.add(ln);
+  const s=textSprite(e.wert!=null?mFmt(e.wert,e):mFmt(e.modell,e));s.position.copy(a).add(p).multiplyScalar(0.5).add(new THREE.Vector3(0,0.12,0));gMeas.add(s);measN++;
+  const mid=a.clone().add(p).multiplyScalar(0.5),dir=camera.position.clone().sub(controls.target);if(dir.lengthSq()<1e-6)dir.set(1,0.6,1);dir.setLength(Math.max(2.2,a.distanceTo(p)*1.6));
+  controls.target.copy(mid);camera.position.copy(mid).add(dir);controls.update();H.dirty();renderMeasure();}
+function renderMeasure(){const all=massAll(),cnt={gemessen:0,geschaetzt:0,unbekannt:0};all.forEach(e=>cnt[QUELLE[e.quelle]?e.quelle:'unbekannt']++);
+  let h='<div class="row"><span class="muted">Zwei Punkte antippen (Boden, Wand, Möbel).</span><b id="eLast">'+esc(lastMeas)+'</b><button id="eMClr" style="margin-left:auto"'+(measN||measA?'':' disabled')+'>Messungen löschen</button></div>';
+  if(lastMeasObj){const m=lastMeasObj,rm=roomAt(m.a.x,m.a.y+0.3,m.a.z)||roomAt(m.p.x,m.p.y+0.3,m.p.z);
+    h+='<div class="sel"><div class="row"><b>Als Maß speichern</b><span class="muted">Modell: '+fmt(m.d)+(m.dh>0.05&&m.dy>0.05?' (waagerecht '+fmt(m.dh)+', Höhe '+fmt(m.dy)+')':'')+'</span></div>'+
+      '<div class="row"><select id="eMKat" aria-label="Kategorie">'+Object.keys(MKAT).map(k=>'<option value="'+k+'"'+(k==='sonstiges'?' selected':'')+'>'+MKAT[k]+'</option>').join('')+'</select><input type="text" id="eMName" placeholder="Bezeichnung, z. B. Fensterbreite" value="'+esc(rm?rm[0]+' – ':'')+'"></div>'+
+      '<div class="row"><label class="chk">Vor Ort gemessen <input type="number" id="eMWert" step="1" min="0" value="'+cm(m.d)+'"> cm</label><label class="chk">Strecke <select id="eMArt"><option value="d">direkt</option><option value="dh">waagerecht</option><option value="dy">Höhe</option></select></label><input type="text" id="eMNotiz" placeholder="Notiz" style="width:min(200px,45vw)"><button id="eMSave">Speichern</button></div>'+
+      '<div class="muted">Trage den Wert ein, den du wirklich gemessen hast. Das Modell ändert sich dadurch nicht von selbst; die Liste zeigt die Abweichung, und über „Exportieren“ wandern die Werte in die Maßdateien des Modells.</div></div>';}
+  h+='<details class="sub"'+(massOpen?' open':'')+' id="eMDet"><summary><b>Maßregister</b> <span class="muted">'+cnt.gemessen+' gemessen · '+cnt.geschaetzt+' geschätzt · '+cnt.unbekannt+' unbekannt</span></summary>'+
+    '<div class="row"><select id="eMFil" aria-label="Kategorie"><option value="">Alle Kategorien</option>'+Object.keys(MKAT).map(k=>'<option value="'+k+'"'+(massKat===k?' selected':'')+'>'+MKAT[k]+'</option>').join('')+'</select><input type="search" id="eMQ" placeholder="Suchen" value="'+esc(massQ)+'" aria-label="Suchen"><button id="eMExp">Exportieren</button><button id="eMImpB">Importieren …</button><input type="file" id="eMImp" accept=".json,application/json" hidden></div>'+
+    '<div class="klist" id="eMList"></div><div id="eMOut"></div></details>';
+  body.innerHTML=h;
+  $('eMClr').onclick=()=>{clearMeas();render();};
+  if(lastMeasObj){$('eMSave').onclick=()=>{const m=lastMeasObj,name=$('eMName').value.trim();if(!name){$('eMName').focus();return;}const art=$('eMArt').value,v=+$('eMWert').value,ok=isFinite(v)&&v>0;
+      massPut('eigen.'+Date.now().toString(36),{name,kat:$('eMKat').value,raum:(roomAt(m.a.x,m.a.y+0.3,m.a.z)||[''])[0]||undefined,modell:+m[art].toFixed(3),wert:ok?+(v/100).toFixed(3):null,quelle:ok?'gemessen':'unbekannt',notiz:$('eMNotiz').value.trim()||undefined,
+        pts:[[+m.a.x.toFixed(3),+m.a.y.toFixed(3),+m.a.z.toFixed(3)],[+m.p.x.toFixed(3),+m.p.y.toFixed(3),+m.p.z.toFixed(3)]]});
+      lastMeasObj=null;massOpen=true;massKat='';massQ='';H.toast('Maß gespeichert');render();};}
+  $('eMDet').ontoggle=e=>{massOpen=e.target.open;};$('eMFil').onchange=e=>{massKat=e.target.value;renderMassList();};$('eMQ').oninput=e=>{massQ=e.target.value;renderMassList();};
+  $('eMExp').onclick=()=>{const data=JSON.stringify({app:'haus3d-masse',v:1,stand:new Date().toISOString().slice(0,10),eintraege:Object.keys(massUser).map(id=>Object.assign({id},massUser[id]))},null,1);
+    try{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([data],{type:'application/json'}));a.download='masse-nachgemessen.json';document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},500);}catch(e){}
+    $('eMOut').innerHTML='<div class="muted">Enthält nur deine eigenen Nachmessungen ('+Object.keys(massUser).length+'). Falls kein Download kam: Text kopieren.</div><textarea readonly>'+esc(data)+'</textarea>';};
+  $('eMImpB').onclick=()=>{$('eMOut').innerHTML='<div class="muted">Datei wählen oder Text einfügen:</div><textarea id="eMTxt"></textarea><div class="row"><button id="eMFile">Datei wählen …</button><button id="eMTake">Text übernehmen</button></div>';
+    $('eMFile').onclick=()=>$('eMImp').click();$('eMTake').onclick=()=>massImport($('eMTxt').value);};
+  $('eMImp').onchange=e=>{const f=e.target.files&&e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>massImport(String(r.result));r.readAsText(f);};
+  renderMassList();}
+function massImport(t){try{const d=JSON.parse(t);const list=Array.isArray(d)?d:(d&&d.eintraege);if(!Array.isArray(list))throw 0;let n=0;
+    list.forEach(e=>{if(!e||!e.id)return;const {id,...rest}=e;massUser[id]=Object.assign({},massUser[id]||{},rest);n++;});massSave();H.toast(n+' Maße importiert');massOpen=true;renderMeasure();}catch(e){H.toast('Datei nicht erkannt');}}
+function renderMassList(){const list=$('eMList');if(!list)return;const q=massQ.trim().toLowerCase();
+  const rows=massAll().filter(e=>(!massKat||e.kat===massKat)&&(!q||((e.name||'')+' '+(e.raum||'')+' '+(e.notiz||'')+' '+e.id).toLowerCase().includes(q))).sort((a,b)=>(a.kat||'').localeCompare(b.kat||'')||(a.name||'').localeCompare(b.name||''));
+  list.innerHTML=rows.length?rows.map(e=>{const qk=QUELLE[e.quelle]?e.quelle:'unbekannt',ed=massEdit===e.id;
+    return '<div class="krow"><div class="kinfo"><b>'+esc(e.name||e.id)+'</b> <span class="badge '+qk+'">'+QUELLE[qk]+'</span><div class="muted">'+esc(MKAT[e.kat]||e.kat||'')+(e.raum?' · '+esc(e.raum):'')+' · Modell '+mFmt(e.modell,e)+(e.wert!=null?' · gemessen '+mFmt(e.wert,e)+esc(massDelta(e)):'')+(e.datum?' · '+esc(e.datum):'')+(e.notiz?' · '+esc(e.notiz):'')+'</div></div>'+
+      '<div class="row">'+(ed?'<input type="number" step="1" min="0" id="eMEdV" aria-label="Gemessener Wert" value="'+(e.wert!=null?(mUnit(e)==='m'?cm(e.wert):e.wert):e.modell!=null?(mUnit(e)==='m'?cm(e.modell):e.modell):'')+'"><span class="muted">'+(mUnit(e)==='m'?'cm':esc(mUnit(e)))+'</span><button data-mok="'+esc(e.id)+'">OK</button><button data-mcancel="1">Abbrechen</button>'
+        :'<button data-mmess="'+esc(e.id)+'">Nachmessen</button>'+(e.modell!=null&&e.quelle!=='gemessen'?'<button data-mok2="'+esc(e.id)+'" title="Der Modellwert stimmt mit der Wirklichkeit überein">Stimmt so</button>':'')+(e.pts?'<button data-mshow="'+esc(e.id)+'">Zeigen</button>':'')+(e.eigen?'<button data-mdel="'+esc(e.id)+'" aria-label="Eigenen Eintrag löschen" title="Eigenen Eintrag löschen">✕</button>':''))+'</div></div>';}).join('')
+    :'<div class="muted">Keine Einträge.</div>';
+  const byId=new Map(rows.map(e=>[e.id,e]));const keep=e=>({name:e.name,kat:e.kat,raum:e.raum,modell:e.modell,einheit:e.einheit});
+  list.querySelectorAll('[data-mmess]').forEach(b=>b.onclick=()=>{massEdit=b.dataset.mmess;renderMassList();const i=$('eMEdV');if(i){i.focus();i.select();}});
+  list.querySelectorAll('[data-mcancel]').forEach(b=>b.onclick=()=>{massEdit=null;renderMassList();});
+  list.querySelectorAll('[data-mok]').forEach(b=>b.onclick=()=>{const v=+$('eMEdV').value;if(!(v>0))return;const e=byId.get(b.dataset.mok);massPut(e.id,Object.assign(keep(e),{wert:mUnit(e)==='m'?+(v/100).toFixed(3):v,quelle:'gemessen'}));massEdit=null;renderMeasure();});
+  list.querySelectorAll('[data-mok2]').forEach(b=>b.onclick=()=>{const e=byId.get(b.dataset.mok2);massPut(e.id,Object.assign(keep(e),{wert:e.modell,quelle:'gemessen'}));renderMeasure();});
+  list.querySelectorAll('[data-mshow]').forEach(b=>b.onclick=()=>massShow(byId.get(b.dataset.mshow)));
+  list.querySelectorAll('[data-mdel]').forEach(b=>b.onclick=()=>{delete massUser[b.dataset.mdel];massSave();renderMeasure();});}
+
+// =====================================================================
 // Tippen im Einrichtungsmodus (Streichen, Maßband, Abwählen)
 // =====================================================================
 let down=null;
@@ -400,8 +470,7 @@ function render(){const tabs=panel.querySelectorAll('[data-tool]');tabs.forEach(
     h+='<div id="eSel"></div>';body.innerHTML=h;
     body.querySelectorAll('[data-cat]').forEach(b=>b.onclick=()=>{const k=b.dataset.cat,c=CAT[k],p=placePoint();addItem({t:k,w:c[1],d:c[2],h:c[3],c:c[4],x:+p.x.toFixed(3),y:+p.y.toFixed(3),z:+p.z.toFixed(3),ry:0},true);H.toast(c[0]+' hinzugefügt');});
     renderSelInfo();}
-  else if(tool==='measure'){body.innerHTML='<div class="row"><span class="muted">Zwei Punkte antippen (Boden, Wand, Möbel).</span><b id="eLast">'+esc(lastMeas)+'</b><button id="eMClr" style="margin-left:auto"'+(measN||measA?'':' disabled')+'>Messungen löschen</button></div>';
-    $('eMClr').onclick=()=>{clearMeas();render();};}
+  else if(tool==='measure')renderMeasure();
   else if(tool==='vars'){const V=vars(),names=Object.keys(V).sort((a,b)=>(V[b].t||0)-(V[a].t||0));
     body.innerHTML='<div class="row"><input type="text" id="eVName" placeholder="Name der Variante" maxlength="40"><button id="eVSave">Speichern</button></div>'+
       '<div class="vlist">'+(names.length?names.map(n=>'<div class="row"><span>'+esc(n)+' <span class="muted">'+(V[n].t?new Date(V[n].t).toLocaleDateString('de-DE'):'')+'</span></span><span class="row"><button data-load="'+esc(n)+'">Laden</button><button data-del="'+esc(n)+'" aria-label="'+esc(n)+' löschen">Löschen</button></span></div>').join(''):'<span class="muted">Noch keine Varianten gespeichert.</span>')+'</div>'+
@@ -441,5 +510,5 @@ editBtn.addEventListener('click',()=>setEdit(!H.editMode));$('editClose').addEve
 
 // ---------- Start: gespeicherten Stand anwenden ----------
 try{let cur=LS.get(K_CUR,null);if(!cur){const old=LS.get(K_OLDWALL,null);cur={v:1,walls:old&&typeof old==='object'?old:{},pieces:{},items:[]};}applyState(cur);}catch(e){console.warn('Einrichtung konnte nicht geladen werden',e);}
-window.__einrichten={state:()=>state,pieces:()=>buildPieces(),doors:()=>buildDoors(),selectDoor,applyDoor,gate:gateCfg,applyGate,setEdit,applyState,PW};
+window.__einrichten={state:()=>state,pieces:()=>buildPieces(),doors:()=>buildDoors(),selectDoor,applyDoor,gate:gateCfg,applyGate,masse:()=>massAll(),massPut,setEdit,applyState,PW};
 })();
