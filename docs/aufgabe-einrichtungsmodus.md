@@ -1,7 +1,7 @@
 # Übergabe an den Agenten: Einrichtungsmodus
 
-> **Stand v83 (09.11.2026): alle fünf Punkte in einer ersten Fassung umgesetzt** – Details unten unter
-> „Umsetzung v83“. Nächster Schritt: Rückmeldung von Robert einholen und nachbessern.
+> **Stand v84 (11.11.2026): Katalog mit Quellen, Türen-Design, Flügeltor vor der Garage** – siehe
+> „Umsetzung v84“. Performance: `docs/plan-performance.md`. v83 (09.11.2026): die fünf Grundfunktionen.
 
 Stand: 09.11.2026. Bitte zuerst `CLAUDE.md` und `docs/uebergabe.md` lesen.
 
@@ -110,3 +110,33 @@ Bekannte Grenzen: Eine Wandfläche ist eine Quaderseite – lange Wände über z
 ganz. Die Möbel-Erkennung ist heuristisch (z. B. Kapok-Lounge = mehrere Teile, eng stehende Möbel
 können zusammenhängen). Gespeicherte Möbel-IDs hängen an der Ursprungsposition: Wird ein Möbel im
 Code verschoben, verliert die Variante dessen Verschiebung.
+
+## Umsetzung v84 (11.11.2026)
+
+- **Katalog** (Reiter „Katalog“): Artikel kommen aus `src/katalog.js` (`window.KATALOG`). Dort ist eine
+  Liste von **Quellen** `{id, name, laden:()=>Promise<Artikel[]>}`; heute nur der Fantasiekatalog mit
+  erfundenen Marken (Nordlicht, Casa Lumen, Werkbank Nr. 7, Stapelbar, Traumwerk …) und Preisen.
+  Eine Online-Quelle wird später als weitere Quelle eingetragen (Beispiel im Dateikopf); die Artikel müssen
+  nur auf das Feld `form` (Bauform aus `CAT` in `einrichten.js`) und B/T/H in cm abgebildet werden.
+  Suche, Kategorie-Filter, Farbwahl je Artikel, „Einfügen“ setzt das Möbel wie unter „Neu“ in die
+  Bildmitte (Name, Marke, Preis bleiben am Möbel und in Varianten gespeichert: `p`, `n`, `mk`, `pr`).
+  Neue Bauformen: Ecksofa, Hocker, Bank, runder Tisch, Couchtisch, Stehlampe (auch unter „Neu“).
+- **Türen** (Reiter „Türen“): Türen werden beim ersten Öffnen erkannt – jede `swing`-Drehgruppe (seit v84
+  merkt sich `swing()` den Pivot: `a.pv`, `a.axis`) und jede `makeDoor`-Tür, deren größtes Teil ein hohes,
+  dünnes Blatt ist (≥ 1,70 m hoch, ≤ 12 cm dick, 55–130 cm breit). 22 Türen werden gefunden, Schranktüren
+  (< 1,85 m, < 62 cm) heißen „Schranktür“. Tür antippen → Design: Original, Weiß glatt, Kassetten, Anthrazit,
+  Eiche hell, Nussbaum, Milchglas; Farbe bei den lackierten Varianten; „Auf / Zu“; „Auf alle Türen anwenden“.
+  Umsetzung: Material des Blatts tauschen (Material-Arrays bleiben Arrays), Kassetten = ein zusätzliches
+  Mesh je Tür im Pivot. ID = Pivot-Weltposition in cm (`d514_0_472`), Speicher `state.doors`.
+- **Flügeltor vor der Garage**: Kasten unter „Türen“. Zweiflügeliges Tor in der Garagenöffnung (zwischen
+  weißem Rahmen und Sektionaltor, z = NF+0,14), öffnet zum Hof, klickbar wie andere Türen. Material: Lärche
+  oder Eiche dunkel (Bretter als Textur), Stahl anthrazit/moosgrün/weinrot, Aluminium weiß, Edelstahl,
+  eigene Farbe. Optionen: Fenster oben (3 je Flügel), Sektionaltor ausblenden. Liegt in `gRoof`, also nur in
+  Hof-/Fassaden-/Keller-Ansichten sichtbar („Zum Hof schauen“). Geometrie wird nur einmal gebaut, danach
+  nur Materialien getauscht bzw. Gruppe versteckt (Klick-Registrierung in `acts` bleibt gültig).
+  Speicher `state.tor`.
+- `window.HAUS` zusätzlich: `anims, doors, toggleDoor, B, canvasTex, clickable, swing, tog, gRoof, NF, gx0,
+  gx1, garPans, white, isFacade()`.
+- Test: Headless-Chrome-Lauf über die gebaute Datei (alle Reiter, Türstile, Tor-Materialien, Katalog-Einfügen,
+  Varianten-Rundlauf) ohne Konsolenfehler; 883 Draw-Calls, 141 k Dreiecke im Überblick (Messbasis für den
+  Performance-Plan).

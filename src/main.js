@@ -754,7 +754,7 @@ doors.forEach(d=>d.g.traverse(o=>{if(o.isMesh){o.castShadow=true;o.receiveShadow
 const acts=[],anims=[];
 function clickable(meshes,fn){meshes.forEach(m=>{m.userData.act=fn;acts.push(m);});}
 function anim(get,set,open){const a={get,set,open,target:0};anims.push(a);return a;}
-const swing=(pv,axis,open)=>anim(()=>pv.rotation[axis],v=>pv.rotation[axis]=v,open);
+const swing=(pv,axis,open)=>{const a=anim(()=>pv.rotation[axis],v=>pv.rotation[axis]=v,open);a.pv=pv;a.axis=axis;return a;};
 const slide=(o,open)=>anim(()=>o.position.z,v=>o.position.z=v,open);
 const tog=a=>()=>{a.target=a.target?0:a.open;};
 const fIn=M('#F4F6F7',0.4),fShelf=new THREE.MeshStandardMaterial({color:col('#DDEFF5'),transparent:true,opacity:0.55,roughness:0.1}),binM=new THREE.MeshStandardMaterial({color:col('#D9E3E8'),transparent:true,opacity:0.6,roughness:0.2});
@@ -2015,7 +2015,7 @@ const rollT=canvasTex(64,128,(x,w,h)=>{x.fillStyle='#F2F2F0';x.fillRect(0,0,w,h)
  const sOpen=Hv+Math.PI*R/2+0.02,place=sv=>{pans.forEach((m,k)=>{const u=k*ph+ph/2+sv;let y,z,th;
    if(u<=Hv){y=CF+u;z=z0;th=0;}else if(u<=Hv+Math.PI*R/2){th=(u-Hv)/R;y=CF+Hv+R*Math.sin(th);z=z0+R*(1-Math.cos(th));}else{th=Math.PI/2;y=CF+Hv+R;z=z0+R+(u-Hv-Math.PI*R/2);}
    m.position.set(gx0+0.03+W/2,y,z);m.rotation.x=th;});};
- const gst={s:0};place(0);const ga=anim(()=>gst.s,v=>{gst.s=v;place(v);},sOpen);clickable(pans,tog(ga));window.__garage=ga;
+ const gst={s:0};place(0);const ga=anim(()=>gst.s,v=>{gst.s=v;place(v);},sOpen);clickable(pans,tog(ga));window.__garage=ga;window.__garPans=pans;
  const __gn0=gRoof.children.length;
  // Inhalt (aufgeräumt): Gartengeräte links, Netzrolle, Lochmatte + Einhell-Karton hinten, Etagere/Eimer/Holzklotz/Bälle rechts, Stäbe + Trimmer am Pfeiler
  const blk=M('#1E1E20',0.6),wd=M('#C89A5A',0.7);
@@ -2516,7 +2516,10 @@ scene.traverse(o=>{if(o.isMesh&&o.geometry&&o.geometry.type==='PlaneGeometry'&&M
     rooms:()=>window.__ROOMS||[],toast:t=>window.__toast&&window.__toast(t),dirty:()=>{__shF=0;},
     addFurn:a=>{furnList.push(...a);const hid=furnBtn.getAttribute('aria-pressed')==='true';a.forEach(m=>m.visible=!hid);},
     addDeco:a=>{decoMeshes.push(...a);const hid=decoBtn.getAttribute('aria-pressed')==='true';a.forEach(m=>m.visible=!hid);},
-    removeFurn:a=>{const S=new Set(a);furnList=furnList.filter(m=>!S.has(m));}};
+    removeFurn:a=>{const S=new Set(a);furnList=furnList.filter(m=>!S.has(m));},
+    // Türen (Drehflügel, Einrichtungsmodus "Türen") und Garagentor
+    anims,doors,toggleDoor,B,canvasTex,clickable,swing,tog,gRoof,NF,gx0,gx1,garPans:window.__garPans||[],white,
+    isFacade:()=>facadeMode||kgMode};
 })();
 requestAnimationFrame(loop);
 })();
