@@ -25,7 +25,7 @@
 - Hilfsfunktionen (`basis.js`, `eg.js`, `eg-bedienung.js`): `B(x0,x1,y0,y1,z0,z1,mat,parent)` (Quader), `cyl`, `blob`,
   `M(hex,rough,extra)` (Material, gecacht; `Mu` ungecacht), `canvasTex`, `win`, `sash`, `openWin`,
   `swing`, `tog`, `anim`, `clickable`, `deco`, `label`.
-- Sichtbarkeitsgruppen: `gCel` (Keller), `gRoof` (Außen/Fassade), `gOG`, `gDG`; Steuerung in `loop()` (`start.js`).
+- Sichtbarkeitsgruppen: `gCel` (Keller-Einrichtung), `gCelF` (Keller-Rohbau, auch in Außenansichten sichtbar), `gRoof` (Außen/Fassade), `gOG`, `gDG`; Steuerung in `loop()` (`start.js`).
 - Ansichten (`ansichten.js`): `VIEWS{key:{p,t,fl,facade}}` + `<option>` in `index.html`; Etagen `setLevel(-1..2)`.
   Doppelklick-Räume in `ROOMS`, Treppen in `FLIGHTS` (`navigation.js`).
 - Performance: statische Teile werden in `start.js` zu wenigen Meshes zusammengefasst.

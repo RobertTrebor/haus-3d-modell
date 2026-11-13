@@ -283,8 +283,9 @@ const CRX0=7.05,CRX1=8.41,CRZ0=7.0,CRZ1=7.96,CRH=CF+1.45;
 const conc=canvasTex(512,256,(x,w,h)=>{x.fillStyle='#A8A49A';x.fillRect(0,0,w,h);for(let i=0;i<900;i++){const v=120+rnd()*90;x.fillStyle=`rgba(${v},${v-4},${v-12},0.35)`;x.fillRect(rnd()*w,rnd()*h,2+rnd()*8,1+rnd()*3);}for(let y=0;y<h;y+=32){x.fillStyle='rgba(60,55,50,0.35)';x.fillRect(0,y+rnd()*3,w,2);}},[1,1]);
 const concM=(r1,r2)=>{const t=conc.clone();t.needsUpdate=true;t.wrapS=t.wrapT=THREE.RepeatWrapping;t.repeat.set(r1,r2);return new THREE.MeshStandardMaterial({map:t,roughness:0.95});};
 const cwM=concM(2,1.2),cfM=M('#8E887E',0.95),brickM=new THREE.MeshStandardMaterial({map:canvasTex(128,128,(x,w,h)=>{x.fillStyle='#C8C0B0';x.fillRect(0,0,w,h);for(let r=0;r<8;r++)for(let c=-1;c<3;c++){x.fillStyle=`rgb(${190+rnd()*40},${130+rnd()*40},${80+rnd()*30})`;x.fillRect(c*56+(r%2)*28+2,r*16+2,52,12);}},[1,1]),roughness:0.9});
-B(CRX0,CRX1,CF-0.2,CF,CRZ0,CRZ1,cfM,gCel);B(CRX1,8.86,CF,0,CRZ0-0.3,CRZ1+0.4,cwM,gCel);B(CRX0,CRX1,CRH,0,CRZ0,CRZ1,concM(4,1),gCel);
-B(CRX0+0.7,CRX0+1.0,CRH-0.18,CRH,CRZ0,CRZ1,cwM,gCel);B(CRX1-0.5,CRX1,CF,CRH,CRZ1-0.4,CRZ1,brickM,gCel);
+// Rohbau des Kriechkellers als Bauteil kennzeichnen (struct), damit er nicht als Möbel gilt und in Außenansichten stehen bleibt
+[B(CRX0,CRX1,CF-0.2,CF,CRZ0,CRZ1,cfM,gCel),B(CRX1,8.86,CF,0,CRZ0-0.3,CRZ1+0.4,cwM,gCel),B(CRX0,CRX1,CRH,0,CRZ0,CRZ1,concM(4,1),gCel),
+ B(CRX0+0.7,CRX0+1.0,CRH-0.18,CRH,CRZ0,CRZ1,cwM,gCel),B(CRX1-0.5,CRX1,CF,CRH,CRZ1-0.4,CRZ1,brickM,gCel)].forEach(m=>{m.userData.struct=1;});
 const pipe=(x0,z0,x1,z1,y,r,m)=>{const L=Math.hypot(x1-x0,z1-z0);const p=new THREE.Mesh(new THREE.CylinderGeometry(r,r,L,12),m);p.position.set((x0+x1)/2,y,(z0+z1)/2);p.rotation.z=Math.PI/2;p.rotation.y=-Math.atan2(z1-z0,x1-x0);gCel.add(p);return p;};
 pipe(CRX0,CRZ0+0.2,CRX1,CRZ0+0.2,CRH-0.12,0.07,M('#D8CFB8',0.8));pipe(CRX0,CRZ0+0.4,CRX1,CRZ0+0.4,CRH-0.06,0.025,M('#8A9096',0.4,{metalness:0.3}));pipe(CRX0,CRZ0+0.5,CRX1,CRZ0+0.5,CRH-0.08,0.015,white);
 // Hausanschluss Wasser an der Ostwand

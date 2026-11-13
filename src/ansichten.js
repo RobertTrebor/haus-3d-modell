@@ -77,7 +77,7 @@ camera.position.set(...VIEWS[START].p);controls.target.set(...VIEWS[START].t);fa
 
 const viewSel=document.getElementById('viewSel');viewSel.value=START;
 viewSel.addEventListener('change',()=>goTo(viewSel.value));
-const floorSel=document.getElementById('floorSel');floorSel.addEventListener('change',()=>{if(floorSel.value==='kg'){goTo('kg');return;}setLevel({eg:0,og:1,dg:2}[floorSel.value]);});
+const floorSel=document.getElementById('floorSel');floorSel.addEventListener('change',()=>{if(floorSel.value==='kg'){goTo('kg');return;}facadeMode=false;setLevel({eg:0,og:1,dg:2}[floorSel.value]);});
 controls.addEventListener('start',()=>{tween=null;});
 // ===== Ansichts-Menü (Bottom-Sheet) =====
 (function(){
