@@ -76,8 +76,12 @@ Arbeitsweise:
   einer reinen Umsortierung gleich bleiben; Stand v103: `Bauteile=2232 Modell=2137936823 Raeume=-1893535870 Ansichten=-1918846762 Moebel=554 Tueren=22`.
 - Git: Auf Roberts Rechner ist keine Git-Identität eingerichtet. Die Commits vom 13.11. wurden einzeln mit
   `git -c user.name="Robert Lengsfeld" -c user.email="RobertTrebor@users.noreply.github.com" commit …` erstellt.
-  Gearbeitet wird auf dem Branch `einrichtungsmodus-weiterarbeit` (nicht `main`).
-- Artifact: zeigt v92; veröffentlicht aus VS Code mit den Fähigkeiten `db` und `user`.
+  Seit dem 13.11.2026 (v103) ist `main` der aktuelle Stand und der Arbeitsbranch; `einrichtungsmodus-weiterarbeit`
+  wurde nach `main` übernommen und wird nicht mehr gebraucht.
+- Nicht im Claude-Chat direkt am Artifact ändern lassen: Das Artifact wird aus dem Repository gebaut, solche
+  Änderungen gingen beim nächsten Build verloren. Unterwegs: Claude Code mit Anbindung an dieses Repository, oder
+  Fotos und Wünsche sammeln und am PC umsetzen.
+- Artifact: zeigt den jeweils letzten Build; veröffentlicht aus VS Code mit den Fähigkeiten `db` und `user`.
 
 ## Historie
 - v30–v82: Einzeldateien in `C:\Users\rober\Documents\Grundriss-Versionen`.
