@@ -4,6 +4,38 @@ Stand: 11.11.2026 (v84). Gilt für die Modellskripte (Szene in `basis.js`, Schle
 Ziel: flüssiges Drehen/Zoomen auf dem Android-Handy, sofortige Reaktion auf Tipp und Ziehen,
 weniger Akkuverbrauch – ohne dass das Modell sichtbar schlechter aussieht.
 
+## 0. Aktualisierung 13.11.2026 (v99): Messung und Vorschlag für schwache PCs
+
+Robert arbeitet an mehreren PCs; auf manchen läuft die Darstellung sehr schleppend. Von den Schritten unten ist
+noch keiner umgesetzt. Messung im Headless-Chrome (Software-Rendering, 1280×720 – die Millisekunden sind nur
+untereinander vergleichbar, nicht mit echter Hardware):
+
+| Ansicht | Zeichenaufrufe | Dreiecke | sichtbare Punktlichter | Bild |
+|---|---|---|---|---|
+| Haus von der Straße (Startansicht) | 1832 | 303k | 2 | 36 ms |
+| … ohne Deko | 1754 | 227k | | 17 ms |
+| … ohne Deko und Möbel | 862 | 124k | | 8 ms |
+| Überblick (EG) | 883 | 141k | 10 | 19 ms |
+| OG Überblick | 1164 | 173k | 17 | 15 ms |
+| Wohnzimmer | 233 | 62k | 20 | 6 ms |
+| Küche | 282 | 18k | 20 | 4 ms |
+
+Gesamt: 2204 Meshes, davon nur 489 zusammengefasst; 31 Punktlichter. Befunde:
+- Die Außenansichten sind am teuersten, und die Startansicht ist seit v93 eine Außenansicht. Mehr als die Hälfte
+  ihrer Zeichenaufrufe und Dreiecke entfällt auf Möbel und Deko im Hausinneren, die man von außen kaum sieht.
+- In Innenräumen sind bis zu 20 Punktlichter gleichzeitig sichtbar; jedes kostet Rechenzeit in jedem Bildpunkt.
+- Die Schleife rendert dauerhaft, auch im Stillstand; die Schatten werden alle 20 Bilder neu berechnet.
+
+Vorgeschlagene Reihenfolge (nach erwartetem Gewinn auf schwacher Hardware):
+1. **Inneneinrichtung in Außenansichten ausblenden** (Möbel und Deko aus, solange man außen ist; nahe am Fenster
+   wieder ein). Erwartung: Außenansichten etwa halbe Zeichenlast.
+2. **Rendern nur bei Bedarf** (Schritt 1 unten) und Schatten nur bei Änderung (Schritt 3).
+3. **Lichter begrenzen** (Schritt 2 unten): höchstens 4–6 Punktlichter gleichzeitig.
+4. **Leistungsstufe** „Auto / Hoch / Niedrig“ in der Leiste: Niedrig = Auflösung bis 0,75, keine Schatten, weniger
+   Lichter, Deko aus. Auto wählt nach gemessener Bildzeit (die Auflösungsanpassung gibt es schon).
+5. **Mehr zusammenfassen**: Möbel und klickbare Teile je Raum bündeln (Schritt 4 unten).
+6. **Messanzeige** mit `?debug` (Schritt 0 unten), damit sich die Wirkung auf Roberts PCs mit Zahlen belegen lässt.
+
 ## 1. Befund (aus dem Code; Messwerte folgen in Schritt 0)
 
 | Punkt | Wo | Wirkung |
