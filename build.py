@@ -10,8 +10,10 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
 SRC, DIST = ROOT / "src", ROOT / "dist"
-SCRIPTS = ["config/masse.js", "config/raeume.js", "config/bestand.js", "main.js", "masse/masse.js", "masse/innenwaende.js", "masse/aussenwaende.js", "masse/tueren.js",
-           "masse/moebel.js", "katalog.js", "einrichten.js"]
+SCRIPTS = ["config/masse.js", "config/raeume.js", "config/bestand.js", "main.js", "ansichten.js",
+           "navigation.js", "start.js", "masse/masse.js", "masse/innenwaende.js",
+           "masse/aussenwaende.js", "masse/tueren.js", "masse/moebel.js", "katalog.js",
+           "einrichten.js"]
 MIME = {".jpg": "image/jpeg", ".jpeg": "image/jpeg", ".png": "image/png", ".webp": "image/webp"}
 
 
