@@ -13,9 +13,38 @@ function resize(){const w=stage.clientWidth,h=stage.clientHeight;renderer.setSiz
 new ResizeObserver(resize).observe(stage);resize();
 
 // Bedienung (Klick, Taste, Rad, Tippen) hält das Zeichnen kurz am Laufen; Klicks und Umschalter erneuern auch die Schatten
-['pointerdown','pointerup','click','change','input','keydown','wheel','touchend'].forEach(n=>window.addEventListener(n,()=>{__dirtyUntil=performance.now()+600;if(n==='click'||n==='change')__shF=0;},{capture:true,passive:true}));
+['pointerdown','pointerup','click','change','input','keydown','wheel','touchend'].forEach(n=>window.addEventListener(n,()=>{__dirtyUntil=performance.now()+600;if(n==='click'||n==='change'){__shF=0;__lightKey='';}},{capture:true,passive:true}));
 const __lastP=new THREE.Vector3(1e9,0,0),__lastQ=new THREE.Quaternion();let __animPrev=0,__idle=false,__visSig=0;
 const visGroups=facadeGroups.concat([gCel,gCelF,gRoof,gOG,gDG,gDGshell]);
+// ---- Leistungsstufe: Auto / Hoch / Niedrig ----
+// Hoch: volle Auflösung, Schatten, alle Lichter. Auto: wie Hoch, aber die Auflösung passt sich an und bei dauerhaft
+// langsamen Bildern (über 45 ms) wird auf Niedrig gewechselt. Niedrig: Auflösung bis 0,75, keine Schatten, höchstens
+// vier Punktlichter (die nächsten eingeschalteten). Die Stufe steuert auch, ab welchem Abstand in Außenansichten die
+// Inneneinrichtung gezeichnet wird (LEIST.innen in basis.js).
+let __lightKey='',__lightT=0,__slow=0;const __lightP=new THREE.Vector3(1e9,0,0),leistBtn=document.getElementById('leistung');
+function setPr(v){if(v!==__pr){__pr=v;renderer.setPixelRatio(__pr);resize();}}
+function applyLeistung(){LEIST.eff=LEIST.mode==='auto'?(LEIST.autoLow?'niedrig':'mittel'):LEIST.mode;const e=LEIST.eff;
+  sun.castShadow=LEIST.schatten[e];if(e==='hoch')setPr(__prMax);else if(e==='niedrig')setPr(Math.min(__pr,1));
+  if(leistBtn)leistBtn.textContent='Leistung: '+({auto:LEIST.autoLow?'Auto (niedrig)':'Auto',hoch:'Hoch',niedrig:'Niedrig'}[LEIST.mode]);
+  __lightKey='';__shF=0;__dirty=1;}
+function leistungMessung(avg){const e=LEIST.eff;
+  if(e!=='hoch'){const lo=LEIST.prMin[e],hi=e==='niedrig'?Math.min(1,__prMax):__prMax;if(avg>30&&__pr>lo)setPr(Math.max(lo,__pr-0.25));else if(avg<17&&__pr<hi)setPr(Math.min(hi,__pr+0.25));}
+  if(LEIST.mode==='auto'&&!LEIST.autoLow){__slow=avg>45&&__pr<=1?__slow+1:0;
+    if(__slow>=2){LEIST.autoLow=true;applyLeistung();if(window.__toast)window.__toast('Leistung automatisch auf „Niedrig“ gestellt');}}}
+// Punktlichter: in Außen- und Kelleransicht nur die äußeren (wie bisher); auf Stufe Niedrig zusätzlich höchstens vier –
+// eingeschaltete zuerst, dann die nächsten. Neu gewählt wird nur bei Wechsel der Ansicht/Stufe, nach Klicks und wenn die
+// Kamera über 1,5 m gewandert ist (höchstens alle 0,8 s), damit die Shader nicht ständig neu übersetzt werden.
+function updateLights(now){
+  if(!window.__pls){window.__pls=[];scene.traverse(o=>{if(o.isPointLight){let q=o,out=false;while(q){if(q===gRoof||q===gVS)out=true;q=q.parent;}window.__pls.push([o,out]);}});}
+  const fm=facadeMode||kgMode,max=LEIST.lichter[LEIST.eff],key=(fm?1:0)+'|'+(kgMode?1:0)+'|'+max;
+  if(key===__lightKey&&!(max<99&&now-__lightT>800&&camera.position.distanceToSquared(__lightP)>2.25))return;
+  __lightKey=key;__lightT=now;__lightP.copy(camera.position);const cand=[],p=new THREE.Vector3();
+  window.__pls.forEach(([l,out])=>{const on=!fm||out||kgMode;if(max>=99)l.visible=on;else{l.visible=false;if(on)cand.push([l,(l.intensity>0?0:1e6)+l.getWorldPosition(p).distanceToSquared(camera.position)]);}});
+  cand.sort((a,b)=>a[1]-b[1]).slice(0,max).forEach(([l])=>{l.visible=true;});__shF=0;}
+if(leistBtn){try{const m=localStorage.getItem('haus3d-leistung');if(m==='hoch'||m==='niedrig')LEIST.mode=m;}catch(e){}
+  leistBtn.addEventListener('click',()=>{LEIST.mode={auto:'hoch',hoch:'niedrig',niedrig:'auto'}[LEIST.mode];LEIST.autoLow=false;__slow=0;try{localStorage.setItem('haus3d-leistung',LEIST.mode);}catch(e){}applyLeistung();});}
+applyLeistung();
+window.__dbgExtra=()=>'Stufe '+LEIST.mode+(LEIST.mode!==LEIST.eff?' → '+LEIST.eff:'')+(typeof innerHidden!=='undefined'?' · Einrichtung '+(innerHidden?'ausgeblendet':'sichtbar'):'');
 function loop(now){
   requestAnimationFrame(loop);
   doorTick();
@@ -42,8 +71,7 @@ function loop(now){
   dgLabs.forEach(l=>l.visible=gDG.visible);if(gDG.visible)[jLab,wLab,lLab,gLab,aLab,obLab].forEach(l=>l.visible=false);
   if(kgMode){gCel.visible=true;gRoof.visible=true;(window.__garConf||[]).forEach(m=>m.visible=false);}
   gCelF.visible=gCel.visible||facadeMode; // Keller-Außenwand zur Straße: in Außenansichten immer sichtbar
-  if(!window.__pls){window.__pls=[];scene.traverse(o=>{if(o.isPointLight){let q=o,out=false;while(q){if(q===gRoof||q===gVS)out=true;q=q.parent;}window.__pls.push([o,out]);}});}
-  {const fm=facadeMode||kgMode,key=fm?1:0;if(window.__plk!==key){window.__plk=key;window.__pls.forEach(([l,out])=>{l.visible=!fm||out||kgMode;});__shF=0;}}
+  updateLights(now);
   // Sichtbarkeit der Gruppen geändert (Wände ein-/ausgeblendet)? Dann Schatten neu berechnen.
   {let sig=0;for(let i=0;i<visGroups.length;i++)if(visGroups[i].visible)sig=(Math.imul(sig,31)+i+1)|0;if(sig!==__visSig){__visSig=sig;__shF=0;}}
   // Nur zeichnen, wenn sich etwas geändert hat: Kamera, bewegliche Teile, Bedienung oder noch ausstehende Schatten.
@@ -53,7 +81,7 @@ function loop(now){
   if(__shF<3)renderer.shadowMap.needsUpdate=true;__shF++;
   renderer.render(scene,camera);__frames++;
   // Auflösung an die Geräteleistung anpassen (flüssig drehen hat Vorrang); gemessen wird nur zwischen direkt aufeinanderfolgenden Bildern
-  {const tn=performance.now(),dt=tn-__fl;__fl=tn;if(!__idle&&dt<250){__ft+=dt;if(++__fn>=45){const avg=__ft/__fn;__ft=0;__fn=0;__avg=avg;let np=__pr;if(avg>30&&__pr>1)np=Math.max(1,__pr-0.25);else if(avg<17&&__pr<__prMax)np=Math.min(__prMax,__pr+0.25);if(np!==__pr){__pr=np;renderer.setPixelRatio(__pr);resize();}}}__idle=false;}
+  {const tn=performance.now(),dt=tn-__fl;__fl=tn;if(!__idle&&dt<250){__ft+=dt;if(++__fn>=45){const avg=__ft/__fn;__ft=0;__fn=0;__avg=avg;leistungMessung(avg);}}__idle=false;}
 }
 scene.traverse(o=>{if(o.isMesh&&o.geometry&&o.geometry.type==='PlaneGeometry'&&Math.abs(o.rotation.x+Math.PI/2)<1e-3){if(!Array.isArray(o.material)&&!o.material.polygonOffset)o.material=o.material.clone();(Array.isArray(o.material)?o.material:[o.material]).forEach(m=>{m.polygonOffset=true;m.polygonOffsetFactor=-1;m.polygonOffsetUnits=-4;});}});
 // ---- Performance: unbewegliche Teile je Gruppe, Material und Rolle (Deko/Möbel/Wand) zu wenigen Objekten zusammenfassen ----

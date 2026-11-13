@@ -12,7 +12,11 @@ renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.shadowMap.autoUpdate=fal
 // Zeichnen nur bei Bedarf (start.js): __dirty = nächstes Bild zeichnen, __dirtyUntil = bis zu diesem Zeitpunkt durchzeichnen
 // (nach Bedienung), __anim = in diesem Bild hat sich ein bewegliches Teil bewegt (Türen, Rollläden, Flügel, Geräte)
 let __dirty=1,__dirtyUntil=performance.now()+5000,__anim=0;
-let __frames=0,__avg=0; // Messanzeige (start.js): gezeichnete Bilder, mittlerer Bildabstand in ms
+let __frames=0,__avg=0;
+// Leistungsstufe (Schalter „Leistung“ in der Leiste, start.js): mode = Wahl (auto/hoch/niedrig), eff = wirksame Stufe.
+// innen = Abstand zum Haus in m, bis zu dem in Außenansichten die Inneneinrichtung gezeichnet wird; lichter = Punktlichter
+// gleichzeitig; prMin = kleinstes Pixelverhältnis, auf das die automatische Auflösungsanpassung heruntergehen darf.
+const LEIST={mode:'auto',eff:'mittel',autoLow:false,innen:{hoch:30,mittel:8,niedrig:4},schatten:{hoch:true,mittel:true,niedrig:false},lichter:{hoch:99,mittel:99,niedrig:4},prMin:{hoch:1,mittel:1,niedrig:0.75}}; // Messanzeige (start.js): gezeichnete Bilder, mittlerer Bildabstand in ms
 stage.prepend(renderer.domElement);
 
 const scene=new THREE.Scene();
