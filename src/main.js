@@ -2353,10 +2353,22 @@ renderer.domElement.addEventListener('pointerdown',e=>{if(e.pointerType==='touch
   pivot=rot&&(camIn||(window.__roomAt&&window.__roomAt(c.x,c.y-0.5,c.z)))?c.clone():null;},true);
 ['pointerup','pointercancel'].forEach(n=>window.addEventListener(n,e=>touchIds.delete(e.pointerId),true));
 renderer.domElement.addEventListener('wheel',()=>{pivot=null;},{capture:true,passive:true});
+// Zoomen/Verschieben im Raum: Schritte, die aus dem Raum oder durch eine Wand führen, werden verworfen (außer bei „Wände aus“)
+const inRoomBox=(p,r)=>p.x>r[2]+0.1&&p.x<r[3]-0.1&&p.z>r[4]+0.1&&p.z<r[5]-0.1&&p.y>r[6]+0.3&&p.y<r[6]+(r[6]===0?H:2.45)-0.1;
+const navRay=new THREE.Raycaster();
+function leavesRoom(a,b){const R=window.__ROOMS||[],ra=R.some(r=>inRoomBox(a,r));
+  if(!ra&&!camIn)return false;
+  if(ra&&!R.some(r=>inRoomBox(b,r)))return true;
+  const d=b.clone().sub(a),len=d.length();if(len<1e-6)return false;
+  const bl=[];scene.traverse(o=>{if(o.isMesh&&o.userData.navBlocker)bl.push(o);});
+  navRay.set(a,d.normalize());navRay.near=0;navRay.far=len+0.15;navRay.camera=camera;
+  return navRay.intersectObjects(bl,false).some(h=>{let o=h.object;while(o){if(!o.visible)return false;o=o.parent;}return true;});}
 {const upd=controls.update.bind(controls);controls.update=function(){
   if(pivot&&!camera.position.equals(pivot))pivot=null; // Kamera wurde anderweitig bewegt (Ansichtswechsel o. Ä.)
+  const pc=camera.position.clone(),pt=controls.target.clone();
   const r=upd();
   if(pivot){const d=controls.target.clone().sub(camera.position);camera.position.copy(pivot);controls.target.copy(pivot).add(d);}
+  else if(!wallsHidden&&!camera.position.equals(pc)&&leavesRoom(pc,camera.position)){camera.position.copy(pc);controls.target.copy(pt);}
   return r;};}
 
 // ===== Ansichts-Menü (Bottom-Sheet) =====
