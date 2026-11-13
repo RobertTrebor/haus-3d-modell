@@ -70,6 +70,11 @@ function leavesRoom(a,b){const R=window.__ROOMS||[],ra=R.some(r=>inRoomBox(a,r))
     window.__lastHit=[p.x.toFixed(2),p.y.toFixed(2),p.z.toFixed(2),n.y.toFixed(2)];
     const portal=h.object.userData.navPortal;
     if(portal){const from=roomAt(c.x,c.y-0.5,c.z),target=portal.rooms[from&&from[1]];if(!target){toast('Kein angrenzender Raum');return;}if(!portal.isOpen()){toast('Tür ist geschlossen');return;}viewSel.value=target;viewSel.dispatchEvent(new Event('change'));return;}
+    // Von außen in den Hauseingang: im Windfang hinstellen und die Blickrichtung behalten (die Holztreppe hinauf zum Flur,
+    // Richtung Wohn- und Schlafzimmer) statt in die Ansicht „Windfang“ zu wechseln, die nach links schaut.
+    if(c.z>EDZ&&!roomAt(c.x,c.y-0.5,c.z)&&p.x>CX0-0.1&&p.x<CL1+0.1&&p.z>SD0-0.2&&p.z<EDZ+0.15&&p.y>EF-0.4&&p.y<EF+2.7){
+      if(h.object.userData.navBlocker||pathBlocked(p)){toast('Tür ist geschlossen');return;}
+      moveTo([exc,EF+EYE,EDZ-0.6],[exc,1.25,Z0+0.3],'Hauseingang');return;}
     const camEye=c.y-EYE;
     const fl=FLIGHTS.find(f=>inBox(p,f.box));
     if(fl){const goUp=Math.abs(camEye-fl.lo[1])<=Math.abs(camEye-fl.hi[1]);const s=goUp?fl.hi:fl.lo;stand(s[0],s[1],s[2],s[3],s[4],fl.n+(goUp?' – oben':' – unten'));return;}
