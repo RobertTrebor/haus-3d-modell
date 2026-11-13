@@ -2346,6 +2346,18 @@ const viewSel=document.getElementById('viewSel');
 viewSel.addEventListener('change',()=>goTo(viewSel.value));
 const floorSel=document.getElementById('floorSel');floorSel.addEventListener('change',()=>{if(floorSel.value==='kg'){goTo('kg');return;}setLevel({eg:0,og:1,dg:2}[floorSel.value]);});
 controls.addEventListener('start',()=>{tween=null;});
+// Drehen im Raum: Kamera bleibt am Standpunkt (Umsehen statt Umkreisen), damit sie nicht durch Wände wandert
+let pivot=null,camIn=false;const touchIds=new Set();
+renderer.domElement.addEventListener('pointerdown',e=>{if(e.pointerType==='touch')touchIds.add(e.pointerId);
+  const rot=e.pointerType==='touch'?touchIds.size===1:(e.button===0&&!e.ctrlKey&&!e.metaKey&&!e.shiftKey),c=camera.position;
+  pivot=rot&&(camIn||(window.__roomAt&&window.__roomAt(c.x,c.y-0.5,c.z)))?c.clone():null;},true);
+['pointerup','pointercancel'].forEach(n=>window.addEventListener(n,e=>touchIds.delete(e.pointerId),true));
+renderer.domElement.addEventListener('wheel',()=>{pivot=null;},{capture:true,passive:true});
+{const upd=controls.update.bind(controls);controls.update=function(){
+  if(pivot&&!camera.position.equals(pivot))pivot=null; // Kamera wurde anderweitig bewegt (Ansichtswechsel o. Ä.)
+  const r=upd();
+  if(pivot){const d=controls.target.clone().sub(camera.position);camera.position.copy(pivot);controls.target.copy(pivot).add(d);}
+  return r;};}
 
 // ===== Ansichts-Menü (Bottom-Sheet) =====
 (function(){
@@ -2381,7 +2393,7 @@ controls.addEventListener('start',()=>{tween=null;});
     ['Bogenzimmer','kroom',KRX0,XE,KRZ0,KRZ1,CF],['Kellerbüro','kbuero',KBX0,KBX1,KBZ0,KBZ1,CF],['Waschküche','kvest',VX0,VX1,VZ0,WKZ1,CF],['Garage','garage',gx0,gx1,NF+0.32,NF+4.92,CF],['Vorratsraum','kpantry',PX0,PX1,PZ0b,PZ1b,CF],['Keller-WC','kwc',WX0-1.2,WX1-1.2,WZ0+4.55,WZ1+4.55,CF],['Kellerflur','kcab',CW1,6.1,4.53,6.55,CF],
     ['Yogazimmer','yoga',DKX0,DKX1,DKZ0,3.3,DGF],['Flur (DG)','dgflur',2.96,5.15,3.42,DKZ1,DGF],['Bad (DG)','dgbath',5.27,DKX1,3.42,DKZ1,DGF],['Abstellkammer','dgstore',DKX0,2.84,3.42,DKZ1,DGF]];
   window.__ROOMS=ROOMS;window.__toast=t=>toast(t);
-  const roomAt=(x,y,z)=>ROOMS.find(r=>x>r[2]&&x<r[3]&&z>r[4]&&z<r[5]&&y>r[6]-0.35&&y<r[6]+(r[6]===0?H:2.45));
+  const roomAt=window.__roomAt=(x,y,z)=>ROOMS.find(r=>x>r[2]&&x<r[3]&&z>r[4]&&z<r[5]&&y>r[6]-0.35&&y<r[6]+(r[6]===0?H:2.45));
   // Treppenläufe: Bereich + unterer/oberer Standpunkt mit Blickrichtung
   const SM=(HX0+SUX)/2,S2=(SDX+EX)/2;
   const FLIGHTS=[
@@ -2462,7 +2474,7 @@ function loop(now){
   const inside=(c.y<H&&((c.x>0&&c.x<W&&c.z>0&&c.z<D)||(c.x>XW&&c.x<XE&&c.z>Z0&&c.z<S)))||(c.y<3.6&&c.x>HX0&&c.x<HX1&&c.z>Z0&&c.z<HZ1)||(c.y<OGF+OGH&&c.x>CX0&&c.x<CL1&&c.z>HZ1-0.1&&c.z<EDZ)||(c.y>LY&&c.y<OGF+OGH&&c.x>HX0&&c.x<EX&&c.z>U1Z-1.4&&c.z<HZ1+0.4)||(c.y<0.9&&c.x>CW0&&c.x<CW1&&c.z>Z0&&c.z<HZ1+0.35)||(c.y<-0.3&&c.x>KRX0&&c.x<CW1&&c.z>KRZ0&&c.z<KRZ1)||(c.y<-0.3&&c.x>KBX0&&c.x<KBX1&&c.z>KBZ0-0.1&&c.z<KRZ0)||(c.y<-0.3&&c.x>VX0-0.3&&c.x<VX1+0.2&&c.z>-0.1&&c.z<VZ1)||(c.y<-0.3&&c.x>CW1-0.05&&c.x<8.45&&c.z>3.7&&c.z<8.0)||(c.y<-0.3&&c.x>WX1-0.05&&c.x<CRX1&&c.z>CRZ0&&c.z<CRZ1)||(c.y<H&&c.x>KX0&&c.x<KX1&&c.z>KZ0&&c.z<KZ1)||(c.y<H&&c.x>BX0&&c.x<BX1&&c.z>BZ0&&c.z<BZ1)||(c.y<H&&c.x>RX0&&c.x<RX1&&c.z>RZ0&&c.z<RZ1);
   gWin.visible=inside||c.z>-0.05;gLeft.visible=inside||!(c.x<0&&c.z<D);gRight.visible=inside||c.x<W+0.05;gBack.visible=inside||c.z<D+0.05;
   gDW.visible=inside||c.x>XW;gDS.visible=inside||c.z<S;gDE.visible=inside||c.x<XE;gHE.visible=inside||c.x<HX1;gHS.visible=inside||c.z<HZ1;gVS.visible=inside||c.z<EDZ||c.y<2.2;const inOG=(c.y>LY+0.5&&c.y<OGF+OGH&&c.x>HX0-0.1&&c.x<CL1&&c.z>Z0&&c.z<FZ)||c.y>OGF&&c.y<OGF+OGH&&((c.x>JX0&&c.x<JX1&&c.z>JZ0&&c.z<JZ1)||(c.x>KX0w&&c.x<KX1w&&c.z>KZ0w&&c.z<KZ1w)||(c.x>GX0&&c.x<LX1&&c.z>LZ0o&&c.z<LZ1o)||(c.x>AUX0&&c.x<AUX1&&c.z>AUZ0&&c.z<AUZ1)||(c.x>OBX0&&c.x<OBX1&&c.z>OBZ0&&c.z<OBZ1)||(c.x>HX0&&c.x<EX&&c.z>JZ1&&c.z<U1Z+0.3));
-  const inWG=c.y>OGF&&c.y<OGF+WGH&&c.x>GX0&&c.x<GX1&&c.z>LZ0o&&c.z<LZ1o;gVR.visible=inside||c.y<4.5;gUp.visible=inside||c.y<4.5||floorOG;gVRoof.visible=inside||c.y<4.5;gOG.visible=floorOG||inOG;const inDG=c.y>DGF+0.2&&c.y<DGF+2.45&&c.x>DKX0&&c.x<DKX1&&c.z>DKZ0&&c.z<DKZ1;gDG.visible=floorDG||inDG;gDGshell.visible=inDG;if(inDG)gOG.visible=true;jLab.visible=gOG.visible;wLab.visible=gOG.visible;lLab.visible=gOG.visible;aLab.visible=gOG.visible;obLab.visible=gOG.visible;gOBE.visible=inOG||c.x<OBX1;gOBW.visible=inOG||c.x>OBX0;gAW.visible=inOG||c.x>AUX0;gAS.visible=inOG||c.z<AUZ1;gAE.visible=inOG||c.x<AUX1;gAN.visible=inOG||c.z>AUZ0;gLab.visible=gOG.visible;gGW.visible=inOG||c.x>GX0;gGS.visible=inOG||c.z<LZ1o;gGN.visible=inOG||c.z>LZ0o;gLS.visible=inOG||c.z<LZ1o;gLE.visible=inOG||c.x<LX1;gGC.visible=inWG||c.y<OGF+WGH;gWN.visible=inOG||c.z>KZ0w;gWE.visible=inOG||c.x<KX1w;gWS.visible=inOG||c.z<KZ1w;gJN.visible=inOG||c.z>JZ0;gJW.visible=inOG||c.x>JX0;gJE.visible=inOG||c.x<JX1;gJS.visible=inOG||c.z<JZ1;gVW.visible=inside||c.x>CX0-EWT;gCE.visible=inside||c.x<CL1;gCel.visible=inside;gKE.visible=inside||c.x<KX1;gKS.visible=inside||c.z<KZ1;gKN.visible=inside||c.z<KZ0;gBaE.visible=inside||c.x<BX1;gBN.visible=inside||c.z>RZ0;gBE.visible=inside||c.x<RX1;
+  const inWG=c.y>OGF&&c.y<OGF+WGH&&c.x>GX0&&c.x<GX1&&c.z>LZ0o&&c.z<LZ1o;gVR.visible=inside||c.y<4.5;gUp.visible=inside||c.y<4.5||floorOG;gVRoof.visible=inside||c.y<4.5;gOG.visible=floorOG||inOG;const inDG=c.y>DGF+0.2&&c.y<DGF+2.45&&c.x>DKX0&&c.x<DKX1&&c.z>DKZ0&&c.z<DKZ1;gDG.visible=floorDG||inDG;camIn=inside||inOG||inDG;gDGshell.visible=inDG;if(inDG)gOG.visible=true;jLab.visible=gOG.visible;wLab.visible=gOG.visible;lLab.visible=gOG.visible;aLab.visible=gOG.visible;obLab.visible=gOG.visible;gOBE.visible=inOG||c.x<OBX1;gOBW.visible=inOG||c.x>OBX0;gAW.visible=inOG||c.x>AUX0;gAS.visible=inOG||c.z<AUZ1;gAE.visible=inOG||c.x<AUX1;gAN.visible=inOG||c.z>AUZ0;gLab.visible=gOG.visible;gGW.visible=inOG||c.x>GX0;gGS.visible=inOG||c.z<LZ1o;gGN.visible=inOG||c.z>LZ0o;gLS.visible=inOG||c.z<LZ1o;gLE.visible=inOG||c.x<LX1;gGC.visible=inWG||c.y<OGF+WGH;gWN.visible=inOG||c.z>KZ0w;gWE.visible=inOG||c.x<KX1w;gWS.visible=inOG||c.z<KZ1w;gJN.visible=inOG||c.z>JZ0;gJW.visible=inOG||c.x>JX0;gJE.visible=inOG||c.x<JX1;gJS.visible=inOG||c.z<JZ1;gVW.visible=inside||c.x>CX0-EWT;gCE.visible=inside||c.x<CL1;gCel.visible=inside;gKE.visible=inside||c.x<KX1;gKS.visible=inside||c.z<KZ1;gKN.visible=inside||c.z<KZ0;gBaE.visible=inside||c.x<BX1;gBN.visible=inside||c.z>RZ0;gBE.visible=inside||c.x<RX1;
   if(facadeMode&&c.y>11)facadeMode=false;
   gMid.visible=facadeMode||floorOG||(c.x>HX0-0.1&&c.x<CL1&&c.z>Z0&&c.z<FZ&&c.y>1.2&&c.y<OGF+OGH);gRoof.visible=facadeMode;if(window.__atticRail)window.__atticRail.visible=!facadeMode;if(facadeMode){facadeGroups.forEach(g=>g.visible=true);gCel.visible=c.y<1.2&&Math.hypot(c.x-3,c.z-3)<16;}(window.__garConf||[]).forEach(m=>m.visible=!facadeMode);if(facadeMode){dimG.visible=false;}else dimG.visible=document.getElementById('dims').getAttribute('aria-pressed')==='true';
   dgLabs.forEach(l=>l.visible=gDG.visible);if(gDG.visible)[jLab,wLab,lLab,gLab,aLab,obLab].forEach(l=>l.visible=false);
