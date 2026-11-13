@@ -70,7 +70,7 @@ Bewusste Einschränkungen der Navigation:
 
 Arbeitsweise:
 - Prüfen nach Umbauten: `python tools/pruefen.py` (braucht den laufenden `server.py`). Der Fingerabdruck muss bei
-  einer reinen Umsortierung gleich bleiben; Stand v98: `Bauteile=2170 Modell=-1679057508 Raeume=-1893535870 Ansichten=-1918846762 Moebel=554 Tueren=22`.
+  einer reinen Umsortierung gleich bleiben; Stand v99: `Bauteile=2204 Modell=-1170160104 Raeume=-1893535870 Ansichten=-1918846762 Moebel=554 Tueren=22`.
 - Git: Auf Roberts Rechner ist keine Git-Identität eingerichtet. Die Commits vom 13.11. wurden einzeln mit
   `git -c user.name="Robert Lengsfeld" -c user.email="RobertTrebor@users.noreply.github.com" commit …` erstellt.
   Gearbeitet wird auf dem Branch `einrichtungsmodus-weiterarbeit` (nicht `main`).

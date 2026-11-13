@@ -11,12 +11,12 @@ ogB(JX0-0.38,JX1+0.18,-0.3,-0.015,JZ0-0.38,JZ1+0.18,M('#F4F2EC',0.9));
 // Nordwand mit Sprossenfenster
 const jn0=1.07,jn1=2.87,jy0=0.95,jy1=2.2;
 ogB(JX0-0.38,jn0,0,OGH,JZ0-0.38,JZ0,wallMat,gJN);ogB(jn1,JX1+0.18,0,OGH,JZ0-0.38,JZ0,wallMat,gJN);ogB(jn0,jn1,0,jy0,JZ0-0.38,JZ0,wallMat,gJN);ogB(jn0,jn1,jy1,OGH,JZ0-0.38,JZ0,wallMat,gJN);
-win({ax:'z',f:JZ0,s:-1,a0:jn0,a1:jn1,y0:OGF+jy0,y1:OGF+jy1,g:gJN,rows:[0.53],noBox:1});
+win({ax:'z',f:JZ0,s:-1,a0:jn0,a1:jn1,y0:OGF+jy0,y1:OGF+jy1,g:gJN,rows:[0.53],noBox:1});stulp('z',gJN,JZ0,-1,jn0,jn1,OGF+jy0,OGF+jy1,true);
 ogB(jn0-0.1,jn1+0.1,jy1+0.04,jy1+0.3,JZ0,JZ0+0.2,white,gJN);
 // Westwand mit Fenster zum Holzbalkon
 const jw0=1.6,jw1=2.45,jch=1.36;
 ogB(JX0-0.38,JX0,0,OGH,JZ0,jw0,wallMat,gJW);ogB(JX0-0.38,JX0,0,OGH,jw1,JZ1,wallMat,gJW);ogB(JX0-0.38,JX0,0,jy0,jw0,jw1,wallMat,gJW);ogB(JX0-0.38,JX0,jy1,OGH,jw0,jw1,wallMat,gJW);
-win({ax:'x',f:JX0,s:-1,a0:jw0,a1:jw1,y0:OGF+jy0,y1:OGF+jy1,g:gJW,rows:[0.34,0.67],noBox:1});
+win({ax:'x',f:JX0,s:-1,a0:jw0,a1:jw1,y0:OGF+jy0,y1:OGF+jy1,g:gJW,rows:[0.34,0.67],noBox:1});stulp('x',gJW,JX0,-1,jw0,jw1,OGF+jy0,OGF+jy1,false);
 ogB(JX0,JX0+0.2,jy1+0.04,jy1+0.3,jw0-0.1,jw1+0.1,white,gJW);
 // Ost- und Südwand (Tür im Süden, Ostteil)
 ogB(JX1,JX1+0.18,0,OGH,JZ0,JZ1,wallMat,gJE);
@@ -83,11 +83,11 @@ const KX0w=W+T,KX1w=RX1,KZ0w=0,KZ1w=RZ1;const gWN=new THREE.Group(),gWE=new THRE
 ogB(KX0w,KX1w+0.38,-0.3,-0.015,KZ0w-0.38,KZ1w+0.18,M('#F4F2EC',0.9));
 // Nordwand mit Fenster (Rollladen halb unten)
 ogB(KX0w,nw0,0,OGH,KZ0w-0.38,KZ0w,wallMat,gWN);ogB(nw1,KX1w+0.38,0,OGH,KZ0w-0.38,KZ0w,wallMat,gWN);ogB(nw0,nw1,0,jy0,KZ0w-0.38,KZ0w,wallMat,gWN);ogB(nw0,nw1,jy1,OGH,KZ0w-0.38,KZ0w,wallMat,gWN);
-win({ax:'z',f:KZ0w,s:-1,a0:nw0,a1:nw1,y0:OGF+jy0,y1:OGF+jy1,g:gWN,rows:[0.53],noBox:1});
+win({ax:'z',f:KZ0w,s:-1,a0:nw0,a1:nw1,y0:OGF+jy0,y1:OGF+jy1,g:gWN,rows:[0.53],noBox:1});stulp('z',gWN,KZ0w,-1,nw0,nw1,OGF+jy0,OGF+jy1,true);
 const shutM=M('#7E8486',0.5);ogB(nw0+0.05,nw1-0.05,jy0+0.75,jy1,KZ0w-0.27,KZ0w-0.255,shutM,gWN);ogB(nw0-0.15,nw1+0.15,jy1+0.02,OGH-0.02,KZ0w,KZ0w+0.24,white,gWN);
 // Ostwand mit Fenster und Vorhängen
 ogB(KX1w,KX1w+0.38,0,OGH,KZ0w,ew0,wallMat,gWE);ogB(KX1w,KX1w+0.38,0,OGH,ew1,KZ1w+0.18,wallMat,gWE);ogB(KX1w,KX1w+0.38,0,jy0,ew0,ew1,wallMat,gWE);ogB(KX1w,KX1w+0.38,jy1,OGH,ew0,ew1,wallMat,gWE);
-win({ax:'x',f:KX1w,s:1,a0:ew0,a1:ew1,y0:OGF+jy0,y1:OGF+jy1,g:gWE,rows:[0.55],noBox:1});
+win({ax:'x',f:KX1w,s:1,a0:ew0,a1:ew1,y0:OGF+jy0,y1:OGF+jy1,g:gWE,rows:[0.55],noBox:1});stulp('x',gWE,KX1w,1,ew0,ew1,OGF+jy0,OGF+jy1,true);
 ogB(KX1w+0.255,KX1w+0.27,jy0+0.25,jy1,ew0+0.05,ew1-0.05,shutM,gWE);ogB(KX1w-0.24,KX1w,jy1+0.02,OGH-0.02,ew0-0.15,ew1+0.15,white,gWE);
 cyl(KX1w-0.12,(ew0+ew1)/2,0.012,OGF+jy1+0.05,0.01,white,6,gWE);ogB(KX1w-0.13,KX1w-0.11,jy1+0.02,jy1+0.04,ew0-0.12,ew1+0.12,white,gWE);
 {const cm=new THREE.MeshStandardMaterial({color:col('#F4E8D0'),roughness:0.95,side:THREE.DoubleSide,transparent:true,opacity:0.92});

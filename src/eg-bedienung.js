@@ -1,6 +1,6 @@
 // Bewegliche Teile: Fensterflügel, Rollläden, Türen, Geräte und Küchenschränke (klickbar),
 // mit den Helfern sash, addShutter, makeDoor, clickable, anim, swing, tog.
-{sash=__wrapS(sash);sashFrame=__wrapS(sashFrame);addShutter=__wrapS(addShutter);belt=__wrapS(belt);stripDoor=__wrapS(stripDoor);} // Zähler __S wie bei win (eg.js)
+{sash=__wrapS(sash);stulp=__wrapS(stulp);sashFrame=__wrapS(sashFrame);addShutter=__wrapS(addShutter);belt=__wrapS(belt);stripDoor=__wrapS(stripDoor);} // Zähler __S wie bei win (eg.js)
 // ---- Fenstergriffe + Flügel ----
 const hMat=Mu('#C8B07A',0.3,{metalness:0.75});
 const sashes=[],sashHits=[];
@@ -13,12 +13,12 @@ function winHandle(ax,face,dir,a,y,g){
 function sashFrame(ax,g,a0,a1,y0,y1,pd){const sf=0.045;
   if(ax==='z'){B(a0,a1,y0,y0+sf,pd-0.02,pd+0.02,pvc,g);B(a0,a1,y1-sf,y1,pd-0.02,pd+0.02,pvc,g);B(a0,a0+sf,y0,y1,pd-0.02,pd+0.02,pvc,g);B(a1-sf,a1,y0,y1,pd-0.02,pd+0.02,pvc,g);}
   else{B(pd-0.02,pd+0.02,y0,y0+sf,a0,a1,pvc,g);B(pd-0.02,pd+0.02,y1-sf,y1,a0,a1,pvc,g);B(pd-0.02,pd+0.02,y0,y1,a0,a0+sf,pvc,g);B(pd-0.02,pd+0.02,y0,y1,a1-sf,a1,pvc,g);}}
-function sash(ax,g,a0,a1,y0,y1,bandA,bandB,pd,dir,hy,flip){
+function sash(ax,g,a0,a1,y0,y1,bandA,bandB,pd,dir,hy,flip,noHandle){
   const lo=Math.min(bandA,bandB),hi=Math.max(bandA,bandB),sf=0.045;
   // sash frame
   if(ax==='z'){B(a0,a1,y0,y0+sf,pd-0.02,pd+0.02,pvc,g);B(a0,a1,y1-sf,y1,pd-0.02,pd+0.02,pvc,g);B(a0,a0+sf,y0,y1,pd-0.02,pd+0.02,pvc,g);B(a1-sf,a1,y0,y1,pd-0.02,pd+0.02,pvc,g);}
   else{B(pd-0.02,pd+0.02,y0,y0+sf,a0,a1,pvc,g);B(pd-0.02,pd+0.02,y1-sf,y1,a0,a1,pvc,g);B(pd-0.02,pd+0.02,y0,y1,a0,a0+sf,pvc,g);B(pd-0.02,pd+0.02,y0,y1,a1-sf,a1,pvc,g);}
-  const hA=flip?a1:a0,hx=flip?a0+0.04:a1-0.04,face=pd+dir*0.045,hs=winHandle(ax,face,dir,hx,hy,g);
+  const hA=flip?a1:a0,hx=flip?a0+0.04:a1-0.04,face=pd+dir*0.045,hs=noHandle?[]:winHandle(ax,face,dir,hx,hy,g),hy0=noHandle?y0:hy-0.17,hy1=noHandle?y1:hy+0.07; // ohne Griff: ganzer Mittelholm ist Klickfläche
   g.updateMatrixWorld(true);
   const pv=new THREE.Group();if(ax==='z')pv.position.set(hA,0,pd);else pv.position.set(pd,0,hA);g.add(pv);pv.updateMatrixWorld(true);
   const bb=new THREE.Box3(),e=0.006,take=[];
@@ -26,7 +26,7 @@ function sash(ax,g,a0,a1,y0,y1,bandA,bandB,pd,dir,hy,flip){
     const A=ax==='z'?[bb.min.x,bb.max.x]:[bb.min.z,bb.max.z],Dd=ax==='z'?[bb.min.z,bb.max.z]:[bb.min.x,bb.max.x];
     if(A[0]>=a0-e&&A[1]<=a1+e&&bb.min.y>=y0-e&&bb.max.y<=y1+e&&Dd[0]>=lo-e&&Dd[1]<=hi+e)take.push(o);});
   take.forEach(o=>pv.attach(o));
-  const hit=ax==='z'?B(hx-0.04,hx+0.04,hy-0.17,hy+0.07,Math.min(face,face+dir*0.06),Math.max(face,face+dir*0.06),hitMat,pv):B(Math.min(face,face+dir*0.06),Math.max(face,face+dir*0.06),hy-0.17,hy+0.07,hx-0.04,hx+0.04,hitMat,pv);
+  const hit=ax==='z'?B(hx-0.04,hx+0.04,hy0,hy1,Math.min(face,face+dir*0.06),Math.max(face,face+dir*0.06),hitMat,pv):B(Math.min(face,face+dir*0.06),Math.max(face,face+dir*0.06),hy0,hy1,hx-0.04,hx+0.04,hitMat,pv);
   hit.position.sub(pv.position);hit.userData.wall=1;
   const sgn=(ax==='z'?-dir:dir)*(flip?-1:1),sh={pv,open:sgn*1.25,t:0,target:0};hs.forEach(m=>{m.userData.sash=sh;sashHits.push(m);});hit.userData.sash=sh;sashHits.push(hit);sashes.push(sh);return sh;}
 const hitMat=new THREE.MeshBasicMaterial({visible:false});
@@ -40,7 +40,14 @@ sash('x',gKE,kw0+0.07,kwm-0.05,1.02,2.13,KX1+0.09,KX1+0.19,KX1+0.1825,-1,1.58);
 sash('z',gBN,nw0+0.07,nw0+0.07+0.78,1.02,2.13,-0.21,-0.11,-0.2025,1,1.58);
 sash('x',gBE,ew0+0.07,ew0+0.07+0.555,1.02,2.13,RX1+0.11,RX1+0.21,RX1+0.2025,-1,1.58);
 sash('x',gBaE,bw0+0.07,bw1-0.07,1.17,2.08,BX1+0.11,BX1+0.21,BX1+0.2025,-1,1.62);
-function toggleSash(sh){sh.target=sh.target?0:sh.open;}
+// Zweiflügelige Fenster (stulp): sh.needs = Flügel, der zuerst offen sein muss; sh.follower = Flügel, der mit schließt
+function toggleSash(sh){if(sh.needs&&!sh.target&&!sh.needs.target){if(window.__toast)window.__toast('Erst den rechten Flügel öffnen');return;}
+  sh.target=sh.target?0:sh.open;if(!sh.target&&sh.follower)sh.follower.target=0;}
+// Zweiflügeliges Fenster aus win(): Griff am rechten Flügel (von innen gesehen), beide Flügel außen angeschlagen.
+// f = Wandfläche, s = Richtung nach außen (wie bei win), rightHigh = rechter Flügel liegt bei den größeren Koordinaten.
+function stulp(ax,g,f,s,a0,a1,y0,y1,rightHigh){const fw=0.07,mw=0.1,sw=(a1-a0-2*fw-mw)/2,P=[[a0+fw,a0+fw+sw],[a0+fw+sw+mw,a1-fw]],R=P[rightHigh?1:0],L=P[rightHigh?0:1],hy=y0+0.61;
+  const r=sash(ax,g,R[0],R[1],y0+fw,y1-fw,f+s*0.21,f+s*0.11,f+s*0.2025,-s,hy,rightHigh),l=sash(ax,g,L[0],L[1],y0+fw,y1-fw,f+s*0.21,f+s*0.11,f+s*0.2025,-s,hy,!rightHigh,true);
+  l.needs=r;r.follower=l;return [r,l];}
 // ---- Rollläden + Gurtband ----
 const shutters=[],shutHits=[];
 const beltBoxM=M('#EFE6D2',0.45),strapM=M('#E9DFC8',0.5);
