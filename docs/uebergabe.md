@@ -59,6 +59,9 @@ Offen:
 7. Viele Maße und Positionen stammen aus Fotos (geschätzt). Korrekturen: am PC über „Fest übernehmen“ bzw. das
    Maßregister, oder anhand weiterer Fotos im Code.
 
+9. Alter Bauplan (um 1940): Abgleich mit dem Maßregister und nach Priorität sortierte Liste zum Nachmessen in
+   `docs/altplan-abgleich.md` (13.11.2026). Am Modell wurde dafür nichts geändert; Entscheidungen stehen aus.
+
 Außenansichten (v94/v95): Der Keller-Rohbau (Wände, Böden, Decken) hängt in der Gruppe `gCelF` und bleibt in
 Außenansichten sichtbar; nur die Kellereinrichtung (`gCel`) wird dort ausgeblendet. Die Außenansicht endet nicht
 mehr beim Blick von oben, sondern über eine andere Ansicht oder die Etagenknöpfe EG/OG/DG.
