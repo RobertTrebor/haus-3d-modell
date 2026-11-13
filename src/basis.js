@@ -16,12 +16,12 @@ const DAY_BG=new THREE.Color('#CFE0EE').convertSRGBToLinear();
 const NIGHT_BG=new THREE.Color('#1C2536').convertSRGBToLinear();
 scene.background=DAY_BG.clone();
 
-const camera=new THREE.PerspectiveCamera(50,1,0.1,80);
+const camera=new THREE.PerspectiveCamera(50,1,0.1,120);
 const controls=new THREE.OrbitControls(camera,renderer.domElement);
 controls.enableDamping=true;
 controls.maxPolarAngle=Math.PI*0.6;
 controls.minDistance=0.3;
-controls.maxDistance=14;
+controls.maxDistance=40; // weit herauszoomen erlaubt; die Ansichten selbst bleiben bei höchstens 14 m (viewCam in ansichten.js)
 
 const col=h=>new THREE.Color(h).convertSRGBToLinear();
 const Mu=(h,r=0.85,extra={})=>new THREE.MeshStandardMaterial(Object.assign({color:col(h),roughness:r,metalness:0},extra));

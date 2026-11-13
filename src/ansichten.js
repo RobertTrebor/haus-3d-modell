@@ -66,14 +66,17 @@ let tween=null;
 let kgMode=false;const kgClip=[new THREE.Plane(new THREE.Vector3(0,-1,0),CF+2.12)];
 function setLevel(l){kgMode=l===-1;renderer.clippingPlanes=kgMode?kgClip:[];floorOG=l>=1;floorDG=l>=2;const v=['kg','eg','og','dg'][l+1];const fs=document.getElementById('floorSel');if(fs)fs.value=v;document.querySelectorAll('.seg button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.floor===v)));}
 function setFloor(on){setLevel(on?1:0);}
+// Kamerastandpunkt einer Ansicht: höchstens 14 m vom Blickziel (so waren die Ansichten immer zu sehen, als 14 m noch die
+// Zoomgrenze war); weiter weg kommt man nur durch eigenes Herauszoomen.
+function viewCam(v){const t=new THREE.Vector3(...v.t),d=new THREE.Vector3(...v.p).sub(t);if(d.length()>14)d.setLength(14);return [t.clone().add(d),t];}
 function goTo(key){
-  const v=VIEWS[key];const p=new THREE.Vector3(...v.p),t=new THREE.Vector3(...v.t);setLevel(v.fl===-1?-1:(v.fl===2?2:(v.fl?1:0)));facadeMode=!!v.facade;
+  const v=VIEWS[key];const [p,t]=viewCam(v);setLevel(v.fl===-1?-1:(v.fl===2?2:(v.fl?1:0)));facadeMode=!!v.facade;
   if(reduce){camera.position.copy(p);controls.target.copy(t);return;}
   tween={p0:camera.position.clone(),t0:controls.target.clone(),p,t,start:performance.now(),dur:900};
 }
 // Startansicht der App (Schlüssel aus VIEWS; die Auswahl im Menü folgt automatisch)
 const START='street';
-camera.position.set(...VIEWS[START].p);controls.target.set(...VIEWS[START].t);facadeMode=!!VIEWS[START].facade;
+{const [p,t]=viewCam(VIEWS[START]);camera.position.copy(p);controls.target.copy(t);}facadeMode=!!VIEWS[START].facade;
 
 const viewSel=document.getElementById('viewSel');viewSel.value=START;
 viewSel.addEventListener('change',()=>goTo(viewSel.value));
