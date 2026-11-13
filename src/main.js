@@ -1637,7 +1637,8 @@ const shelf=(x0,x1,z0,z1,h,n)=>{const al=(x1-x0)>(z1-z0);ogB(x0,x1,0,h,z0,z0+0.0
   for(let k=0;k<n;k++){const y=0.08+k*(h-0.1)/(n-1);if(o2X(x0,x1,z0,z1))ogB(x0,x1,y,y+0.02,z0,z1,shW);else ogB(x0,x1,y,y+0.02,z0,z1,shW);
    if(k<n-1){const along=(x1-x0)>(z1-z0);const L=along?x1-x0:z1-z0;for(let q=0.03;q<L-0.05;q+=0.035+rnd()*0.02){const c=bookC[Math.floor(rnd()*8)],hh=0.17+rnd()*0.1;if(along)ogB(x0+q,x0+q+0.028,y+0.02,y+0.02+hh,z0+0.03,z1-0.06,M(c,0.7));else ogB(x0+0.03,x1-0.06,y+0.02,y+0.02+hh,z0+q,z0+q+0.028,M(c,0.7));}}}};
 const o2X=()=>true;
-shelf(LX0+0.75,LX0+1.55,LZ0o,LZ0o+0.32,2.0,6);shelf(LX0+1.57,LX0+2.37,LZ0o,LZ0o+0.32,2.0,6);
+// Nordregale: je 0,60 m breit (geschätzt, genaue Maße folgen) – enden bei x=LX0+1.67, damit die geöffnete Flurtür (Blatt reicht bis ca. LX0+1.80) frei bleibt
+shelf(LX0+0.45,LX0+1.05,LZ0o,LZ0o+0.32,2.0,6);shelf(LX0+1.07,LX0+1.67,LZ0o,LZ0o+0.32,2.0,6);
 shelf(LX0,LX0+0.32,LZ0o+0.35,LZ0o+1.15,2.15,6);shelf(LX0,LX0+0.32,LZ0o+1.17,LZ0o+1.97,2.15,6);
 ogB(LX0+2.42,LX0+2.47,0,0.85,LZ0o+0.05,LZ0o+0.45,M('#222',0.5));
 cyl(LX0+0.48,LZ1o-0.45,0.3,OGF+0.6,0.03,M('#B8885A',0.7),20,gOG);cyl(LX0+0.48,LZ1o-0.45,0.03,OGF,0.6,M('#B8885A',0.7),8,gOG);
