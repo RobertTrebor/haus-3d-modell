@@ -12,9 +12,41 @@ const K_CUR='haus3d-einrichtung-v1',K_VAR='haus3d-varianten-v1',K_OLDWALL='haus3
 const LS={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d;}catch(e){return d;}},
   set(k,v){try{localStorage.setItem(k,JSON.stringify(v));return true;}catch(e){return false;}}};
 let state={v:2,walls:{},pieces:{},items:[],doors:{},tor:null};
-let saveT=0;const flush=()=>{if(saveT){clearTimeout(saveT);saveT=0;LS.set(K_CUR,state);}};
+// Gespeichert wird nur bei echter Änderung; quiet = Stand wird nur angewendet (Start, anderes Gerät), kein neuer Zeitstempel
+let saveT=0,lastJs='',quiet=false;
+const flush=()=>{if(saveT){clearTimeout(saveT);saveT=0;}const js=JSON.stringify(state);if(js===lastJs)return;lastJs=js;LS.set(K_CUR,state);if(!quiet){LS.set(K_T,Date.now());syncPush();}};
 const save=()=>{clearTimeout(saveT);saveT=setTimeout(flush,200);};
 window.addEventListener('pagehide',flush);document.addEventListener('visibilitychange',()=>{if(document.hidden)flush();});
+
+// ---------- Synchronisierung der Designideen (Artifact-Datenbank auf claude.ai; sonst nur dieses Gerät) ----------
+// Privat je angemeldeter Person: data/users/<id>/einrichtung {t,dev,json} und .../varianten {json}. Neuerer Zeitstempel gewinnt.
+const K_T='haus3d-einrichtung-t',K_DEV='haus3d-geraet';
+const DEV=(()=>{let d=LS.get(K_DEV,null);if(!d){d=Math.random().toString(36).slice(2,10);LS.set(K_DEV,d);}return d;})();
+const sync={status:'lokal',cur:null,vars:null,curBusy:false,curDirty:false,varBusy:false,varDirty:false,pushT:0};
+const SYNC_TXT={lokal:'Nur auf diesem Gerät gespeichert. Synchronisierung zwischen PC und Smartphone gibt es im Artifact auf claude.ai (angemeldet).',
+  verbinde:'Synchronisierung: Verbindung wird aufgebaut …',ok:'Synchronisierung aktiv: Designideen und Varianten sind auf allen Geräten gleich, auf denen du dieses Artifact öffnest.',
+  offline:'Synchronisierung: Speicher gerade nicht erreichbar – Änderungen bleiben auf diesem Gerät und werden später abgeglichen.',fehler:'Synchronisierung: Fehler beim Speichern – Änderungen bleiben auf diesem Gerät.'};
+function setSync(st){if(sync.status===st)return;sync.status=st;const el=$('eSync');if(el)el.textContent=SYNC_TXT[st];}
+function syncPush(){if(!sync.cur)return;clearTimeout(sync.pushT);sync.pushT=setTimeout(pushCur,1500);}
+function pushCur(){if(!sync.cur)return;if(sync.curBusy){sync.curDirty=true;return;}sync.curBusy=true;sync.curDirty=false;
+  sync.cur.set({t:+LS.get(K_T,0)||1,dev:DEV,json:lastJs||JSON.stringify(state)}).then(()=>setSync('ok'),()=>setSync('fehler')).then(()=>{sync.curBusy=false;if(sync.curDirty)pushCur();});}
+function pushVars(){if(!sync.vars)return;if(sync.varBusy){sync.varDirty=true;return;}sync.varBusy=true;sync.varDirty=false;
+  sync.vars.set({json:JSON.stringify(LS.get(K_VAR,{}))}).then(()=>setSync('ok'),()=>setSync('fehler')).then(()=>{sync.varBusy=false;if(sync.varDirty)pushVars();});}
+function onCur(snap){const md=snap.metadata||{};if(md.hasPendingWrites)return;const d=snap.exists?snap.data():null,lt=+LS.get(K_T,0)||0,rt=d&&+d.t||0;
+  if(!md.fromCache)setSync('ok');
+  if(d&&typeof d.json==='string'&&rt>lt){let st=null;try{st=JSON.parse(d.json);}catch(e){}if(!st)return;flush();
+    quiet=true;try{applyState(st);flush();}finally{quiet=false;}LS.set(K_T,rt);H.toast('Stand vom anderen Gerät übernommen');if(H.editMode)render();}
+  else if(lt>rt&&!md.fromCache)pushCur();}
+function onVars(snap){const md=snap.metadata||{};if(md.hasPendingWrites)return;const d=snap.exists?snap.data():null;let R={};try{R=d&&typeof d.json==='string'?JSON.parse(d.json)||{}:{};}catch(e){}
+  const L=LS.get(K_VAR,{}),M=Object.assign({},R);let lc=false,rc=false;
+  Object.keys(L).forEach(n=>{if(!M[n]||(+L[n].t||0)>(+M[n].t||0)){M[n]=L[n];rc=true;}});Object.keys(M).forEach(n=>{if(!L[n]||(+M[n].t||0)>(+L[n].t||0))lc=true;});
+  if(lc){LS.set(K_VAR,M);if(H.editMode&&tool==='vars')render();}if(rc&&!md.fromCache)pushVars();}
+async function syncInit(){const c=window.claude;if(!c||typeof c.use!=='function')return;setSync('verbinde');
+  try{const [db,user]=await Promise.all([c.use('db'),c.use('user')]);const id=db&&user?await user.id():null;if(!id){setSync('lokal');return;}
+    sync.cur=db.doc('data/users/'+id+'/einrichtung');sync.vars=db.doc('data/users/'+id+'/varianten');
+    const tm=setTimeout(()=>{if(sync.status==='verbinde')setSync('offline');},10000);
+    sync.cur.onSnapshot(sn=>{clearTimeout(tm);onCur(sn);},()=>{clearTimeout(tm);setSync('offline');});sync.vars.onSnapshot(onVars,()=>{});
+  }catch(e){sync.cur=sync.vars=null;setSync('lokal');}}
 
 // ---------- Fester Bestand und Baumaße (src/config/, nur mit server.py am PC schreibbar) ----------
 // Zwei Ebenen: BASE/MCFG = Status quo des Hauses (Dateien im Repo), state = Designideen (Browser, Varianten).
@@ -487,7 +519,10 @@ function applyState(st){resetAll();st=st||{};
   const ds=st.doors||{};if(Object.keys(ds).length){buildDoors();Object.keys(ds).forEach(id=>{const d=doorById.get(id),v=ds[id];if(!d||!v||!DOOR_STYLES[v.s])return;d.style=v.s;d.c=v.c||null;applyDoor(d);});}
   if(st.tor){gateCfg.an=true;gateCfg.mat=GATE_MATS[st.tor.mat]?st.tor.mat:'laerche';if(st.tor.c)gateCfg.c=st.tor.c;gateCfg.fenster=!!st.tor.fenster;gateCfg.sekt=!!st.tor.sekt;applyGate();}
   save();}
+// Varianten: gelöschte bleiben als Marke {t,del} erhalten, damit das Löschen auch auf dem anderen Gerät ankommt
 const vars=()=>LS.get(K_VAR,{});
+const liveVars=()=>{const V=vars(),o={};Object.keys(V).forEach(n=>{if(V[n]&&V[n].s&&!V[n].del)o[n]=V[n];});return o;};
+const setVars=V=>{const ok=LS.set(K_VAR,V);pushVars();return ok;};
 const snapshot=()=>JSON.parse(JSON.stringify(state));
 
 // =====================================================================
@@ -519,14 +554,14 @@ function render(){const tabs=panel.querySelectorAll('[data-tool]');tabs.forEach(
     body.querySelectorAll('[data-cat]').forEach(b=>b.onclick=()=>{const k=b.dataset.cat,c=CAT[k],p=placePoint();addItem({t:k,w:c[1],d:c[2],h:c[3],c:c[4],x:+p.x.toFixed(3),y:+p.y.toFixed(3),z:+p.z.toFixed(3),ry:0},true);H.toast(c[0]+' hinzugefügt');});
     renderSelInfo();}
   else if(tool==='measure')renderMeasure();
-  else if(tool==='vars'){const V=vars(),names=Object.keys(V).sort((a,b)=>(V[b].t||0)-(V[a].t||0));
-    body.innerHTML='<div class="row"><input type="text" id="eVName" placeholder="Name der Variante" maxlength="40"><button id="eVSave">Speichern</button></div>'+
+  else if(tool==='vars'){const V=liveVars(),names=Object.keys(V).sort((a,b)=>(V[b].t||0)-(V[a].t||0));
+    body.innerHTML='<div class="muted" id="eSync">'+SYNC_TXT[sync.status]+'</div><div class="row"><input type="text" id="eVName" placeholder="Name der Variante" maxlength="40"><button id="eVSave">Speichern</button></div>'+
       '<div class="vlist">'+(names.length?names.map(n=>'<div class="row"><span>'+esc(n)+' <span class="muted">'+(V[n].t?new Date(V[n].t).toLocaleDateString('de-DE'):'')+'</span></span><span class="row"><button data-load="'+esc(n)+'">Laden</button><button data-del="'+esc(n)+'" aria-label="'+esc(n)+' löschen">Löschen</button></span></div>').join(''):'<span class="muted">Noch keine Varianten gespeichert.</span>')+'</div>'+
       '<div class="row"><button id="eVExp">Exportieren</button><label class="chk"><button id="eVImpB">Importieren …</button><input type="file" id="eVImp" accept=".json,application/json" hidden></label><button id="eVReset" style="margin-left:auto">'+(confirmReset?'Wirklich alles zurücksetzen?':'Alles zurücksetzen')+'</button></div><div id="eVOut"></div>';
-    $('eVSave').onclick=()=>{const n=$('eVName').value.trim();if(!n){$('eVName').focus();return;}const V2=vars();V2[n]={t:Date.now(),s:snapshot()};LS.set(K_VAR,V2)?H.toast('Gespeichert: '+n):H.toast('Speichern nicht möglich');render();};
-    body.querySelectorAll('[data-load]').forEach(b=>b.onclick=()=>{const v=vars()[b.dataset.load];if(v){applyState(v.s);H.toast('Geladen: '+b.dataset.load);}});
-    body.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{const V2=vars();delete V2[b.dataset.del];LS.set(K_VAR,V2);render();});
-    $('eVExp').onclick=()=>{const data=JSON.stringify({app:'haus3d-einrichtung',v:1,aktuell:snapshot(),varianten:vars()},null,1);
+    $('eVSave').onclick=()=>{const n=$('eVName').value.trim();if(!n){$('eVName').focus();return;}const V2=vars();V2[n]={t:Date.now(),s:snapshot()};setVars(V2)?H.toast('Gespeichert: '+n):H.toast('Speichern nicht möglich');render();};
+    body.querySelectorAll('[data-load]').forEach(b=>b.onclick=()=>{const v=liveVars()[b.dataset.load];if(v){applyState(v.s);H.toast('Geladen: '+b.dataset.load);}});
+    body.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{const V2=vars();V2[b.dataset.del]={t:Date.now(),del:1};setVars(V2);render();});
+    $('eVExp').onclick=()=>{const data=JSON.stringify({app:'haus3d-einrichtung',v:1,aktuell:snapshot(),varianten:liveVars()},null,1);
       try{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([data],{type:'application/json'}));a.download='einrichtung-varianten.json';document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},500);}catch(e){}
       $('eVOut').innerHTML='<div class="muted">Falls kein Download kam: Text kopieren und auf dem anderen Gerät bei „Importieren“ einfügen.</div><textarea readonly>'+esc(data)+'</textarea>';};
     $('eVImpB').onclick=()=>{$('eVOut').innerHTML='<div class="muted">Datei wählen oder Text hier einfügen:</div><textarea id="eVTxt"></textarea><div class="row"><button id="eVFile">Datei wählen …</button><button id="eVTake">Text übernehmen</button></div>';
@@ -534,10 +569,10 @@ function render(){const tabs=panel.querySelectorAll('[data-tool]');tabs.forEach(
     $('eVImp').onchange=e=>{const f=e.target.files&&e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>importText(String(r.result));r.readAsText(f);};
     $('eVReset').onclick=()=>{if(!confirmReset){confirmReset=true;render();setTimeout(()=>{if(confirmReset){confirmReset=false;if(tool==='vars')render();}},4000);return;}confirmReset=false;resetAll();save();H.toast('Alles zurückgesetzt');render();};}}
 function importText(t){try{const d=JSON.parse(t);if(!d||(d.app!=='haus3d-einrichtung'&&!d.walls))throw 0;const V2=vars();let n=0;
-    if(d.varianten)Object.keys(d.varianten).forEach(k=>{V2[k]=d.varianten[k];n++;});
+    if(d.varianten)Object.keys(d.varianten).forEach(k=>{V2[k]=Object.assign({},d.varianten[k],{t:Date.now()});n++;});
     if(d.walls||d.pieces||d.items){V2['Import '+new Date().toLocaleString('de-DE')]={t:Date.now(),s:d};n++;}
     if(d.aktuell){V2['Importiert (aktuell) '+new Date().toLocaleDateString('de-DE')]={t:Date.now(),s:d.aktuell};n++;}
-    LS.set(K_VAR,V2);H.toast(n+' Variante(n) importiert');render();}catch(e){H.toast('Datei nicht erkannt');}}
+    setVars(V2);H.toast(n+' Variante(n) importiert');render();}catch(e){H.toast('Datei nicht erkannt');}}
 function renderSelInfo(){const box=$('eSel');if(!box)return;if(!sel){box.innerHTML='';return;}const pc=sel,[w,d,h]=sizeOf(pc),isNew=pc.kind==='new';
   const nm=pc.item?(pc.item.n||CAT[pc.item.t][0]):'Möbelstück',rm=pc.room?' · '+pc.room[0]:'',prod=isNew&&pc.item.mk?esc(pc.item.mk)+(pc.item.pr?' · '+eur(pc.item.pr):'')+' · ':'';
   let s='<div class="sel"><div class="row"><b>'+esc(nm)+'</b><span class="muted">'+prod+esc(rm.slice(3))+' · '+fmt(w).slice(0,-2)+' × '+fmt(d).slice(0,-2)+' × '+fmt(h)+'</span></div>'+
@@ -561,6 +596,8 @@ editBtn.addEventListener('click',()=>setEdit(!H.editMode));$('editClose').addEve
 
 // ---------- Start: gespeicherten Stand anwenden ----------
 try{applyBase();}catch(e){console.warn('Bestand konnte nicht angewendet werden',e);}
-try{let cur=LS.get(K_CUR,null);if(!cur){const old=LS.get(K_OLDWALL,null);cur={v:1,walls:old&&typeof old==='object'?old:{},pieces:{},items:[]};}applyState(cur);}catch(e){console.warn('Einrichtung konnte nicht geladen werden',e);}
-window.__einrichten={commitPiece,selectPiece,applyPiece,addItem,canWrite:()=>canWrite,bestand:BASE,festItems,state:()=>state,pieces:()=>buildPieces(),doors:()=>buildDoors(),selectDoor,applyDoor,gate:gateCfg,applyGate,masse:()=>massAll(),massPut,setEdit,applyState,PW};
+try{let cur=LS.get(K_CUR,null);if(!cur){const old=LS.get(K_OLDWALL,null);cur={v:1,walls:old&&typeof old==='object'?old:{},pieces:{},items:[]};}const had=!!LS.get(K_CUR,null);quiet=true;try{applyState(cur);flush();}finally{quiet=false;}
+  if(had&&!LS.get(K_T,0)&&lastJs!==JSON.stringify({v:2,walls:{},pieces:{},items:[],doors:{},tor:null}))LS.set(K_T,1);}catch(e){console.warn('Einrichtung konnte nicht geladen werden',e);}
+syncInit();
+window.__einrichten={sync,commitPiece,selectPiece,applyPiece,addItem,canWrite:()=>canWrite,bestand:BASE,festItems,state:()=>state,pieces:()=>buildPieces(),doors:()=>buildDoors(),selectDoor,applyDoor,gate:gateCfg,applyGate,masse:()=>massAll(),massPut,setEdit,applyState,PW};
 })();

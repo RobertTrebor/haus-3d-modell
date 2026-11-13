@@ -1,6 +1,6 @@
 # Speicherlogik: Status quo und Designideen
 
-Stand: 13.11.2026 (v88). Es gibt zwei getrennte Ebenen.
+Stand: 13.11.2026 (v89). Es gibt zwei getrennte Ebenen.
 
 ## 1. Status quo des Hauses – fest im Projekt (`src/config/`)
 
@@ -30,15 +30,23 @@ muss sein Eintrag in `bestand.js` entfernt oder umbenannt werden.
 
 ## 2. Designideen – im Browser
 
-Wandfarben, verschobene oder neue Möbel, Türen-Design, Varianten: wie bisher im `localStorage`
+Wandfarben, verschobene oder neue Möbel, Türen-Design, Varianten: im `localStorage`
 (`haus3d-einrichtung-v1`, `haus3d-varianten-v1`), mit Export/Import als Datei. Gespeichert werden nur
 Abweichungen vom Status quo; „Zurück an Ursprung“ und „Alles zurücksetzen“ führen auf den Status quo zurück.
 
-## 3. Synchronisierung PC ↔ Smartphone (geprüft, noch nicht umgesetzt)
+## 3. Synchronisierung PC ↔ Smartphone (seit v89)
 
-Das Artifact kann eine eingebaute Datenbank nutzen (Artifact-Fähigkeit `db`, zusammen mit `user`): Daten liegen
-bei claude.ai, pro angemeldeter Person privat unter `data/users/<id>/`, und sind auf jedem Gerät gleich, auf dem
-das Artifact geöffnet wird. Damit lassen sich Designideen und Varianten zwischen PC und Smartphone abgleichen.
-Einschränkungen: nur im Artifact (nicht auf localhost), nur angemeldet, und das Artifact muss mit dieser Fähigkeit
-veröffentlicht werden. Geplanter Ablauf: Status quo am PC pflegen → bauen → Artifact aktualisieren → Designideen
-im Artifact (PC oder Smartphone), gespeichert in der Artifact-Datenbank, mit `localStorage` als Rückfall.
+Designideen (aktueller Stand und Varianten) werden im Artifact über die eingebaute Datenbank von claude.ai
+abgeglichen (Artifact-Fähigkeiten `db` und `user`). Die Daten liegen privat je angemeldeter Person:
+
+- `data/users/<id>/einrichtung` – `{t, dev, json}`: aktueller Stand, Zeitstempel der letzten Änderung, Gerät
+- `data/users/<id>/varianten` – `{json}`: alle Varianten; gelöschte bleiben als Marke `{t, del}` erhalten
+
+Regeln: Beim aktuellen Stand gewinnt der neuere Zeitstempel; Varianten werden je Name zusammengeführt (neuere
+gewinnt). Geschrieben wird nur bei echter Änderung, gebündelt nach 1,5 s. `localStorage` bleibt als lokale Kopie
+und Rückfall. Der Reiter „Varianten“ zeigt den Zustand der Synchronisierung an.
+
+Voraussetzungen: nur im Artifact (nicht auf localhost oder aus der Datei), nur angemeldet, und das Artifact muss
+mit `capabilities: {db: {}, user: {}}` veröffentlicht sein. Der Status quo (`src/config/`) wird nicht
+synchronisiert – er ist Teil des Builds. Ablauf: Status quo am PC pflegen → bauen → Artifact aktualisieren →
+Designideen im Artifact am PC oder Smartphone.
