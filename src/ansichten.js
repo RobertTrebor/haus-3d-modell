@@ -71,9 +71,11 @@ function goTo(key){
   if(reduce){camera.position.copy(p);controls.target.copy(t);return;}
   tween={p0:camera.position.clone(),t0:controls.target.clone(),p,t,start:performance.now(),dur:900};
 }
-camera.position.set(...VIEWS.overview.p);controls.target.set(...VIEWS.overview.t);
+// Startansicht der App (Schlüssel aus VIEWS; die Auswahl im Menü folgt automatisch)
+const START='street';
+camera.position.set(...VIEWS[START].p);controls.target.set(...VIEWS[START].t);facadeMode=!!VIEWS[START].facade;
 
-const viewSel=document.getElementById('viewSel');
+const viewSel=document.getElementById('viewSel');viewSel.value=START;
 viewSel.addEventListener('change',()=>goTo(viewSel.value));
 const floorSel=document.getElementById('floorSel');floorSel.addEventListener('change',()=>{if(floorSel.value==='kg'){goTo('kg');return;}setLevel({eg:0,og:1,dg:2}[floorSel.value]);});
 controls.addEventListener('start',()=>{tween=null;});

@@ -31,7 +31,7 @@
   <div class="toast" id="toast" aria-live="polite"></div>
   <div class="hint"><b>Maus</b>: links ziehen = drehen, rechts ziehen = verschieben, Rad = zoomen. <b>Touch</b>: 1 Finger = drehen, 2 Finger = zoomen/verschieben. <b>Doppelklick / Doppeltipp</b>: in einen Raum wechseln oder dorthin gehen, auf einer Treppe hoch bzw. runter. Einfacher Klick öffnet Türen, Fenster, Rollläden, Schränke und Geräte. <b>Einrichten</b>: Wände streichen, Möbel verschieben, neue Möbel, Katalog, Türen und Garagentor, Maßband mit Maßregister (gemessen/geschätzt), Varianten.</div>
   <nav class="dock" aria-label="Ansicht und Optionen">
-    <button id="viewBtn" class="viewbtn" aria-haspopup="dialog" aria-expanded="false" aria-controls="viewSheet"><span class="vk">Ansicht</span><span id="viewName">Überblick</span><span class="chev" aria-hidden="true">▴</span></button>
+    <button id="viewBtn" class="viewbtn" aria-haspopup="dialog" aria-expanded="false" aria-controls="viewSheet"><span class="vk">Ansicht</span><span id="viewName">Haus von der Straße</span><span class="chev" aria-hidden="true">▴</span></button>
     <div class="seg" role="group" aria-label="Etage"><button data-floor="kg" aria-pressed="false">KG</button><button data-floor="eg" aria-pressed="true">EG</button><button data-floor="og" aria-pressed="false">OG</button><button data-floor="dg" aria-pressed="false">DG</button></div>
     <div class="tog">
       <button id="dims" aria-pressed="false">Maße</button>
@@ -42,11 +42,11 @@
     </div>
     <div class="vh-sr"><select id="viewSel" aria-label="Ansicht wählen">
         <optgroup label="Haus">
-          <option value="overview" selected>Überblick</option>
+          <option value="overview">Überblick</option>
           <option value="top">Draufsicht</option>
           <option value="outside">Hauseingang von außen</option>
           <option value="estairs">Eingangstreppe</option>
-          <option value="street">Haus von der Straße</option>
+          <option value="street" selected>Haus von der Straße</option>
           <option value="street2">Straße schräg von links</option>
           <option value="garden">Haus von der Gartenseite</option>
           <option value="terraceside">Haus von der Terrassenseite</option>
