@@ -1,5 +1,5 @@
 // Baumaße des Hauses (feste Größen) und fest gespeicherte Nachmessungen. Wird von server.py geschrieben
-// (Einrichten → Maßband) und von main.js gelesen. Aufbau: konst = Konstanten für main.js (Meter bzw. Stück;
+// (Einrichten → Maßband) und von basis.js gelesen. Aufbau: konst = Konstanten für das Modell (Meter bzw. Stück;
 // Raummaße stehen in raeume.js),
 // register = Nachmessungen zum Maßregister (IDs wie in src/masse/). Änderungen per Git committen.
 window.HAUS_MASSE={

@@ -1,6 +1,6 @@
 # Plan: Darstellung schneller und reaktionsfreudiger machen
 
-Stand: 11.11.2026 (v84). Gilt für `src/main.js` (Szene, Schleife) und `src/einrichten.js`.
+Stand: 11.11.2026 (v84). Gilt für die Modellskripte (Szene in `basis.js`, Schleife und Zusammenfassen in `start.js`; früher `main.js`) und `src/einrichten.js`.
 Ziel: flüssiges Drehen/Zoomen auf dem Android-Handy, sofortige Reaktion auf Tipp und Ziehen,
 weniger Akkuverbrauch – ohne dass das Modell sichtbar schlechter aussieht.
 

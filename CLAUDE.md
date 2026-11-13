@@ -15,15 +15,20 @@
   (seit v89 auch aus VS Code mit dem Artifact-Werkzeug: `dist/haus-3d-modell.html` mit dieser URL veröffentlichen;
   die Fähigkeiten `db` und `user` für die Synchronisierung bleiben erhalten, wenn `capabilities` weggelassen wird).
   Versionsnummern laufen ab v83 weiter (v30–v82 liegen in `Dokumente\Grundriss-Versionen`).
-- `main.js` ist eine IIFE. Hilfsfunktionen: `B(x0,x1,y0,y1,z0,z1,mat,parent)` (Quader), `cyl`, `blob`,
+- Modellskripte (klassische Skripte mit gemeinsamem Gültigkeitsbereich, Ladereihenfolge fest, siehe README):
+  `basis.js`, `eg.js`, `eg-bedienung.js`, `eingang.js`, `keller.js`, `vorbau.js`, `og.js`, `aussen.js`, `dg.js`,
+  `schalter.js`, `ansichten.js`, `navigation.js`, `start.js`. Neue Datei: in `index.html` und `SCRIPTS`
+  (`build.py`) eintragen. Namen sind global – keine Namen wie `top`, `name`, `parent`, `open` auf oberster Ebene.
+  Die Reihenfolge des Codes bestimmt die Zufallsfolge (`rnd()`); nicht umsortieren, ohne zu vergleichen.
+- Hilfsfunktionen (`basis.js`, `eg.js`, `eg-bedienung.js`): `B(x0,x1,y0,y1,z0,z1,mat,parent)` (Quader), `cyl`, `blob`,
   `M(hex,rough,extra)` (Material, gecacht; `Mu` ungecacht), `canvasTex`, `win`, `sash`, `openWin`,
   `swing`, `tog`, `anim`, `clickable`, `deco`, `label`.
-- Sichtbarkeitsgruppen: `gCel` (Keller), `gRoof` (Außen/Fassade), `gOG`, `gDG`; Steuerung in `loop()`.
-- Ansichten: `VIEWS{key:{p,t,fl,facade}}` + `<option>` in `index.html`; Doppelklick-Räume in `ROOMS`,
-  Treppen in `FLIGHTS`; Etagen `setLevel(-1..2)`.
-- Performance: statische Teile werden am Ende von `main.js` zu wenigen Meshes zusammengefasst.
+- Sichtbarkeitsgruppen: `gCel` (Keller), `gRoof` (Außen/Fassade), `gOG`, `gDG`; Steuerung in `loop()` (`start.js`).
+- Ansichten (`ansichten.js`): `VIEWS{key:{p,t,fl,facade}}` + `<option>` in `index.html`; Etagen `setLevel(-1..2)`.
+  Doppelklick-Räume in `ROOMS`, Treppen in `FLIGHTS` (`navigation.js`).
+- Performance: statische Teile werden in `start.js` zu wenigen Meshes zusammengefasst.
   Neue bewegliche oder verschiebbare Teile müssen per `clickable`/`anim`/`doors`/`sashes` registriert
   sein (bzw. vom Zusammenfassen ausgenommen werden), sonst sind sie danach nicht mehr einzeln greifbar.
-- Einrichtungsmodus: `src/einrichten.js` (nutzt `window.HAUS` vom Ende von `main.js`). Möbelkatalog mit
+- Einrichtungsmodus: `src/einrichten.js` (nutzt `window.HAUS` aus `start.js`). Möbelkatalog mit
   Quellen: `src/katalog.js` (`window.KATALOG`). Performance-Plan: `docs/plan-performance.md`.
 - Bilder: Datei nach `src/assets/art/`, Eintrag in `src/art.js`, im Code `window.ART.<schlüssel>`.

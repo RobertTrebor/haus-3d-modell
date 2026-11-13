@@ -1,5 +1,5 @@
 // Einrichtungsmodus: Wände streichen, Möbel verschieben/drehen, neue Möbel, Maßband, Varianten.
-// Braucht window.HAUS aus main.js (wird am Ende von main.js nach dem Zusammenfassen gesetzt).
+// Braucht window.HAUS aus start.js (wird dort nach dem Zusammenfassen gesetzt).
 (function(){
 'use strict';
 const H=window.HAUS;if(!H)return;

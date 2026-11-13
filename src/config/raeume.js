@@ -1,8 +1,8 @@
-// Räume: Maße, an denen main.js hängt (Meter). Wird von server.py geschrieben (Einrichten → Maßband →
-// Maßregister → „Ins Modell übernehmen“ bei raum.<schlüssel>.breite / .tiefe) und von main.js gelesen.
+// Räume: Maße, an denen das Modell hängt (Meter). Wird von server.py geschrieben (Einrichten → Maßband →
+// Maßregister → „Ins Modell übernehmen“ bei raum.<schlüssel>.breite / .tiefe) und vom Modell gelesen (rm() in basis.js).
 // Schlüssel = Ansichtsschlüssel aus ROOMS. breite = Ausdehnung in x, tiefe = in z. x0/z0 stehen nur dort, wo der
 // Raum im Modell eine eigene feste Ecke hat; sonst ergibt sich die Lage aus den Nachbarräumen und Wandstärken.
-// Fehlt ein Feld, ist das Maß (noch) nicht einzeln änderbar, sondern in main.js abgeleitet.
+// Fehlt ein Feld, ist das Maß (noch) nicht einzeln änderbar, sondern im Code abgeleitet.
 window.HAUS_RAEUME={
  "raeume": {
   "slide": {"name": "Wohnzimmer", "etage": "EG", "breite": 3.9, "tiefe": 3.54},

@@ -22,7 +22,7 @@ Ein Eintrag sieht so aus:
 
 - `modell` ist der Wert, der im 3D-Modell steckt. Für Räume (`raum.<schlüssel>.breite/.tiefe`) und Türen
   (`tuer.<tür-id>.breite/.hoehe`) liest die App ihn zur Laufzeit aus dem Modell, er muss nicht eingetragen werden.
-- `wert` ist der nachgemessene Wert, `quelle` die Herkunft, `konst` ein Hinweis, welche Konstante in `main.js`
+- `wert` ist der nachgemessene Wert, `quelle` die Herkunft, `konst` ein Hinweis, welche Konstante im Modell (`basis.js` … `dg.js`)
   den Modellwert bestimmt (hilft beim Nachziehen des Codes).
 - `einheit` ist `m`, wenn nichts angegeben ist; Zählwerte bekommen z. B. `einheit:'Stk'`.
 
@@ -44,12 +44,12 @@ Ein Eintrag sieht so aus:
 
 1. Die Einträge aus `masse-nachgemessen.json` in die passende Datei unter `src/masse/` übernehmen
    (`quelle:'gemessen'`, `datum`, `notiz`). Eigene IDs (`eigen.…`) dabei in sprechende IDs umbenennen.
-2. Weicht `wert` vom `modell` ab: die zugehörige Konstante in `main.js` (siehe `konst`) anpassen und prüfen, was
+2. Weicht `wert` vom `modell` ab: die zugehörige Konstante im Modell (siehe `konst`) anpassen und prüfen, was
    davon abhängt (Möbelpositionen sind absolute Koordinaten). Anschließend `modell` im Eintrag angleichen.
 3. `docs/uebergabe.md` ergänzen, falls es ein grundsätzlich neues Maß ist. Build, Commit, Push.
 
 ## Noch nicht umgesetzt
 
-- Die Modellgeometrie liest die Werte nicht automatisch aus dem Register; die Konstanten in `main.js`
+- Die Modellgeometrie liest die Werte nicht automatisch aus dem Register; die Konstanten in den Modellskripten
   müssen weiterhin von Hand nachgezogen werden (bewusst, damit ein Tippfehler nicht das Modell zerlegt).
 - Die „Maße“-Beschriftungen im 3D-Bild sind noch nicht nach Herkunft eingefärbt.

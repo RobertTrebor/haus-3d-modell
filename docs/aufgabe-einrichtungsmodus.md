@@ -67,7 +67,8 @@ und Fenster, Doppelklick wechselt den Raum.
   Die Datei aus `dist/` kann Robert in einem claude.ai-Chat ins Live-Artifact übernehmen lassen.
 - Sichtbare Texte in der Oberfläche auf Deutsch.
 - Maße von Robert stehen in `docs/uebergabe.md` und haben Vorrang vor Schätzungen.
-- Später, nicht jetzt: Three.js-Update (aktuell r128 per CDN) und Aufteilung von `main.js` in Module.
+- Später, nicht jetzt: Three.js-Update (aktuell r128 per CDN) und Module. Seit v92 ist `main.js` in mehrere
+  klassische Skripte aufgeteilt (`basis.js` … `start.js`, siehe README); ältere Abschnitte hier sagen noch `main.js`.
   Wenn es für den Einrichtungsmodus hilft, darf der neue Code schon in eine eigene Datei
   (z. B. `src/einrichten.js`). Dann muss `build.py` diese Datei mit einbetten.
 

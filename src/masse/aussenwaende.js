@@ -1,4 +1,4 @@
-// Außenwände, Vorbau, Fenster, Eingang (Stand 09.11.2026 aus docs/uebergabe.md; Modellwerte aus main.js)
+// Außenwände, Vorbau, Fenster, Eingang (Stand 09.11.2026 aus docs/uebergabe.md; Modellwerte aus dem Modell)
 window.MASSE.add('aussenwaende',[
  {id:'wand.aussen.dicke',name:'Außenwände – Dicke',raum:'alle',modell:0.38,wert:0.38,quelle:'gemessen',datum:'2026-11-09',konst:'EWT'},
  {id:'vorbau.breite',name:'Vorbau (Hauseingang) – Breite',raum:'Hauseingang',modell:4.10,wert:4.10,quelle:'gemessen',datum:'2026-11-09'},

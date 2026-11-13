@@ -6,9 +6,9 @@
 //           wert     – nachgemessener Wert (m), falls vorhanden,
 //           quelle   – 'gemessen' | 'geschaetzt' | 'unbekannt',
 //           datum    – 'JJJJ-MM-TT', notiz, einheit (Standard 'm', sonst z. B. 'Stk'),
-//           konst    – Name der Konstante/Formel in main.js, die den Modellwert bestimmt (Hilfe beim Nachziehen)}
+//           konst    – Name der Konstante/Formel im Modell, die den Modellwert bestimmt (Hilfe beim Nachziehen)}
 //
-// IDs: Räume  raum.<ansichtsschlüssel>.breite / .tiefe  (Schlüssel aus ROOMS in main.js, z. B. raum.kvest.breite)
+// IDs: Räume  raum.<ansichtsschlüssel>.breite / .tiefe  (Schlüssel aus ROOMS in navigation.js, z. B. raum.kvest.breite)
 //      Türen  tuer.<tür-id>.breite / .hoehe             (Tür-ID aus dem Reiter „Türen“, z. B. tuer.d514_0_472.breite)
 //      sonst frei, z. B. wand.aussen.dicke, kg.buero.balken.breite, eigen.<zeit> (aus der App)
 window.MASSE={eintraege:[],add(kat,list){list.forEach(e=>{if(!e||!e.id)return;e.kat=e.kat||kat;this.eintraege.push(e);});}};

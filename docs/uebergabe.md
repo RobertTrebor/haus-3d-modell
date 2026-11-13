@@ -25,7 +25,7 @@ Kellertreppe, Garage (Sektionaltor per Klick).
 2. **Einrichtungsmodus** – v83 umgesetzt (`src/einrichten.js`, siehe `docs/aufgabe-einrichtungsmodus.md`).
    Rückmeldung von Robert abwarten: Möbel-Erkennung (Teile, die zusammengehören), Bedienung am Handy.
 3. Weiteres Gebäude im Garten als eigener Teil. Benötigt: Lage zum Haus, Außenmaße, Höhen, Fotos.
-4. Three.js-Update und Aufteilung von `main.js` in Module (sinnvoll zusammen mit 2./3.).
+4. Three.js-Update und Module (die Aufteilung von `main.js` in mehrere klassische Skripte ist seit v92 erledigt) (sinnvoll zusammen mit 2./3.).
 5. Kleinigkeiten: dunkle Fläche oben an der linken Gartentreppe glätten; EG/OG-Fenster der Gartenseite
    (dreiteiliges Esszimmerfenster, Wintergarten 3×3-Sprossen, Putzband) mit Fotos abgleichen;
    Maße Kriechkeller/Garage nachmessen.

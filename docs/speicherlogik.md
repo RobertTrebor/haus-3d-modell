@@ -8,7 +8,7 @@ Alles, was das Haus so beschreibt, wie es wirklich ist. Die Dateien liegen im Re
 
 | Datei | Inhalt | Wird geändert über |
 |---|---|---|
-| `src/config/masse.js` → `konst` | Baumaße, an denen `main.js` hängt (Meter bzw. Stück) | Einrichten → Maßband → Maßregister → „Ins Modell übernehmen“ |
+| `src/config/masse.js` → `konst` | Baumaße, an denen das Modell hängt (Meter bzw. Stück) | Einrichten → Maßband → Maßregister → „Ins Modell übernehmen“ |
 | `src/config/masse.js` → `register` | Nachmessungen zum Maßregister (IDs wie in `src/masse/`) | Einrichten → Maßband → „Speichern“, „Nachmessen“, „Stimmt so“ |
 | `src/config/raeume.js` | Raummaße (Breite, Tiefe, feste Ecken) | Einrichten → Maßband → Maßregister → „Ins Modell übernehmen“ |
 | `src/config/bestand.js` → `pieces` | Korrekturen an vorhandenen Möbeln (Verschiebung `dx`/`dz`, Drehung `ry`, `hidden`) | Einrichten → Möbel → Stück wählen → „Fest übernehmen“ / „Aus Bestand entfernen“ |
@@ -31,8 +31,8 @@ Feld in `raeume.js` steht. Angebunden: Wohnzimmer, Esszimmer, Flur (Breite), Kü
 Bogenzimmer (Tiefe), Kellerbüro, Waschküche, Garage (Breite), Vorratsraum. Die Räume im OG folgen den Räumen
 darunter; DG, Windfang, WCs und Kellerflur sind noch nicht einzeln angebunden.
 
-Achtung: Teile mit festen Koordinaten in `main.js` wandern bei einer Maßänderung nicht automatisch mit.
-Die IDs der Möbel (`m<x>_<z>_<y>`) ergeben sich aus ihrer Lage in `main.js`; wird ein Möbelstück dort verschoben,
+Achtung: Teile mit festen Koordinaten in den Modellskripten wandern bei einer Maßänderung nicht automatisch mit.
+Die IDs der Möbel (`m<x>_<z>_<y>`) ergeben sich aus ihrer Lage im Code; wird ein Möbelstück dort verschoben,
 muss sein Eintrag in `bestand.js` entfernt oder umbenannt werden.
 
 ## 2. Designideen – im Browser

@@ -1,4 +1,4 @@
-// Innenwände, Raumhöhen, Räume, Treppen (Stand 09.11.2026 aus docs/uebergabe.md; Modellwerte aus main.js)
+// Innenwände, Raumhöhen, Räume, Treppen (Stand 09.11.2026 aus docs/uebergabe.md; Modellwerte aus dem Modell)
 window.MASSE.add('innenwaende',[
  {id:'wand.innen.dicke',name:'Innenwände – Dicke (inkl. Türrahmen)',raum:'alle',modell:0.18,wert:0.18,quelle:'gemessen',datum:'2026-11-09',notiz:'ca.',konst:'T'},
  {id:'raum.eg.hoehe',name:'Raumhöhe EG',raum:'EG',modell:2.59,wert:2.59,quelle:'gemessen',datum:'2026-11-09',konst:'H'},
