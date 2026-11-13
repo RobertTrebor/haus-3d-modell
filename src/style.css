@@ -116,3 +116,18 @@ body.editing .head,body.editing .hint{display:none}
 @media (max-width:640px){.edit{top:8px;left:8px;right:8px;width:auto;transform:none;max-height:44vh}.edit-tabs{gap:4px;padding:6px}.edit-tabs button{padding:0 8px;font-size:.8rem;min-height:34px}.edit-tabs .edit-x{min-width:34px}}
 .dbg{position:absolute;top:74px;left:14px;max-width:calc(100% - 28px);background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:5px 10px;font:12px ui-monospace,Consolas,monospace;color:var(--ink);pointer-events:none}
 .dbg[hidden]{display:none}
+
+/* ---- Laufmodus (laufen.js) ---- */
+.walkhud{position:absolute;inset:0;pointer-events:none;display:none}
+body.walking .walkhud{display:block}
+body.walking .dock,body.walking .hint,body.walking .head,body.walking .sheet{display:none}
+body.walking #stage canvas{cursor:crosshair}
+.walkx{pointer-events:auto;position:absolute;top:14px;right:14px;font:inherit;font-size:.9rem;color:var(--ink);background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:0 14px;min-height:44px;cursor:pointer}
+.walkx:focus-visible{outline:2px solid var(--active);outline-offset:2px}
+.walkhelp{position:absolute;top:14px;left:14px;max-width:min(520px,calc(100% - 220px));background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:8px 12px;font-size:.8rem;color:var(--ink-soft)}
+.walkjoy{pointer-events:auto;position:absolute;left:22px;bottom:calc(26px + env(safe-area-inset-bottom,0px));width:136px;height:136px;border-radius:50%;background:rgba(255,255,255,.3);border:2px solid rgba(43,42,39,.35);touch-action:none;display:none}
+.walkjoy i{position:absolute;left:50%;top:50%;width:56px;height:56px;margin:-28px 0 0 -28px;border-radius:50%;background:rgba(255,252,246,.9);border:1px solid rgba(43,42,39,.4);box-shadow:0 2px 8px rgba(0,0,0,.25)}
+.walkdot{position:absolute;left:50%;top:50%;width:8px;height:8px;margin:-4px 0 0 -4px;border-radius:50%;background:rgba(255,255,255,.9);border:1px solid rgba(0,0,0,.6);display:none}
+body.walk-lock .walkdot{display:block}
+@media (any-pointer:coarse){.walkjoy{display:block}}
+@media (pointer:coarse){.walkhelp{display:none}}

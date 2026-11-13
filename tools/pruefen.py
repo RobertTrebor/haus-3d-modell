@@ -3,7 +3,8 @@
 
 Aufruf:  python tools/pruefen.py fingerabdruck   -> Kennzahlen des Modells (vor und nach einem Umbau vergleichen)
          python tools/pruefen.py funktion        -> Drehen, Zoomen, Schalter, Doppelklick, Einrichtungsmodus
-         python tools/pruefen.py                 -> beides
+         python tools/pruefen.py laufen          -> Laufmodus: Start, Wände halten, außen laufen
+         python tools/pruefen.py                 -> alles
 
 Fingerabdruck: Anzahl der Bauteile und je eine Prüfsumme über alle Bauteile (Lage, sämtliche Eckpunkte, Farbe,
 Sichtbarkeit – unabhängig von der Reihenfolge), über Räume/Treppen (ROOMS, FLIGHTS) und über die Ansichten (VIEWS).
@@ -63,7 +64,27 @@ FUNKTION = KOPF + r"""
 }catch(e){log('FEHLER '+e.message+' '+errs.join(' ; '));}})();
 </script>"""
 
-TESTS = {"fingerabdruck": (FINGERABDRUCK, 14), "funktion": (FUNKTION, 34)}
+LAUFEN = KOPF + r"""
+(async()=>{try{const W=await laden(),H=W.HAUS,D=W.document,s=D.getElementById('viewSel'),L=W.__laufen,R=W.__ROOMS;
+ const ansicht=async v=>{s.value=v;s.dispatchEvent(new W.Event('change'));await w(1800);};
+ const geh=async(code,ms)=>{L.taste(code,true);await w(ms);L.taste(code,false);await w(150);};
+ const f=v=>v.toFixed(2),raum=p=>{const r=W.__roomAt(p.x,p.fuss+1,p.z);return r?r[0]:'keiner';};
+ await ansicht('slide');const t0=performance.now();L.start();const bau=performance.now()-t0;await w(400);const z=L.zahl(),a=L.stand();
+ log('Start im Wohnzimmer: Aufbau '+bau.toFixed(0)+' ms, Dreiecke fest='+z.fest+' beweglich='+z.beweglich+' davon Moebel='+z.moebel+', Fuss='+f(a.fuss)+' (soll 0.00), Regler aus='+(!H.controls.enabled));
+ await geh('KeyW',4000);const b=L.stand();
+ log('4 s geradeaus: '+f(Math.hypot(b.x-a.x,b.z-a.z))+' m gelaufen, Raum='+raum(b)+' (soll Wohnzimmer), Fuss='+f(b.fuss));
+ await geh('KeyS',1500);await geh('KeyD',4000);const c=L.stand();log('zurueck und 4 s seitwaerts: Raum='+raum(c)+' x='+f(c.x)+' z='+f(c.z));
+ L.stop();await w(300);log('Beendet: Regler an='+H.controls.enabled+', Leiste sichtbar='+(W.getComputedStyle(D.querySelector('.dock')).display!=='none'));
+ await ansicht('overview');L.start();await w(400);const d=L.stand();await geh('KeyW',3000);const e=L.stand();
+ log('Start aussen: x='+f(d.x)+' z='+f(d.z)+' Fuss='+f(d.fuss)+'; 3 s geradeaus: '+f(Math.hypot(e.x-d.x,e.z-d.z))+' m, Fuss='+f(e.fuss));
+ await geh('KeyW',5000);const g=L.stand();log('weiter aufs Haus zu (5 s): x='+f(g.x)+' z='+f(g.z)+' Fuss='+f(g.fuss)+' Raum='+raum(g));
+ L.stop();await ansicht('hall');L.start();await w(400);const h0=L.stand();await geh('KeyW',6000);const h1=L.stand();
+ log('Flur Richtung Treppe (nur zur Information, Schritt 2): Fuss '+f(h0.fuss)+' -> '+f(h1.fuss)+', x='+f(h1.x)+' z='+f(h1.z));
+ L.stop();log(fehler());
+}catch(e){log('FEHLER '+e.message+' '+errs.join(' ; '));}})();
+</script>"""
+
+TESTS = {"fingerabdruck": (FINGERABDRUCK, 14), "funktion": (FUNKTION, 34), "laufen": (LAUFEN, 75)}
 
 
 class Langsam(BaseHTTPRequestHandler):

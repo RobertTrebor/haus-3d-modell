@@ -36,7 +36,7 @@ function leistungMessung(avg){const e=LEIST.eff;
 // Kamera über 1,5 m gewandert ist (höchstens alle 0,8 s), damit die Shader nicht ständig neu übersetzt werden.
 function updateLights(now){
   if(!window.__pls){window.__pls=[];scene.traverse(o=>{if(o.isPointLight){let q=o,out=false;while(q){if(q===gRoof||q===gVS)out=true;q=q.parent;}window.__pls.push([o,out]);}});}
-  const fm=facadeMode||kgMode,max=LEIST.lichter[LEIST.eff],key=(fm?1:0)+'|'+(kgMode?1:0)+'|'+max;
+  const fm=(facadeMode&&!window.__laufenAn)||kgMode,max=LEIST.lichter[LEIST.eff],key=(fm?1:0)+'|'+(kgMode?1:0)+'|'+max;
   if(key===__lightKey&&!(max<99&&now-__lightT>800&&camera.position.distanceToSquared(__lightP)>2.25))return;
   __lightKey=key;__lightT=now;__lightP.copy(camera.position);const cand=[],p=new THREE.Vector3();
   window.__pls.forEach(([l,out])=>{const on=!fm||out||kgMode;if(max>=99)l.visible=on;else{l.visible=false;if(on)cand.push([l,(l.intensity>0?0:1e6)+l.getWorldPosition(p).distanceToSquared(camera.position)]);}});
@@ -134,7 +134,7 @@ scene.traverse(o=>{if(o.isMesh&&o.geometry&&o.geometry.type==='PlaneGeometry'&&M
     addDeco:a=>{decoMeshes.push(...a);a.forEach(innerCheck);applyFurnDeco();},
     removeFurn:a=>{const S=new Set(a);furnList=furnList.filter(m=>!S.has(m));},
     // Türen (Drehflügel, Einrichtungsmodus "Türen") und Garagentor
-    anims,doors,toggleDoor,B,canvasTex,clickable,swing,tog,gRoof,NF,gx0,gx1,garPans:window.__garPans||[],white,
+    anims,doors,toggleDoor,fixed,togGroups:TOG,B,canvasTex,clickable,swing,tog,gRoof,NF,gx0,gx1,garPans:window.__garPans||[],white,
     isFacade:()=>facadeMode||kgMode};
 })();
 // ---- Messanzeige: mit ?debug in der Adresse oder durch dreimaliges schnelles Klicken auf den Titel (bleibt gemerkt) ----

@@ -1,6 +1,6 @@
 # Übergabe 3D-Modell Haus Mühlstr. 46
 
-Stand: 13.11.2026 (v92). Repository am 09.11.2026 angelegt aus v82 (`v82_Performance.html`).
+Stand: 13.11.2026 (v104). Repository am 09.11.2026 angelegt aus v82 (`v82_Performance.html`).
 
 ## Wichtige Maße (von Robert)
 - Raumhöhe EG und OG 2,59 m; Kellerräume 2,20 m; Bogen-Scheitel 1,81 m.
@@ -68,6 +68,18 @@ mehr beim Blick von oben, sondern über eine andere Ansicht oder die Etagenknöp
 
 Performance (v100–v103, siehe `docs/plan-performance.md`): Messanzeige (`?debug` oder dreimal auf den Titel klicken),
 Zeichnen nur bei Bedarf, Schalter „Leistung“ (Auto/Hoch/Niedrig), Inneneinrichtung in Außenansichten erst nahe am Haus.
+
+Laufmodus (v104, `src/laufen.js`, Schritt 1 von 2): Knopf „Laufen“ in der Leiste. Am PC W/A/S/D oder Pfeiltasten,
+Maus zum Umsehen (Klick ins Bild fängt die Maus, Esc gibt sie frei, zweites Esc beendet), Umschalt = schneller; am Handy
+Steuerkreis links unten und Wischen. Start am aktuellen Standpunkt, wenn die Kamera in einem Raum oder knapp über
+dem Boden steht, sonst auf dem Gehweg vor dem Haus. Wände, geschlossene Türen, Möbel und Zäune halten auf; Deko nicht.
+Im Laufmodus gilt die Außenansicht (Fassade, Dach, Garten sichtbar), die Etage folgt der Fußhöhe.
+- Im Artifact lässt sich die Maus vermutlich nicht fangen (der Viewer erlaubt das nicht); dort mit gedrückter Maustaste
+  umsehen. Lokal über `server.py` geht beides. Auf einem echten Handy noch nicht ausprobiert.
+- Treppen werden schon mitgenommen (Stufen bis 32 cm), sind aber noch nicht geprüft: Geländer, Kopfhöhe,
+  Kellertreppe, Dachbodentreppe, Etagenwechsel der Anzeige. Das ist Schritt 2.
+- Das Gartentor und die Haustür müssen wie sonst per Klick geöffnet werden, bevor man durchgehen kann.
+- Offen: fehlender Boden vorne links (Punkt 8 oben) – dort bleibt man auf der letzten Höhe stehen.
 
 Bewusste Einschränkungen der Navigation:
 - Durch offene Türen zoomen geht nicht mehr; Raumwechsel per Doppelklick/Doppeltipp.

@@ -24,11 +24,12 @@ src/
   navigation.js   Umsehen und Zoomen im Raum, Doppelklick, Räume (ROOMS), Treppen (FLIGHTS)
   start.js        Zeichenschleife, Zusammenfassen (Performance), Schnittstelle window.HAUS
   einrichten.js   Einrichtungsmodus; katalog.js Möbelkatalog; masse/ Maßregister
+  laufen.js       Laufmodus: durchs Haus und ums Haus gehen (Tasten/Maus, Steuerkreis am Handy)
   art.js          Liste der Bilder (Schlüssel -> Datei)
   assets/art/     Fotos/Bilder, die im Modell hängen
 build.py          baut dist/haus-3d-modell.html (eine Datei, alles eingebettet)
 server.py         lokaler Server; speichert feste Änderungen in src/config/
-tools/pruefen.py  prüft das Modell im unsichtbaren Chrome (Fingerabdruck, Funktionstest)
+tools/pruefen.py  prüft das Modell im unsichtbaren Chrome (Fingerabdruck, Funktionstest, Laufmodus)
 docs/             Übergabe, Maße, offene Punkte
 ```
 

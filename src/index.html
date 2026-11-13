@@ -30,13 +30,14 @@
   </div>
   <div class="toast" id="toast" aria-live="polite"></div>
   <div class="dbg" id="dbg" hidden></div>
-  <div class="hint"><b>Maus</b>: links ziehen = drehen, rechts ziehen = verschieben, Rad = zoomen. <b>Touch</b>: 1 Finger = drehen, 2 Finger = zoomen/verschieben. <b>Doppelklick / Doppeltipp</b>: in einen Raum wechseln oder dorthin gehen, auf einer Treppe hoch bzw. runter. Einfacher Klick öffnet Türen, Fenster, Rollläden, Schränke und Geräte. <b>Einrichten</b>: Wände streichen, Möbel verschieben, neue Möbel, Katalog, Türen und Garagentor, Maßband mit Maßregister (gemessen/geschätzt), Varianten.</div>
+  <div class="hint"><b>Maus</b>: links ziehen = drehen, rechts ziehen = verschieben, Rad = zoomen. <b>Touch</b>: 1 Finger = drehen, 2 Finger = zoomen/verschieben. <b>Doppelklick / Doppeltipp</b>: in einen Raum wechseln oder dorthin gehen, auf einer Treppe hoch bzw. runter. Einfacher Klick öffnet Türen, Fenster, Rollläden, Schränke und Geräte. <b>Laufen</b>: mit W/A/S/D und Maus (am Handy mit Steuerkreis) durchs Haus und ums Haus gehen. <b>Einrichten</b>: Wände streichen, Möbel verschieben, neue Möbel, Katalog, Türen und Garagentor, Maßband mit Maßregister (gemessen/geschätzt), Varianten.</div>
   <nav class="dock" aria-label="Ansicht und Optionen">
     <button id="viewBtn" class="viewbtn" aria-haspopup="dialog" aria-expanded="false" aria-controls="viewSheet"><span class="vk">Ansicht</span><span id="viewName">Haus von der Straße</span><span class="chev" aria-hidden="true">▴</span></button>
     <div class="seg" role="group" aria-label="Etage"><button data-floor="kg" aria-pressed="false">KG</button><button data-floor="eg" aria-pressed="true">EG</button><button data-floor="og" aria-pressed="false">OG</button><button data-floor="dg" aria-pressed="false">DG</button></div>
     <div class="tog">
       <button id="dims" aria-pressed="false">Maße</button>
       <button id="walls" aria-pressed="false">Wände aus</button>
+      <button id="walkBtn" aria-pressed="false" title="Wie in einem 3D-Spiel durchs Haus gehen">Laufen</button>
       <button id="editBtn" aria-pressed="false">Einrichten</button>
       <button id="deco" aria-pressed="false">Deko aus</button><button id="furn" aria-pressed="false">Möbel aus</button>
       <button id="evening" aria-pressed="false">Abend</button>
@@ -160,5 +161,6 @@
 <script src="masse/moebel.js"></script>
 <script src="katalog.js"></script>
 <script src="einrichten.js"></script>
+<script src="laufen.js"></script>
 </body>
 </html>

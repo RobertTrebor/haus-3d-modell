@@ -33,4 +33,7 @@
   sein (bzw. vom Zusammenfassen ausgenommen werden), sonst sind sie danach nicht mehr einzeln greifbar.
 - Einrichtungsmodus: `src/einrichten.js` (nutzt `window.HAUS` aus `start.js`). Möbelkatalog mit
   Quellen: `src/katalog.js` (`window.KATALOG`). Performance-Plan: `docs/plan-performance.md`.
+- Laufmodus (Knopf „Laufen“): `src/laufen.js`, lädt nach `einrichten.js`. Hindernisse und Boden werden beim Start aus
+  den sichtbaren Flächen berechnet (Möbel aus `furnList` nur als Hindernis, Deko gar nicht, bewegliche Teile aus
+  `HAUS.fixed`). Test: `python tools/pruefen.py laufen`. Stand und offene Punkte: `docs/uebergabe.md`.
 - Bilder: Datei nach `src/assets/art/`, Eintrag in `src/art.js`, im Code `window.ART.<schlüssel>`.
