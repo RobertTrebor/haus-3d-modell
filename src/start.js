@@ -9,11 +9,18 @@ eveBtn.addEventListener('click',()=>{
   renderer.toneMappingExposure=on?1.25:1.05;
 });
 
-function resize(){const w=stage.clientWidth,h=stage.clientHeight;renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();}
+function resize(){const w=stage.clientWidth,h=stage.clientHeight;renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();__dirty=1;}
 new ResizeObserver(resize).observe(stage);resize();
 
+// Bedienung (Klick, Taste, Rad, Tippen) hält das Zeichnen kurz am Laufen; Klicks und Umschalter erneuern auch die Schatten
+['pointerdown','pointerup','click','change','input','keydown','wheel','touchend'].forEach(n=>window.addEventListener(n,()=>{__dirtyUntil=performance.now()+600;if(n==='click'||n==='change')__shF=0;},{capture:true,passive:true}));
+const __lastP=new THREE.Vector3(1e9,0,0),__lastQ=new THREE.Quaternion();let __animPrev=0,__idle=false,__visSig=0;
+const visGroups=facadeGroups.concat([gCel,gCelF,gRoof,gOG,gDG,gDGshell]);
 function loop(now){
+  requestAnimationFrame(loop);
   doorTick();
+  // bewegliche Teile: während der Bewegung zeichnen, am Ende einmal die Schatten erneuern
+  if(__anim){__anim=0;__animPrev=1;__dirty=1;}else if(__animPrev){__animPrev=0;__shF=0;}
   if(tween){
     const k=Math.min(1,(now-tween.start)/tween.dur),e=k<.5?2*k*k:1-Math.pow(-2*k+2,2)/2;
     camera.position.lerpVectors(tween.p0,tween.p,e);controls.target.lerpVectors(tween.t0,tween.t,e);
@@ -37,11 +44,16 @@ function loop(now){
   gCelF.visible=gCel.visible||facadeMode; // Keller-Außenwand zur Straße: in Außenansichten immer sichtbar
   if(!window.__pls){window.__pls=[];scene.traverse(o=>{if(o.isPointLight){let q=o,out=false;while(q){if(q===gRoof||q===gVS)out=true;q=q.parent;}window.__pls.push([o,out]);}});}
   {const fm=facadeMode||kgMode,key=fm?1:0;if(window.__plk!==key){window.__plk=key;window.__pls.forEach(([l,out])=>{l.visible=!fm||out||kgMode;});__shF=0;}}
-  if(__shF<3||(__shF%20===0)){renderer.shadowMap.needsUpdate=true;}__shF++;
+  // Sichtbarkeit der Gruppen geändert (Wände ein-/ausgeblendet)? Dann Schatten neu berechnen.
+  {let sig=0;for(let i=0;i<visGroups.length;i++)if(visGroups[i].visible)sig=(Math.imul(sig,31)+i+1)|0;if(sig!==__visSig){__visSig=sig;__shF=0;}}
+  // Nur zeichnen, wenn sich etwas geändert hat: Kamera, bewegliche Teile, Bedienung oder noch ausstehende Schatten.
+  // Im Stillstand wird kein Bild berechnet (vorher 60 pro Sekunde und alle 20 Bilder neue Schatten).
+  if(!(__dirty||now<__dirtyUntil||__shF<3||!c.equals(__lastP)||!camera.quaternion.equals(__lastQ))){__idle=true;return;}
+  __lastP.copy(c);__lastQ.copy(camera.quaternion);__dirty=0;
+  if(__shF<3)renderer.shadowMap.needsUpdate=true;__shF++;
   renderer.render(scene,camera);__frames++;
-  // Auflösung an die Geräteleistung anpassen (flüssig drehen hat Vorrang)
-  {const tn=performance.now();__ft+=tn-__fl;__fl=tn;if(++__fn>=45){const avg=__ft/__fn;__ft=0;__fn=0;__avg=avg;let np=__pr;if(avg>30&&__pr>1)np=Math.max(1,__pr-0.25);else if(avg<17&&__pr<__prMax)np=Math.min(__prMax,__pr+0.25);if(np!==__pr){__pr=np;renderer.setPixelRatio(__pr);resize();}}}
-  requestAnimationFrame(loop);
+  // Auflösung an die Geräteleistung anpassen (flüssig drehen hat Vorrang); gemessen wird nur zwischen direkt aufeinanderfolgenden Bildern
+  {const tn=performance.now(),dt=tn-__fl;__fl=tn;if(!__idle&&dt<250){__ft+=dt;if(++__fn>=45){const avg=__ft/__fn;__ft=0;__fn=0;__avg=avg;let np=__pr;if(avg>30&&__pr>1)np=Math.max(1,__pr-0.25);else if(avg<17&&__pr<__prMax)np=Math.min(__prMax,__pr+0.25);if(np!==__pr){__pr=np;renderer.setPixelRatio(__pr);resize();}}}__idle=false;}
 }
 scene.traverse(o=>{if(o.isMesh&&o.geometry&&o.geometry.type==='PlaneGeometry'&&Math.abs(o.rotation.x+Math.PI/2)<1e-3){if(!Array.isArray(o.material)&&!o.material.polygonOffset)o.material=o.material.clone();(Array.isArray(o.material)?o.material:[o.material]).forEach(m=>{m.polygonOffset=true;m.polygonOffsetFactor=-1;m.polygonOffsetUnits=-4;});}});
 // ---- Performance: unbewegliche Teile je Gruppe, Material und Rolle (Deko/Möbel/Wand) zu wenigen Objekten zusammenfassen ----
@@ -85,7 +97,7 @@ scene.traverse(o=>{if(o.isMesh&&o.geometry&&o.geometry.type==='PlaneGeometry'&&M
   window.__merged=merged;__shF=0;
   // Schnittstelle für den Einrichtungsmodus (einrichten.js)
   window.HAUS={scene,camera,renderer,controls,col,M,Mu,H,OGF,DGF,CF,konst:KONST,raeume:RAEUME,editMode:false,furnSrc,decoSrc,srcRec,diningSet,dLight,wallMeshes,decoMeshes,
-    rooms:()=>window.__ROOMS||[],toast:t=>window.__toast&&window.__toast(t),dirty:()=>{__shF=0;},
+    rooms:()=>window.__ROOMS||[],toast:t=>window.__toast&&window.__toast(t),dirty:()=>{__shF=0;__dirty=1;},
     addFurn:a=>{furnList.push(...a);const hid=furnBtn.getAttribute('aria-pressed')==='true';a.forEach(m=>m.visible=!hid);},
     addDeco:a=>{decoMeshes.push(...a);const hid=decoBtn.getAttribute('aria-pressed')==='true';a.forEach(m=>m.visible=!hid);},
     removeFurn:a=>{const S=new Set(a);furnList=furnList.filter(m=>!S.has(m));},

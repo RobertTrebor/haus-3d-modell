@@ -35,7 +35,7 @@ function pushVars(){if(!sync.vars)return;if(sync.varBusy){sync.varDirty=true;ret
 function onCur(snap){const md=snap.metadata||{};if(md.hasPendingWrites)return;const d=snap.exists?snap.data():null,lt=+LS.get(K_T,0)||0,rt=d&&+d.t||0;
   if(!md.fromCache)setSync('ok');
   if(d&&typeof d.json==='string'&&rt>lt){let st=null;try{st=JSON.parse(d.json);}catch(e){}if(!st)return;flush();
-    quiet=true;try{applyState(st);flush();}finally{quiet=false;}LS.set(K_T,rt);H.toast('Stand vom anderen Gerät übernommen');if(H.editMode)render();}
+    quiet=true;try{applyState(st);flush();}finally{quiet=false;}LS.set(K_T,rt);H.dirty();H.toast('Stand vom anderen Gerät übernommen');if(H.editMode)render();}
   else if(lt>rt&&!md.fromCache)pushCur();}
 function onVars(snap){const md=snap.metadata||{};if(md.hasPendingWrites)return;const d=snap.exists?snap.data():null;let R={};try{R=d&&typeof d.json==='string'?JSON.parse(d.json)||{}:{};}catch(e){}
   const L=LS.get(K_VAR,{}),M=Object.assign({},R);let lc=false,rc=false;

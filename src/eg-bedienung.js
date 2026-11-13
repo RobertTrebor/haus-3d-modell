@@ -75,8 +75,8 @@ belt(addShutter('x',KX1+0.26,kw0,kw1,0.95,2.2,gKE,false),'x',KX1,-1,kw1+0.12,gKE
 belt(addShutter('z',RZ0-0.27,nw0,nw1,0.95,2.2,gBN,false),'z',RZ0,1,nw1+0.12,gBN);
 belt(addShutter('x',RX1+0.27,ew0,ew1,0.95,2.2,gBE,false),'x',RX1,-1,ew1+0.12,gBE);
 function toggleShutter(sh){sh.target=sh.target>0.5?0:1;}
-function shutTick(){shutters.forEach(sh=>{const df=sh.target-sh.t;if(Math.abs(df)>0.0005){sh.t+=reduceMotionS?df:Math.sign(df)*Math.min(Math.abs(df),0.018);shutApply(sh);}});
-  sashes.forEach(sh=>{const df=sh.target-sh.pv.rotation.y;if(Math.abs(df)>0.001)sh.pv.rotation.y+=reduceMotionS?df:df*0.12;});}
+function shutTick(){shutters.forEach(sh=>{const df=sh.target-sh.t;if(Math.abs(df)>0.0005){__anim=1;sh.t+=reduceMotionS?df:Math.sign(df)*Math.min(Math.abs(df),0.018);shutApply(sh);}});
+  sashes.forEach(sh=>{const df=sh.target-sh.pv.rotation.y;if(Math.abs(df)>0.001){sh.pv.rotation.y+=reduceMotionS?df:df*0.12;__anim=1;}});}
 const reduceMotionS=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 // ---- Türen (klickbar) ----
@@ -111,7 +111,7 @@ function pickDoor(e){const r=renderer.domElement.getBoundingClientRect();mv.set(
 renderer.domElement.addEventListener('pointerdown',e=>{downAt=[e.clientX,e.clientY];});
 renderer.domElement.addEventListener('pointerup',e=>{if(!downAt)return;const moved=Math.hypot(e.clientX-downAt[0],e.clientY-downAt[1]);downAt=null;if(moved>6)return;if(window.HAUS&&HAUS.editMode)return;const p=pickDoor(e);if(p&&p.act)p.act();else if(p&&p.door)toggleDoor(p.door);else if(p&&p.sash)toggleSash(p.sash);else if(p&&p.shutter)toggleShutter(p.shutter);});
 renderer.domElement.addEventListener('pointermove',e=>{if(e.buttons)return;if(window.HAUS&&HAUS.editMode)return;renderer.domElement.style.cursor=pickDoor(e)?'pointer':'';});
-function doorTick(){shutTick();applianceTick();doors.forEach(d=>{const df=d.target-d.g.rotation.y;if(Math.abs(df)>0.001){d.g.rotation.y+=reduceMotion?df:df*0.12;__shF=0;}});}
+function doorTick(){shutTick();applianceTick();doors.forEach(d=>{const df=d.target-d.g.rotation.y;if(Math.abs(df)>0.001){d.g.rotation.y+=reduceMotion?df:df*0.12;__shF=0;__anim=1;}});}
 const reduceMotion=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 doors.forEach(d=>d.g.traverse(o=>{if(o.isMesh){o.castShadow=true;o.receiveShadow=true;}}));
 
@@ -227,7 +227,7 @@ function toastApply(){lever.position.y=toast.lever;slices.forEach(m=>m.position.
 toastApply();
 clickable(tg,()=>{if(toast.state==='idle'){toast.state='on';toast.t=0;}else if(toast.state==='on'){toast.t=99;}});
 function applianceTick(){
-  anims.forEach(a=>{const c=a.get(),df=a.target-c;if(Math.abs(df)>0.0005){a.set(reduceMotion?a.target:c+df*0.14);__shF=0;}});
+  anims.forEach(a=>{const c=a.get(),df=a.target-c;if(Math.abs(df)>0.0005){a.set(reduceMotion?a.target:c+df*0.14);__shF=0;__anim=1;}});
   const fo=Math.max(...fDoors.map(d=>Math.abs(d.get())))/1.8;fLightM.emissiveIntensity=fo>0.05?1.4:0;fLight.intensity=fo>0.05?0.9*fo:0;
   const ko=Math.max(...kDoors.slice(0,2).map(d=>Math.abs(d.get())))/1.55;kLightM.emissiveIntensity=ko>0.05?1.4:0;kfLight.intensity=ko>0.05?ko:0;
   const oo=Math.abs(oDoor.get())/1.45;oLightM.emissiveIntensity=0.4+1.4*oo;oLight.intensity=0.9*oo;
@@ -236,4 +236,5 @@ function applianceTick(){
     if(toast.t>4.5){toast.state='pop';toast.vy=0.011;toast.shade=Math.min(1,toast.shade+0.34);breadM.color.copy(breadBase).lerp(breadDark,toast.shade);}}
   else if(toast.state==='pop'){tSlotM.emissiveIntensity*=0.9;tLight.intensity*=0.9;toast.lever+=((ty1-0.06)-toast.lever)*0.4;
     toast.bread+=toast.vy;toast.vy-=0.0011;if(toast.vy<0&&toast.bread<=0.04){toast.bread=0.04;toast.state='idle';tSlotM.emissiveIntensity=0;tLight.intensity=0;}}
+  if(toast.state==='on'||toast.state==='pop')__anim=1;
   toastApply();}

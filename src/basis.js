@@ -9,6 +9,9 @@ renderer.toneMapping=THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure=1.05;
 renderer.shadowMap.enabled=true;
 renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.shadowMap.autoUpdate=false;let __shF=0;
+// Zeichnen nur bei Bedarf (start.js): __dirty = nächstes Bild zeichnen, __dirtyUntil = bis zu diesem Zeitpunkt durchzeichnen
+// (nach Bedienung), __anim = in diesem Bild hat sich ein bewegliches Teil bewegt (Türen, Rollläden, Flügel, Geräte)
+let __dirty=1,__dirtyUntil=performance.now()+5000,__anim=0;
 let __frames=0,__avg=0; // Messanzeige (start.js): gezeichnete Bilder, mittlerer Bildabstand in ms
 stage.prepend(renderer.domElement);
 
