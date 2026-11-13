@@ -4,6 +4,9 @@
 - Maße von Robert haben Vorrang vor Schätzungen aus Fotos; Geschätztes immer als geschätzt kennzeichnen.
   Gesammelte Maße: `docs/uebergabe.md` und Maßregister `src/masse/*.js` (gemessen/geschätzt/unbekannt,
   Ablauf in `docs/masse.md`). Neue Maße von Robert dort eintragen, nicht nur im Code.
+- Speicherlogik (`docs/speicherlogik.md`): Status quo des Hauses fest in `src/config/` (Baumaße `masse.js`,
+  Möbelkorrekturen `bestand.js`; schreibbar nur über `python server.py`), Designideen im Browser.
+  Neue Baumaße in `main.js` über `KONST.<Name>` anbinden statt als feste Zahl.
 - Gearbeitet wird in `src/`. `dist/` ist generiert (`python build.py`) und nicht im Repo.
 - **Aktuelle Aufgabe: Einrichtungsmodus → `docs/aufgabe-einrichtungsmodus.md`.**
 - Nach jeder größeren Änderung: Commit mit aussagekräftiger Nachricht und push, `python build.py vNN_Kurzname`.

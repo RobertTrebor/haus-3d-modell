@@ -23,7 +23,8 @@ sonst blockiert der Browser die Bilder als Texturen.
 
 - Erweiterung **Live Server** installieren (VS Code schlägt sie vor) → unten rechts **Go Live**
   → öffnet `src/index.html` im Browser und lädt bei jedem Speichern neu.
-- Alternativ im Terminal: `python -m http.server 8000 -d src` → http://localhost:8000
+- Empfohlen im Terminal: `python server.py` → http://localhost:8000. Nur dieser Server kann feste Änderungen
+  (Baumaße, Möbelkorrekturen) in `src/config/` speichern, siehe `docs/speicherlogik.md`.
 
 ## Ein-Datei-Version bauen (für das Artifact / Versionskopien)
 

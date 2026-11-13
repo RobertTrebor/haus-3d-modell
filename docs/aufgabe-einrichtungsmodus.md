@@ -60,7 +60,7 @@ und Fenster, Doppelklick wechselt den Raum.
 
 - In kleinen, einzeln testbaren Schritten arbeiten. Nach jedem Schritt committen und pushen
   (Repo: https://github.com/RobertTrebor/haus-3d-modell).
-- Ansehen: VS Code → Live Server („Go Live“, Wurzel ist `src/`) oder `python -m http.server 8000 -d src`.
+- Ansehen: VS Code → Live Server („Go Live“, Wurzel ist `src/`) oder `python server.py` (kann als einziger in `src/config/` speichern).
 - Vor jedem Commit prüfen: Die Seite lädt ohne Konsolenfehler, die bestehenden Ansichten und Klicks
   (Türen, Fenster, Rollläden, Garage, Etagenknöpfe) funktionieren weiter.
 - Versionen: Nach größeren Schritten `python build.py v83_Kurzname` (Windows ggf. `py build.py …`).

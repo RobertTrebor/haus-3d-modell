@@ -10,7 +10,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
 SRC, DIST = ROOT / "src", ROOT / "dist"
-SCRIPTS = ["main.js", "masse/masse.js", "masse/innenwaende.js", "masse/aussenwaende.js", "masse/tueren.js",
+SCRIPTS = ["config/masse.js", "config/bestand.js", "main.js", "masse/masse.js", "masse/innenwaende.js", "masse/aussenwaende.js", "masse/tueren.js",
            "masse/moebel.js", "katalog.js", "einrichten.js"]
 MIME = {".jpg": "image/jpeg", ".jpeg": "image/jpeg", ".png": "image/png", ".webp": "image/webp"}
 

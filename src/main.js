@@ -67,7 +67,10 @@ function canvasTex(w,h,draw,rep){
 }
 let seed=11;const rnd=()=>{seed=(seed*16807)%2147483647;return seed/2147483647;};
 
-const W=3.9,D=3.54,H=2.59,T=0.18;
+// Baumaße: Quelle ist src/config/masse.js (window.HAUS_MASSE.konst); die Zahlen hier sind nur Rückfallwerte.
+const KONST={W:3.9,D:3.54,H:2.59,T:0.18,OGH:2.59,EWT:0.38,KST:9,VX0:2.55,VX1:5.05,VZ0:0.0,WKZ1:3.63,gx0:5.3,gx1:8.2};
+{const k=(window.HAUS_MASSE&&window.HAUS_MASSE.konst)||{};Object.keys(KONST).forEach(n=>{if(typeof k[n]==='number'&&isFinite(k[n]))KONST[n]=k[n];});}
+const {W,D,H,T}=KONST;
 
 const ftA=canvasTex(2048,2048,(x,w,h)=>{
   const n=12,pw=w/n;
@@ -874,7 +877,7 @@ function applianceTick(){
   toastApply();}
 
 // ---- Treppe zum Hauseingang + Windfang ----
-const EF=-0.68,NSD=4,SDT=0.25,EDZ=SD0+2.5,EWT=0.38,exc=(SDX+EX)/2;
+const EF=-0.68,NSD=4,SDT=0.25,EDZ=SD0+2.5,EWT=KONST.EWT,exc=(SDX+EX)/2;
 const gVS=new THREE.Group();scene.add(gVS);
 const stepWood=M('#C9955A',0.5),treadM=M('#55585C',0.95),panelWood=M('#5A3A22',0.55);
 for(let i=0;i<NSD;i++){const z0=SD0+i*SDT,y=-(0.17*(i+1));B(SDX,EX,-0.8,y,z0,z0+SDT,stepWood);
@@ -978,7 +981,7 @@ B(3.06,3.12,EF,EF+2.0,HZ1+EWT-0.01,HZ1+EWT+0.06,white);B(3.88,3.94,EF,EF+2.0,HZ1
   const hM=M('#F4F4F4',0.3);a(B(-0.72,-0.7,0.98,1.05,0.02,0.07,hM,pv));a(B(-0.72,-0.6,1.03,1.05,0.06,0.08,hM,pv));
   clickable(P,tog(swing(pv,'y',1.45)));})();
 // Kellertreppe unter der Treppe nach oben
-const KST=9,KR0=0.15,CF=EF-KR0-0.19*(KST-1),CW0=3.05,CW1=3.95,cz0=HZ1-0.25;
+const KST=KONST.KST,KR0=0.15,CF=EF-KR0-0.19*(KST-1),CW0=3.05,CW1=3.95,cz0=HZ1-0.25;
 const cellTile=canvasTex(256,256,(x,w,h)=>{x.fillStyle='#E4DDD0';x.fillRect(0,0,w,h);for(let i=0;i<300;i++){x.fillStyle=`rgba(${160+rnd()*40},${150+rnd()*40},130,0.15)`;x.fillRect(rnd()*w,rnd()*h,6,2);}x.strokeStyle='rgba(110,105,95,0.7)';x.lineWidth=3;x.strokeRect(0,0,128,128);x.strokeRect(128,0,128,128);x.strokeRect(0,128,128,128);x.strokeRect(128,128,128,128);},[1,1]);
 const gCel=new THREE.Group();scene.add(gCel);
 const cTop=new THREE.MeshStandardMaterial({map:cellTile,roughness:0.45}),nosM=M('#7C746A',0.5),rough=Mu('#F6F4EF',0.95);rough.userData.paintableWall=1;
@@ -1197,7 +1200,7 @@ B(2.22,2.28,CF,CF+1.6,KRZ1-0.5,KRZ1-0.44,M('#1E1E20',0.4),gCel);B(2.3,2.36,CF,CF
 
 
 // ---- Keller: Waschküche mit Außentür, Flur, WC, Vorratsraum ----
-const WKZ1=3.63,WKD0=3.98,WKD1=4.58,VX0=2.55,VX1=5.05,VZ0=0.0,VZ1=3.72,KFX1=5.8,KFZ0=2.3,WX0=5.95,WX1=7.95,WZ0=2.45,WZ1=3.42,PX0=6.25,PX1=8.41,PZ0b=4.83,PZ1b=6.7;
+const WKZ1=KONST.WKZ1,WKD0=3.98,WKD1=4.58,VX0=KONST.VX0,VX1=KONST.VX1,VZ0=KONST.VZ0,VZ1=3.72,KFX1=5.8,KFZ0=2.3,WX0=5.95,WX1=7.95,WZ0=2.45,WZ1=3.42,PX0=6.25,PX1=8.41,PZ0b=4.83,PZ1b=6.7;
 const garageDoorZ0=2.35,garageDoorZ1=3.20,garageDoorH=2.05;
 const kTile=cellTile;
 const kfl=(x0,x1,z0,z1,tex,sz)=>gCel.add(tileFloor(x0,x1,z0,z1,CF,tex||kTile,sz||0.8));
@@ -1424,7 +1427,7 @@ B(CX0-EWT,CL1+EWT,UE-0.2,UE,HZ1,FZ,M('#F4F1EA',0.9),gUp);
 
 
 // ===================== OBERGESCHOSS =====================
-const OGF=U1,OGH=2.59,gOG=new THREE.Group();scene.add(gOG);let floorOG=false;
+const OGF=U1,OGH=KONST.OGH,gOG=new THREE.Group();scene.add(gOG);let floorOG=false;
 const gJN=new THREE.Group(),gJW=new THREE.Group(),gJE=new THREE.Group(),gJS=new THREE.Group();gOG.add(gJN,gJW,gJE,gJS);
 const ogB=(x0,x1,y0,y1,z0,z1,m,g)=>B(x0,x1,OGF+y0,OGF+y1,z0,z1,m,g||gOG);
 // ---- Janinas Zimmer (über dem Wohnzimmer) ----
@@ -1940,7 +1943,7 @@ const kPutzT=canvasTex(256,256,(x,w,h)=>{x.fillStyle='#F1EFE8';x.fillRect(0,0,w,
 const putzMat=(w,h)=>{const t=kPutzT.clone();t.needsUpdate=true;t.wrapS=t.wrapT=THREE.RepeatWrapping;t.repeat.set(w/1.3,h/1.3);return new THREE.MeshStandardMaterial({map:t,roughness:0.95});};
 const stoneMat=(w,h)=>{const t=nStoneT.clone();t.needsUpdate=true;t.wrapS=t.wrapT=THREE.RepeatWrapping;t.repeat.set(w/2.6,h/1.3);return new THREE.MeshStandardMaterial({map:t,roughness:0.9});};
 const NF=-0.39,bTop=0.06,r5fx0=-0.39,r5fx1=8.86;
-const gx0=5.3,gx1=8.2,kd0=3.55,kd1=4.4,ks0=3.08,ks1=3.45,r5kw0=0.03,r5kw1=1.77;
+const gx0=KONST.gx0,gx1=KONST.gx1,kd0=3.55,kd1=4.4,ks0=3.08,ks1=3.45,r5kw0=0.03,r5kw1=1.77;
 const nst=(a,b,y0,y1)=>B(a,b,y0,y1,NF-0.03,NF,stoneMat(b-a,y1-y0),gRoof);
 const SL=CF+2.25,pz=(a,b,y0,y1)=>B(a,b,y0,y1,NF-0.03,NF,putzMat(b-a,y1-y0),gRoof);
 nst(r5fx0,r5kw0,CF,SL);nst(r5kw1,ks0,CF,SL);nst(ks1,kd0,CF,SL);nst(kd1,gx0,CF,SL);nst(gx1,r5fx1,CF,SL);
@@ -2537,7 +2540,7 @@ scene.traverse(o=>{if(o.isMesh&&o.geometry&&o.geometry.type==='PlaneGeometry'&&M
   fix(decoMeshes,nd);fix(wallMeshes,nw);furnList=furnList.filter(m=>!rm.has(m)).concat(nf);if(window.__garConf)fix(window.__garConf,ng);
   window.__merged=merged;__shF=0;
   // Schnittstelle für den Einrichtungsmodus (einrichten.js)
-  window.HAUS={scene,camera,renderer,controls,col,M,Mu,H,OGF,DGF,CF,editMode:false,furnSrc,decoSrc,srcRec,diningSet,dLight,wallMeshes,decoMeshes,
+  window.HAUS={scene,camera,renderer,controls,col,M,Mu,H,OGF,DGF,CF,konst:KONST,editMode:false,furnSrc,decoSrc,srcRec,diningSet,dLight,wallMeshes,decoMeshes,
     rooms:()=>window.__ROOMS||[],toast:t=>window.__toast&&window.__toast(t),dirty:()=>{__shF=0;},
     addFurn:a=>{furnList.push(...a);const hid=furnBtn.getAttribute('aria-pressed')==='true';a.forEach(m=>m.visible=!hid);},
     addDeco:a=>{decoMeshes.push(...a);const hid=decoBtn.getAttribute('aria-pressed')==='true';a.forEach(m=>m.visible=!hid);},

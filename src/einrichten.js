@@ -16,6 +16,18 @@ let saveT=0;const flush=()=>{if(saveT){clearTimeout(saveT);saveT=0;LS.set(K_CUR,
 const save=()=>{clearTimeout(saveT);saveT=setTimeout(flush,200);};
 window.addEventListener('pagehide',flush);document.addEventListener('visibilitychange',()=>{if(document.hidden)flush();});
 
+// ---------- Fester Bestand und Baumaße (src/config/, nur mit server.py am PC schreibbar) ----------
+// Zwei Ebenen: BASE/MCFG = Status quo des Hauses (Dateien im Repo), state = Designideen (Browser, Varianten).
+const BASE=window.HAUS_BESTAND&&typeof window.HAUS_BESTAND==='object'?window.HAUS_BESTAND:{};if(!BASE.pieces||typeof BASE.pieces!=='object')BASE.pieces={};if(!Array.isArray(BASE.items))BASE.items=[];
+const MCFG=window.HAUS_MASSE&&typeof window.HAUS_MASSE==='object'?window.HAUS_MASSE:{};if(!MCFG.konst)MCFG.konst={};if(!MCFG.register)MCFG.register={};
+let canWrite=false;
+const post=(url,data)=>fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)}).then(r=>{if(!r.ok)throw 0;return true;})
+  .catch(()=>{H.toast('Nicht in die Datei gespeichert – läuft server.py?');return false;});
+const saveBase=()=>post('/api/bestand',{pieces:BASE.pieces,items:BASE.items});
+const saveMasse=()=>post('/api/masse',{konst:MCFG.konst,register:MCFG.register});
+if(/^https?:$/.test(location.protocol)&&/^(localhost|127\.0\.0\.1)$/.test(location.hostname))
+  fetch('/api/info').then(r=>r.ok?r.json():null).then(j=>{canWrite=!!(j&&j.schreibbar);if(canWrite){massMigrate();if(H.editMode)render();}}).catch(()=>{});
+
 // ---------- Hilfen ----------
 const shown=o=>{while(o){if(!o.visible)return false;o=o.parent;}return true;};
 const rc=new THREE.Raycaster(),v2=new THREE.Vector2();
@@ -127,9 +139,13 @@ function materialize(pc){if(pc.wrap)return pc.wrap;const cont=pc.cont,wrap=new T
   if(newF.length)H.addFurn(newF);if(newD.length)H.addDeco(newD);
   if(pc.list.some(it=>it.handle===H.diningSet))pc.light=H.dLight.position.clone();
   pc.wrap=wrap;H.dirty();return wrap;}
+// Bestand eines Möbelstücks (fest übernommene Korrektur) und Vergleich damit
+const baseOf=pc=>Object.assign({dx:0,dz:0,ry:0,hidden:false},pc.fest?null:BASE.pieces[pc.id]);
+const atBase=pc=>{const b=baseOf(pc);return Math.abs(pc.dx-b.dx)<1e-3&&Math.abs(pc.dz-b.dz)<1e-3&&Math.abs(pc.ry-b.ry)<1e-3&&!!pc.hidden===!!b.hidden;};
+const toBase=pc=>{const b=baseOf(pc);pc.dx=+b.dx||0;pc.dz=+b.dz||0;pc.ry=+b.ry||0;pc.hidden=!!b.hidden;};
 function applyPiece(pc){materialize(pc);const w=pc.wrap;w.position.set(pc.pivot.x+pc.dx,pc.pivot.y,pc.pivot.z+pc.dz);w.rotation.y=pc.ry;w.visible=!pc.hidden;w.updateMatrixWorld(true);
   if(pc.light){H.dLight.position.copy(pc.light).sub(pc.pivot).applyAxisAngle(new THREE.Vector3(0,1,0),pc.ry).add(pc.pivot).add(new THREE.Vector3(pc.dx,0,pc.dz));}
-  if(pc.kind==='fixed'){if(pc.dx||pc.dz||pc.ry||pc.hidden)state.pieces[pc.id]={dx:+pc.dx.toFixed(3),dz:+pc.dz.toFixed(3),ry:+pc.ry.toFixed(4),hidden:pc.hidden||undefined};else delete state.pieces[pc.id];}
+  if(pc.kind==='fixed'){if(!atBase(pc))state.pieces[pc.id]={dx:+pc.dx.toFixed(3),dz:+pc.dz.toFixed(3),ry:+pc.ry.toFixed(4),hidden:pc.hidden||undefined};else delete state.pieces[pc.id];}
   else{const it=pc.item;it.x=+(pc.pivot.x+pc.dx).toFixed(3);it.z=+(pc.pivot.z+pc.dz).toFixed(3);it.ry=+pc.ry.toFixed(4);}
   H.dirty();save();if(sel===pc)updSel();}
 function pieceOfHit(h){if(!h)return null;const o=h.object;if(o.userData.piece)return pieceById.get(o.userData.piece)||null;
@@ -177,6 +193,24 @@ function addItem(it,select){const pc={id:it.id||('n'+Date.now().toString(36)+(it
   it.id=pc.id;const wrap=new THREE.Group();wrap.userData.piece=pc.id;const inner=buildItem(it);wrap.add(inner);scene.add(wrap);pc.wrap=wrap;
   wrap.traverse(o=>{if(o.isMesh)o.userData.piece=pc.id;});H.addFurn(inner.children.slice());pc.meshes=inner.children.slice();
   pc.room=roomAt(it.x,it.y+0.3,it.z)||null;pieceById.set(pc.id,pc);items.push(pc);if(!state.items.includes(it))state.items.push(it);applyPiece(pc);if(select)selectPiece(pc);return pc;}
+// Fest übernommene zusätzliche Möbel (Bestand): verhalten sich wie vorhandene Möbel, Designänderungen sind Abweichungen davon
+const festItems=[];
+function addBaseItem(it){const pc={id:it.id,kind:'fixed',fest:true,item:it,pivot:new THREE.Vector3(it.x,it.y,it.z),dx:0,dz:0,ry:0,hidden:false,list:[],decos:[]};
+  const wrap=new THREE.Group(),inner=buildItem(it);inner.rotation.y=it.ry||0;wrap.add(inner);wrap.position.copy(pc.pivot);scene.add(wrap);wrap.updateMatrixWorld(true);pc.wrap=wrap;
+  wrap.traverse(o=>{if(o.isMesh)o.userData.piece=pc.id;});pc.meshes=inner.children.slice();H.addFurn(pc.meshes);pc.box=new THREE.Box3().setFromObject(wrap);
+  pc.room=roomAt(it.x,it.y+0.3,it.z)||null;pieceById.set(pc.id,pc);festItems.push(pc);H.dirty();return pc;}
+function applyBase(){if(Object.keys(BASE.pieces).length){buildPieces();Object.keys(BASE.pieces).forEach(id=>{const pc=pieceById.get(id);if(pc&&!pc.fest){toBase(pc);applyPiece(pc);}});}
+  BASE.items.forEach(it=>{if(it&&it.id&&CAT[it.t]&&!pieceById.has(it.id))addBaseItem(it);});}
+// Aktuelle Lage eines Möbelstücks als Status quo festschreiben (Korrektur) -> src/config/bestand.js
+function commitPiece(pc,remove){let keep=pc;
+  if(pc.kind==='new'){const it=Object.assign({},pc.item);removeItem(pc);BASE.items.push(it);keep=addBaseItem(it);}
+  else if(pc.fest){const it=pc.item;
+    if(remove){BASE.items.splice(BASE.items.indexOf(it),1);H.removeFurn(pc.meshes);scene.remove(pc.wrap);pieceById.delete(pc.id);festItems.splice(festItems.indexOf(pc),1);delete state.pieces[pc.id];keep=null;}
+    else{it.x=+(pc.pivot.x+pc.dx).toFixed(3);it.z=+(pc.pivot.z+pc.dz).toFixed(3);it.ry=+((it.ry||0)+pc.ry).toFixed(4);pc.pivot.set(it.x,it.y,it.z);pc.wrap.children[0].rotation.y=it.ry;pc.dx=pc.dz=pc.ry=0;pc.room=roomAt(it.x,it.y+0.3,it.z)||pc.room;applyPiece(pc);}}
+  else{if(remove)pc.hidden=true;const v={dx:+pc.dx.toFixed(3),dz:+pc.dz.toFixed(3),ry:+pc.ry.toFixed(4)};if(pc.hidden)v.hidden=true;
+    if(v.dx||v.dz||v.ry||v.hidden)BASE.pieces[pc.id]=v;else delete BASE.pieces[pc.id];applyPiece(pc);}
+  selectPiece(remove?null:keep);H.dirty();save();
+  return saveBase().then(ok=>{if(ok)H.toast(remove?'Aus dem Bestand entfernt':'Fest übernommen (src/config/bestand.js)');render();});}
 function rebuildItem(pc){const it=pc.item;H.removeFurn(pc.meshes);pc.wrap.remove(pc.wrap.children[0]);const inner=buildItem(it);pc.wrap.add(inner);
   inner.traverse(o=>{if(o.isMesh)o.userData.piece=pc.id;});pc.meshes=inner.children.slice();H.addFurn(pc.meshes);H.dirty();save();updSel(true);}
 function removeItem(pc){H.removeFurn(pc.meshes);scene.remove(pc.wrap);pieceById.delete(pc.id);items.splice(items.indexOf(pc),1);state.items=state.items.filter(x=>x!==pc.item);if(sel===pc)selectPiece(null);H.dirty();save();}
@@ -197,7 +231,7 @@ let sel=null,selBox=null,selDoor=null;const movable=()=>tool==='move'||tool==='n
 function showBox(obj){if(selBox){scene.remove(selBox);selBox=null;}
   if(obj){selBox=new THREE.BoxHelper(obj,0xE3B448);selBox.material.depthTest=false;selBox.material.transparent=true;selBox.renderOrder=999;selBox.userData.helper=1;scene.add(selBox);}}
 function selectPiece(pc){sel=pc;if(pc)selDoor=null;showBox(pc?(pc.wrap||materialize(pc)):null);render();}
-function sizeOf(pc){if(pc.kind==='new')return [pc.item.w/100,pc.item.d/100,pc.item.h/100];const s=pc.box.getSize(new THREE.Vector3());return [s.x,s.z,s.y];}
+function sizeOf(pc){if(pc.item)return [pc.item.w/100,pc.item.d/100,pc.item.h/100];const s=pc.box.getSize(new THREE.Vector3());return [s.x,s.z,s.y];}
 function updSel(full){if(selBox&&sel){selBox.setFromObject(sel.wrap);}if(full!==false&&sel&&movable())renderSelInfo();}
 const clampTo=(pc,x,z)=>{const r=pc.room;if(!r)return [x,z];return [Math.min(r[3]-0.1,Math.max(r[2]+0.1,x)),Math.min(r[5]-0.1,Math.max(r[4]+0.1,z))];};
 let drag=null,pointers=0,lastPieceDown=0;H.navBlock=()=>H.editMode&&performance.now()-lastPieceDown<700;const plane=new THREE.Plane(),hp=new THREE.Vector3();
@@ -361,13 +395,21 @@ function massAuto(){const out=[];
   const s=new THREE.Vector3();buildDoors().forEach(d=>{d.box.getSize(s);const rn=d.name.replace(/^(Schrank)?[Tt]ür( · )?/,'');
     out.push({id:'tuer.'+d.id+'.breite',kat:'tueren',name:d.name+' – Breite',raum:rn,modell:+Math.max(s.x,s.z).toFixed(3),quelle:'unbekannt'});out.push({id:'tuer.'+d.id+'.hoehe',kat:'tueren',name:d.name+' – Höhe',raum:rn,modell:+s.y.toFixed(3),quelle:'unbekannt'});});
   return out;}
+// Konstanten aus src/config/masse.js, die ein Registereintrag bestimmt: konst 'A' oder 'A-B' (z. B. 'VX1-VX0')
+const KV=H.konst||{};
+const kParse=s=>{const m=/^(\w+)(?:-(\w+))?$/.exec(s||'');return m&&typeof KV[m[1]]==='number'&&(!m[2]||typeof KV[m[2]]==='number')?m:null;};
+function massMigrate(){const ids=Object.keys(massUser);if(!ids.length)return;ids.forEach(id=>{MCFG.register[id]=Object.assign({},MCFG.register[id]||{},massUser[id]);});
+  saveMasse().then(ok=>{if(!ok)return;massUser={};massSave();H.toast(ids.length+' Nachmessungen ins Projekt übernommen');if(H.editMode&&tool==='measure')render();});}
+let massConfirm=null;
 function massAll(){const map=new Map();massAuto().forEach(e=>map.set(e.id,e));
-  ((window.MASSE&&window.MASSE.eintraege)||[]).forEach(e=>{if(!e||!e.id)return;map.set(e.id,Object.assign({quelle:'unbekannt'},map.get(e.id)||{},e,{datei:true}));});
+  ((window.MASSE&&window.MASSE.eintraege)||[]).forEach(e=>{if(!e||!e.id)return;const n=Object.assign({quelle:'unbekannt'},map.get(e.id)||{},e,{datei:true});const k=kParse(e.konst);if(k)n.modell=+(KV[k[1]]-(k[2]?KV[k[2]]:0)).toFixed(3);map.set(e.id,n);});
+  Object.keys(MCFG.register).forEach(id=>{const u=MCFG.register[id];if(!u||typeof u!=='object')return;map.set(id,Object.assign({quelle:'unbekannt',id},map.get(id)||{},u,{id,eigen:true,fest:true}));});
   Object.keys(massUser).forEach(id=>{const u=massUser[id];if(!u||typeof u!=='object')return;map.set(id,Object.assign({quelle:'unbekannt',id},map.get(id)||{},u,{id,eigen:true}));});
   return [...map.values()];}
+const massOwn=()=>Object.assign({},MCFG.register,massUser);
 const mUnit=e=>e.einheit||'m';
 const mFmt=(v,e)=>v==null||isNaN(v)?'–':(mUnit(e)==='m'?fmt(v):String(v)+' '+mUnit(e));
-function massPut(id,data){massUser[id]=Object.assign({},massUser[id]||{},data,{datum:new Date().toISOString().slice(0,10)});massSave();}
+function massPut(id,data){const tgt=canWrite?MCFG.register:massUser;tgt[id]=Object.assign({},tgt[id]||{},data,{datum:new Date().toISOString().slice(0,10)});if(canWrite)saveMasse();else massSave();}
 function massDelta(e){if(e.wert==null||e.modell==null||mUnit(e)!=='m')return '';const d=Math.round((e.wert-e.modell)*100);return d?' · Δ '+(d>0?'+':'')+d+' cm':' · stimmt';}
 // gespeicherte Strecke wieder einzeichnen und die Kamera dorthin holen
 function massShow(e){if(!e.pts)return;const a=new THREE.Vector3(...e.pts[0]),p=new THREE.Vector3(...e.pts[1]);dot(a);dot(p);
@@ -381,7 +423,7 @@ function renderMeasure(){const all=massAll(),cnt={gemessen:0,geschaetzt:0,unbeka
     h+='<div class="sel"><div class="row"><b>Als Maß speichern</b><span class="muted">Modell: '+fmt(m.d)+(m.dh>0.05&&m.dy>0.05?' (waagerecht '+fmt(m.dh)+', Höhe '+fmt(m.dy)+')':'')+'</span></div>'+
       '<div class="row"><select id="eMKat" aria-label="Kategorie">'+Object.keys(MKAT).map(k=>'<option value="'+k+'"'+(k==='sonstiges'?' selected':'')+'>'+MKAT[k]+'</option>').join('')+'</select><input type="text" id="eMName" placeholder="Bezeichnung, z. B. Fensterbreite" value="'+esc(rm?rm[0]+' – ':'')+'"></div>'+
       '<div class="row"><label class="chk">Vor Ort gemessen <input type="number" id="eMWert" step="1" min="0" value="'+cm(m.d)+'"> cm</label><label class="chk">Strecke <select id="eMArt"><option value="d">direkt</option><option value="dh">waagerecht</option><option value="dy">Höhe</option></select></label><input type="text" id="eMNotiz" placeholder="Notiz" style="width:min(200px,45vw)"><button id="eMSave">Speichern</button></div>'+
-      '<div class="muted">Trage den Wert ein, den du wirklich gemessen hast. Das Modell ändert sich dadurch nicht von selbst; die Liste zeigt die Abweichung, und über „Exportieren“ wandern die Werte in die Maßdateien des Modells.</div></div>';}
+      '<div class="muted">Trage den Wert ein, den du wirklich gemessen hast. '+(canWrite?'Der Wert wird fest im Projekt gespeichert (src/config/masse.js). Wo das Modell direkt an einem Maß hängt, bietet die Liste „Ins Modell übernehmen“ an.':'Das Modell ändert sich dadurch nicht von selbst; die Liste zeigt die Abweichung. Am PC (server.py) werden die Werte fest im Projekt gespeichert, sonst über „Exportieren“.')+'</div></div>';}
   h+='<details class="sub"'+(massOpen?' open':'')+' id="eMDet"><summary><b>Maßregister</b> <span class="muted">'+cnt.gemessen+' gemessen · '+cnt.geschaetzt+' geschätzt · '+cnt.unbekannt+' unbekannt</span></summary>'+
     '<div class="row"><select id="eMFil" aria-label="Kategorie"><option value="">Alle Kategorien</option>'+Object.keys(MKAT).map(k=>'<option value="'+k+'"'+(massKat===k?' selected':'')+'>'+MKAT[k]+'</option>').join('')+'</select><input type="search" id="eMQ" placeholder="Suchen" value="'+esc(massQ)+'" aria-label="Suchen"><button id="eMExp">Exportieren</button><button id="eMImpB">Importieren …</button><input type="file" id="eMImp" accept=".json,application/json" hidden></div>'+
     '<div class="klist" id="eMList"></div><div id="eMOut"></div></details>';
@@ -392,9 +434,9 @@ function renderMeasure(){const all=massAll(),cnt={gemessen:0,geschaetzt:0,unbeka
         pts:[[+m.a.x.toFixed(3),+m.a.y.toFixed(3),+m.a.z.toFixed(3)],[+m.p.x.toFixed(3),+m.p.y.toFixed(3),+m.p.z.toFixed(3)]]});
       lastMeasObj=null;massOpen=true;massKat='';massQ='';H.toast('Maß gespeichert');render();};}
   $('eMDet').ontoggle=e=>{massOpen=e.target.open;};$('eMFil').onchange=e=>{massKat=e.target.value;renderMassList();};$('eMQ').oninput=e=>{massQ=e.target.value;renderMassList();};
-  $('eMExp').onclick=()=>{const data=JSON.stringify({app:'haus3d-masse',v:1,stand:new Date().toISOString().slice(0,10),eintraege:Object.keys(massUser).map(id=>Object.assign({id},massUser[id]))},null,1);
+  $('eMExp').onclick=()=>{const data=JSON.stringify({app:'haus3d-masse',v:1,stand:new Date().toISOString().slice(0,10),eintraege:Object.keys(massOwn()).map(id=>Object.assign({id},massOwn()[id]))},null,1);
     try{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([data],{type:'application/json'}));a.download='masse-nachgemessen.json';document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},500);}catch(e){}
-    $('eMOut').innerHTML='<div class="muted">Enthält nur deine eigenen Nachmessungen ('+Object.keys(massUser).length+'). Falls kein Download kam: Text kopieren.</div><textarea readonly>'+esc(data)+'</textarea>';};
+    $('eMOut').innerHTML='<div class="muted">Enthält nur deine eigenen Nachmessungen ('+Object.keys(massOwn()).length+'). Falls kein Download kam: Text kopieren.</div><textarea readonly>'+esc(data)+'</textarea>';};
   $('eMImpB').onclick=()=>{$('eMOut').innerHTML='<div class="muted">Datei wählen oder Text einfügen:</div><textarea id="eMTxt"></textarea><div class="row"><button id="eMFile">Datei wählen …</button><button id="eMTake">Text übernehmen</button></div>';
     $('eMFile').onclick=()=>$('eMImp').click();$('eMTake').onclick=()=>massImport($('eMTxt').value);};
   $('eMImp').onchange=e=>{const f=e.target.files&&e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>massImport(String(r.result));r.readAsText(f);};
@@ -406,7 +448,7 @@ function renderMassList(){const list=$('eMList');if(!list)return;const q=massQ.t
   list.innerHTML=rows.length?rows.map(e=>{const qk=QUELLE[e.quelle]?e.quelle:'unbekannt',ed=massEdit===e.id;
     return '<div class="krow"><div class="kinfo"><b>'+esc(e.name||e.id)+'</b> <span class="badge '+qk+'">'+QUELLE[qk]+'</span><div class="muted">'+esc(MKAT[e.kat]||e.kat||'')+(e.raum?' · '+esc(e.raum):'')+' · Modell '+mFmt(e.modell,e)+(e.wert!=null?' · gemessen '+mFmt(e.wert,e)+esc(massDelta(e)):'')+(e.datum?' · '+esc(e.datum):'')+(e.notiz?' · '+esc(e.notiz):'')+'</div></div>'+
       '<div class="row">'+(ed?'<input type="number" step="1" min="0" id="eMEdV" aria-label="Gemessener Wert" value="'+(e.wert!=null?(mUnit(e)==='m'?cm(e.wert):e.wert):e.modell!=null?(mUnit(e)==='m'?cm(e.modell):e.modell):'')+'"><span class="muted">'+(mUnit(e)==='m'?'cm':esc(mUnit(e)))+'</span><button data-mok="'+esc(e.id)+'">OK</button><button data-mcancel="1">Abbrechen</button>'
-        :'<button data-mmess="'+esc(e.id)+'">Nachmessen</button>'+(e.modell!=null&&e.quelle!=='gemessen'?'<button data-mok2="'+esc(e.id)+'" title="Der Modellwert stimmt mit der Wirklichkeit überein">Stimmt so</button>':'')+(e.pts?'<button data-mshow="'+esc(e.id)+'">Zeigen</button>':'')+(e.eigen?'<button data-mdel="'+esc(e.id)+'" aria-label="Eigenen Eintrag löschen" title="Eigenen Eintrag löschen">✕</button>':''))+'</div></div>';}).join('')
+        :'<button data-mmess="'+esc(e.id)+'">Nachmessen</button>'+(e.modell!=null&&e.quelle!=='gemessen'?'<button data-mok2="'+esc(e.id)+'" title="Der Modellwert stimmt mit der Wirklichkeit überein">Stimmt so</button>':'')+(canWrite&&e.wert!=null&&kParse(e.konst)&&Math.abs(e.wert-e.modell)>0.0005?'<button data-mapply="'+esc(e.id)+'">'+(massConfirm===e.id?'Wirklich? Modell wird neu aufgebaut':'Ins Modell übernehmen')+'</button>':'')+(e.pts?'<button data-mshow="'+esc(e.id)+'">Zeigen</button>':'')+(e.eigen?'<button data-mdel="'+esc(e.id)+'" aria-label="Eigenen Eintrag löschen" title="Eigenen Eintrag löschen">✕</button>':''))+'</div></div>';}).join('')
     :'<div class="muted">Keine Einträge.</div>';
   const byId=new Map(rows.map(e=>[e.id,e]));const keep=e=>({name:e.name,kat:e.kat,raum:e.raum,modell:e.modell,einheit:e.einheit});
   list.querySelectorAll('[data-mmess]').forEach(b=>b.onclick=()=>{massEdit=b.dataset.mmess;renderMassList();const i=$('eMEdV');if(i){i.focus();i.select();}});
@@ -414,7 +456,10 @@ function renderMassList(){const list=$('eMList');if(!list)return;const q=massQ.t
   list.querySelectorAll('[data-mok]').forEach(b=>b.onclick=()=>{const v=+$('eMEdV').value;if(!(v>0))return;const e=byId.get(b.dataset.mok);massPut(e.id,Object.assign(keep(e),{wert:mUnit(e)==='m'?+(v/100).toFixed(3):v,quelle:'gemessen'}));massEdit=null;renderMeasure();});
   list.querySelectorAll('[data-mok2]').forEach(b=>b.onclick=()=>{const e=byId.get(b.dataset.mok2);massPut(e.id,Object.assign(keep(e),{wert:e.modell,quelle:'gemessen'}));renderMeasure();});
   list.querySelectorAll('[data-mshow]').forEach(b=>b.onclick=()=>massShow(byId.get(b.dataset.mshow)));
-  list.querySelectorAll('[data-mdel]').forEach(b=>b.onclick=()=>{delete massUser[b.dataset.mdel];massSave();renderMeasure();});}
+  list.querySelectorAll('[data-mdel]').forEach(b=>b.onclick=()=>{delete massUser[b.dataset.mdel];massSave();if(MCFG.register[b.dataset.mdel]){delete MCFG.register[b.dataset.mdel];saveMasse();}renderMeasure();});
+  list.querySelectorAll('[data-mapply]').forEach(b=>b.onclick=()=>{const e=byId.get(b.dataset.mapply),k=kParse(e.konst);if(!k)return;
+    if(massConfirm!==e.id){massConfirm=e.id;renderMassList();setTimeout(()=>{if(massConfirm===e.id){massConfirm=null;renderMassList();}},5000);return;}
+    massConfirm=null;MCFG.konst=Object.assign({},KV,MCFG.konst,{[k[1]]:+(e.wert+(k[2]?KV[k[2]]:0)).toFixed(3)});saveMasse().then(ok=>{if(ok)location.reload();});});}
 
 // =====================================================================
 // Tippen im Einrichtungsmodus (Streichen, Maßband, Abwählen)
@@ -432,7 +477,7 @@ cv.addEventListener('pointerup',e=>{if(!H.editMode||!down)return;const mv=Math.h
 // =====================================================================
 // Zustand anwenden, Varianten
 // =====================================================================
-function resetAll(){resetWalls();if(pieces)pieces.forEach(pc=>{if(pc.wrap&&(pc.dx||pc.dz||pc.ry||pc.hidden)){pc.dx=pc.dz=pc.ry=0;pc.hidden=false;applyPiece(pc);}});
+function resetAll(){resetWalls();(pieces||[]).concat(festItems).forEach(pc=>{if(pc.wrap&&!atBase(pc)){toBase(pc);applyPiece(pc);}});
   items.slice().forEach(removeItem);resetDoors();gateCfg.an=false;gateCfg.fenster=false;gateCfg.sekt=false;applyGate();
   state={v:2,walls:{},pieces:{},items:[],doors:{},tor:null};selDoor=null;selectPiece(null);}
 function applyState(st){resetAll();st=st||{};
@@ -467,7 +512,10 @@ function render(){const tabs=panel.querySelectorAll('[data-tool]');tabs.forEach(
   else if(tool==='move'||tool==='new'){
     let h='';if(tool==='new')h+='<div class="cat">'+Object.keys(CAT).map(k=>'<button data-cat="'+k+'">'+CAT[k][0]+'</button>').join('')+'</div><div class="muted">Wird in der Bildmitte auf den Boden gestellt. Dann ziehen und drehen.</div>';
     else h+='<div class="muted">Möbelstück antippen zum Auswählen, ziehen zum Verschieben (bleibt im Raum). Q/E drehen am PC.</div>';
+    const gone=canWrite?Object.keys(BASE.pieces).filter(id=>BASE.pieces[id].hidden):[];
+    if(canWrite)h+='<div class="row"><span class="muted">Bestand: '+Object.keys(BASE.pieces).length+' Korrekturen, '+BASE.items.length+' zusätzliche Möbel.</span>'+(gone.length?'<button id="eFestBack">'+gone.length+' entfernte zurückholen</button>':'')+'</div>';
     h+='<div id="eSel"></div>';body.innerHTML=h;
+    if(gone.length)$('eFestBack').onclick=()=>{buildPieces();gone.forEach(id=>{const b=BASE.pieces[id];delete b.hidden;if(!(b.dx||b.dz||b.ry))delete BASE.pieces[id];const pc=pieceById.get(id);if(pc){toBase(pc);applyPiece(pc);}});saveBase().then(()=>render());};
     body.querySelectorAll('[data-cat]').forEach(b=>b.onclick=()=>{const k=b.dataset.cat,c=CAT[k],p=placePoint();addItem({t:k,w:c[1],d:c[2],h:c[3],c:c[4],x:+p.x.toFixed(3),y:+p.y.toFixed(3),z:+p.z.toFixed(3),ry:0},true);H.toast(c[0]+' hinzugefügt');});
     renderSelInfo();}
   else if(tool==='measure')renderMeasure();
@@ -491,24 +539,28 @@ function importText(t){try{const d=JSON.parse(t);if(!d||(d.app!=='haus3d-einrich
     if(d.aktuell){V2['Importiert (aktuell) '+new Date().toLocaleDateString('de-DE')]={t:Date.now(),s:d.aktuell};n++;}
     LS.set(K_VAR,V2);H.toast(n+' Variante(n) importiert');render();}catch(e){H.toast('Datei nicht erkannt');}}
 function renderSelInfo(){const box=$('eSel');if(!box)return;if(!sel){box.innerHTML='';return;}const pc=sel,[w,d,h]=sizeOf(pc),isNew=pc.kind==='new';
-  const nm=isNew?(pc.item.n||CAT[pc.item.t][0]):'Möbelstück',rm=pc.room?' · '+pc.room[0]:'',prod=isNew&&pc.item.mk?esc(pc.item.mk)+(pc.item.pr?' · '+eur(pc.item.pr):'')+' · ':'';
+  const nm=pc.item?(pc.item.n||CAT[pc.item.t][0]):'Möbelstück',rm=pc.room?' · '+pc.room[0]:'',prod=isNew&&pc.item.mk?esc(pc.item.mk)+(pc.item.pr?' · '+eur(pc.item.pr):'')+' · ':'';
   let s='<div class="sel"><div class="row"><b>'+esc(nm)+'</b><span class="muted">'+prod+esc(rm.slice(3))+' · '+fmt(w).slice(0,-2)+' × '+fmt(d).slice(0,-2)+' × '+fmt(h)+'</span></div>'+
     '<div class="row"><button id="eRL" aria-label="15 Grad nach links drehen">⟲ 15°</button><button id="eRR" aria-label="15 Grad nach rechts drehen">⟳ 15°</button>';
-  if(isNew)s+='<button id="eDup">Duplizieren</button><button id="eDel">Löschen</button>';else s+='<button id="eRes"'+(pc.dx||pc.dz||pc.ry?'':' disabled')+'>Zurück an Ursprung</button><button id="eHide">Ausblenden</button>';
+  if(isNew)s+='<button id="eDup">Duplizieren</button><button id="eDel">Löschen</button>';else s+='<button id="eRes"'+(atBase(pc)?' disabled':'')+'>Zurück an Ursprung</button><button id="eHide">Ausblenden</button>';
   s+='<button id="eDone" style="margin-left:auto">Fertig</button></div>';
   if(isNew){const it=pc.item;s+='<div class="row"><label class="chk">B <input type="number" id="eW" min="5" max="500" value="'+it.w+'"></label><label class="chk">T <input type="number" id="eD" min="5" max="500" value="'+it.d+'"></label><label class="chk">H <input type="number" id="eH" min="1" max="300" value="'+it.h+'"></label><span class="muted">cm</span><input type="color" id="eC" value="'+it.c.toLowerCase()+'" aria-label="Farbe"></div>';}
+  if(canWrite)s+='<div class="row"><button id="eFest"'+(!isNew&&atBase(pc)?' disabled':'')+' title="Aktuelle Lage als Ist-Zustand des Hauses speichern">Fest übernehmen</button>'+(isNew?'':'<button id="eFestDel" title="Dieses Möbelstück gibt es in Wirklichkeit nicht (mehr)">Aus Bestand entfernen</button>')+
+    '<span class="muted">'+(isNew?'Möbel steht wirklich dort':'Korrektur des Ist-Zustands')+' → wird im Projekt gespeichert, nicht als Designidee.</span></div>';
   s+='</div>';box.innerHTML=s;
+  if(canWrite){$('eFest').onclick=()=>commitPiece(pc,false);if(!isNew)$('eFestDel').onclick=()=>commitPiece(pc,true);}
   $('eRL').onclick=()=>rot(pc,1);$('eRR').onclick=()=>rot(pc,-1);$('eDone').onclick=()=>{selectPiece(null);render();};
   if(isNew){$('eDel').onclick=()=>{removeItem(pc);render();};$('eDup').onclick=()=>{const it=Object.assign({},pc.item,{id:null,x:pc.item.x+0.3,z:pc.item.z+0.3});addItem(it,true);};
     const num=(id,k,mn,mx)=>{$(id).onchange=e=>{const v=Math.round(+e.target.value);if(!(v>=mn&&v<=mx))return;pc.item[k]=v;rebuildItem(pc);};};num('eW','w',5,500);num('eD','d',5,500);num('eH','h',1,300);
     $('eC').onchange=e=>{pc.item.c=e.target.value.toUpperCase();rebuildItem(pc);};}
-  else{$('eRes').onclick=()=>{pc.dx=pc.dz=pc.ry=0;applyPiece(pc);};$('eHide').onclick=()=>{pc.hidden=true;applyPiece(pc);selectPiece(null);render();H.toast('Ausgeblendet – „Alles zurücksetzen“ unter Varianten holt es zurück');};}}
+  else{$('eRes').onclick=()=>{toBase(pc);applyPiece(pc);};$('eHide').onclick=()=>{pc.hidden=true;applyPiece(pc);selectPiece(null);render();H.toast('Ausgeblendet – „Alles zurücksetzen“ unter Varianten holt es zurück');};}}
 panel.querySelectorAll('[data-tool]').forEach(b=>b.addEventListener('click',()=>{tool=b.dataset.tool;if(tool==='move')buildPieces();if(!movable())sel=null;if(tool!=='doors')selDoor=null;showBox(sel?sel.wrap:selDoor?selDoor.leaf:null);render();}));
 function setEdit(on){H.editMode=on;panel.hidden=!on;editBtn.setAttribute('aria-pressed',String(on));document.body.classList.toggle('editing',on);
   if(on)render();else{selDoor=null;selectPiece(null);drag=null;controls.enabled=true;cv.style.cursor='';}}
 editBtn.addEventListener('click',()=>setEdit(!H.editMode));$('editClose').addEventListener('click',()=>setEdit(false));
 
 // ---------- Start: gespeicherten Stand anwenden ----------
+try{applyBase();}catch(e){console.warn('Bestand konnte nicht angewendet werden',e);}
 try{let cur=LS.get(K_CUR,null);if(!cur){const old=LS.get(K_OLDWALL,null);cur={v:1,walls:old&&typeof old==='object'?old:{},pieces:{},items:[]};}applyState(cur);}catch(e){console.warn('Einrichtung konnte nicht geladen werden',e);}
-window.__einrichten={state:()=>state,pieces:()=>buildPieces(),doors:()=>buildDoors(),selectDoor,applyDoor,gate:gateCfg,applyGate,masse:()=>massAll(),massPut,setEdit,applyState,PW};
+window.__einrichten={commitPiece,selectPiece,applyPiece,addItem,canWrite:()=>canWrite,bestand:BASE,festItems,state:()=>state,pieces:()=>buildPieces(),doors:()=>buildDoors(),selectDoor,applyDoor,gate:gateCfg,applyGate,masse:()=>massAll(),massPut,setEdit,applyState,PW};
 })();
