@@ -63,6 +63,9 @@ Außenansichten (v94/v95): Der Keller-Rohbau (Wände, Böden, Decken) hängt in 
 Außenansichten sichtbar; nur die Kellereinrichtung (`gCel`) wird dort ausgeblendet. Die Außenansicht endet nicht
 mehr beim Blick von oben, sondern über eine andere Ansicht oder die Etagenknöpfe EG/OG/DG.
 
+Performance (v100–v103, siehe `docs/plan-performance.md`): Messanzeige (`?debug` oder dreimal auf den Titel klicken),
+Zeichnen nur bei Bedarf, Schalter „Leistung“ (Auto/Hoch/Niedrig), Inneneinrichtung in Außenansichten erst nahe am Haus.
+
 Bewusste Einschränkungen der Navigation:
 - Durch offene Türen zoomen geht nicht mehr; Raumwechsel per Doppelklick/Doppeltipp.
 - Der Blick nach oben ist wie bisher auf etwa 18° über der Waagerechten begrenzt (`controls.maxPolarAngle`).
@@ -70,7 +73,7 @@ Bewusste Einschränkungen der Navigation:
 
 Arbeitsweise:
 - Prüfen nach Umbauten: `python tools/pruefen.py` (braucht den laufenden `server.py`). Der Fingerabdruck muss bei
-  einer reinen Umsortierung gleich bleiben; Stand v99: `Bauteile=2204 Modell=-1170160104 Raeume=-1893535870 Ansichten=-1918846762 Moebel=554 Tueren=22`.
+  einer reinen Umsortierung gleich bleiben; Stand v103: `Bauteile=2232 Modell=2137936823 Raeume=-1893535870 Ansichten=-1918846762 Moebel=554 Tueren=22`.
 - Git: Auf Roberts Rechner ist keine Git-Identität eingerichtet. Die Commits vom 13.11. wurden einzeln mit
   `git -c user.name="Robert Lengsfeld" -c user.email="RobertTrebor@users.noreply.github.com" commit …` erstellt.
   Gearbeitet wird auf dem Branch `einrichtungsmodus-weiterarbeit` (nicht `main`).

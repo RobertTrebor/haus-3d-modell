@@ -71,6 +71,9 @@ function loop(now){
   dgLabs.forEach(l=>l.visible=gDG.visible);if(gDG.visible)[jLab,wLab,lLab,gLab,aLab,obLab].forEach(l=>l.visible=false);
   if(kgMode){gCel.visible=true;gRoof.visible=true;(window.__garConf||[]).forEach(m=>m.visible=false);}
   gCelF.visible=gCel.visible||facadeMode; // Keller-Außenwand zur Straße: in Außenansichten immer sichtbar
+  // Inneneinrichtung in Außenansichten nur nahe am Haus zeichnen (Abstand je Leistungsstufe, 0,5 m Umschaltpuffer)
+  {const d=Math.hypot(Math.max(INNER_BOX[0]-c.x,0,c.x-INNER_BOX[1]),Math.max(INNER_BOX[2]-c.z,0,c.z-INNER_BOX[3])),lim=LEIST.innen[LEIST.eff];
+   const hide=facadeMode&&!kgMode&&!(window.HAUS&&HAUS.editMode)&&d>(innerHidden?lim-0.5:lim+0.5);if(hide!==innerHidden){innerHidden=hide;applyFurnDeco();__shF=0;}}
   updateLights(now);
   // Sichtbarkeit der Gruppen geändert (Wände ein-/ausgeblendet)? Dann Schatten neu berechnen.
   {let sig=0;for(let i=0;i<visGroups.length;i++)if(visGroups[i].visible)sig=(Math.imul(sig,31)+i+1)|0;if(sig!==__visSig){__visSig=sig;__shF=0;}}
@@ -105,11 +108,12 @@ scene.traverse(o=>{if(o.isMesh&&o.geometry&&o.geometry.type==='PlaneGeometry'&&M
   const isId=g=>g.position.lengthSq()===0&&g.rotation.x===0&&g.rotation.y===0&&g.rotation.z===0&&g.scale.x===1&&g.scale.y===1&&g.scale.z===1;
   const chainOk=par=>{let q=par;while(q&&q!==scene){if(!isId(q)||q.isMesh)return false;q=q.parent;}return q===scene;};
   const tgt=new Map();const targetOf=par=>{if(tgt.has(par))return tgt.get(par);let q=par,r=null;while(q&&q!==scene){if(chainOk(q)){r=q;break;}if(TOG.has(q)){r=false;break;}q=q.parent;}if(r===null&&q===scene)r=scene;tgt.set(par,r);return r;};
+  furnList.concat(decoMeshes).forEach(innerCheck); // Inneneinrichtung für die Außenansichten merken (schalter.js); wird getrennt zusammengefasst
   const buckets=new Map();
   meshes.forEach(m=>{if(!m.parent)return;if(m.material===breadM)return;const par=targetOf(m.parent);if(!par)return;
     if(fixed.has(m)||!m.visible||Array.isArray(m.material)||!m.material||m.material.transparent||m.userData.sash||m.userData.navPortal||m.isInstancedMesh)return;
     const g=m.geometry;if(!g||!g.attributes||!g.attributes.position||(g.morphAttributes&&Object.keys(g.morphAttributes).length))return;
-    const sig=(dS.has(m)?'d':'')+(fS.has(m)?'f':'')+(wS.has(m)?'w':'')+(gS.has(m)?'g':'');
+    const sig=(dS.has(m)?'d':'')+(fS.has(m)?'f':'')+(wS.has(m)?'w':'')+(gS.has(m)?'g':'')+(innerSet.has(m)?'i':'');
     const k=par.uuid+'|'+m.material.uuid+'|'+(m.castShadow?1:0)+(m.receiveShadow?1:0)+'|'+sig;let b=buckets.get(k);if(!b){b={par,mat:m.material,cs:m.castShadow,rs:m.receiveShadow,sig,list:[]};buckets.set(k,b);}b.list.push(m);});
   let merged=0;const rm=new Set(),nd=[],nf=[],nw=[],ng=[];
   buckets.forEach(b=>{if(b.list.length<2)return;const pos=[],nor=[],uv=[],recs=[];const inv=new THREE.Matrix4().copy(b.par.matrixWorld).invert();
@@ -119,15 +123,15 @@ scene.traverse(o=>{if(o.isMesh&&o.geometry&&o.geometry.type==='PlaneGeometry'&&M
     const big=new THREE.Mesh(G,b.mat);big.castShadow=b.cs;big.receiveShadow=b.rs;big.userData.merged=1;b.par.add(big);
     big.userData.recs=recs;recs.forEach(r=>{r.big=big;srcRec.set(r.src,r);});
     b.list.forEach(m=>{m.parent.remove(m);rm.add(m);});merged+=b.list.length;
-    if(b.sig.includes('d'))nd.push(big);if(b.sig.includes('f'))nf.push(big);if(b.sig.includes('w'))nw.push(big);if(b.sig.includes('g'))ng.push(big);});
+    if(b.sig.includes('i'))innerSet.add(big);if(b.sig.includes('d'))nd.push(big);if(b.sig.includes('f'))nf.push(big);if(b.sig.includes('w'))nw.push(big);if(b.sig.includes('g'))ng.push(big);});
   const fix=(arr,extra)=>{const keep=arr.filter(m=>!rm.has(m));arr.length=0;arr.push(...keep,...extra);};
   fix(decoMeshes,nd);fix(wallMeshes,nw);furnList=furnList.filter(m=>!rm.has(m)).concat(nf);if(window.__garConf)fix(window.__garConf,ng);
   window.__merged=merged;__shF=0;
   // Schnittstelle für den Einrichtungsmodus (einrichten.js)
   window.HAUS={scene,camera,renderer,controls,col,M,Mu,H,OGF,DGF,CF,konst:KONST,raeume:RAEUME,editMode:false,furnSrc,decoSrc,srcRec,diningSet,dLight,wallMeshes,decoMeshes,
     rooms:()=>window.__ROOMS||[],toast:t=>window.__toast&&window.__toast(t),dirty:()=>{__shF=0;__dirty=1;},
-    addFurn:a=>{furnList.push(...a);const hid=furnBtn.getAttribute('aria-pressed')==='true';a.forEach(m=>m.visible=!hid);},
-    addDeco:a=>{decoMeshes.push(...a);const hid=decoBtn.getAttribute('aria-pressed')==='true';a.forEach(m=>m.visible=!hid);},
+    addFurn:a=>{furnList.push(...a);a.forEach(innerCheck);applyFurnDeco();},
+    addDeco:a=>{decoMeshes.push(...a);a.forEach(innerCheck);applyFurnDeco();},
     removeFurn:a=>{const S=new Set(a);furnList=furnList.filter(m=>!S.has(m));},
     // Türen (Drehflügel, Einrichtungsmodus "Türen") und Garagentor
     anims,doors,toggleDoor,B,canvasTex,clickable,swing,tog,gRoof,NF,gx0,gx1,garPans:window.__garPans||[],white,

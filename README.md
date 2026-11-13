@@ -47,6 +47,9 @@ sonst blockiert der Browser die Bilder als Texturen.
 - Empfohlen im Terminal: `python server.py` → http://localhost:8000. Nur dieser Server kann feste Änderungen
   (Baumaße, Möbelkorrekturen) in `src/config/` speichern, siehe `docs/speicherlogik.md`.
 
+Messanzeige für die Geschwindigkeit: `http://localhost:8000/?debug` oder dreimal schnell auf den Titel klicken.
+Schalter „Leistung“ in der Leiste: Auto / Hoch / Niedrig (siehe `docs/plan-performance.md`).
+
 ## Ein-Datei-Version bauen (für das Artifact / Versionskopien)
 
 ```

@@ -36,6 +36,21 @@ Vorgeschlagene Reihenfolge (nach erwartetem Gewinn auf schwacher Hardware):
 5. **Mehr zusammenfassen**: Möbel und klickbare Teile je Raum bündeln (Schritt 4 unten).
 6. **Messanzeige** mit `?debug` (Schritt 0 unten), damit sich die Wirkung auf Roberts PCs mit Zahlen belegen lässt.
 
+### Umgesetzt am 13.11.2026 (v100–v103)
+
+| Schritt | Version | Was |
+|---|---|---|
+| Messanzeige | v100 | `?debug` in der Adresse oder dreimal schnell auf den Titel klicken (bleibt gemerkt): Bilder/s, Bildabstand, Zeichenaufrufe, Dreiecke, Auflösung, Lichter, Stufe, Einrichtung sichtbar/ausgeblendet |
+| Zeichnen nur bei Bedarf | v101 | 0 Bilder im Stillstand; Schatten nur nach Klicks/Umschaltern, am Ende von Bewegungen und bei geänderter Wand-Sichtbarkeit (`__dirty`, `__dirtyUntil`, `__anim` in `basis.js`, Regel in `loop()`) |
+| Leistungsstufe | v102 | Schalter „Leistung“: Auto / Hoch / Niedrig (`LEIST` in `basis.js`, `applyLeistung`, `leistungMessung`, `updateLights` in `start.js`). Niedrig: Auflösung bis 0,75, keine Schatten, höchstens 4 Punktlichter. Auto wechselt bei dauerhaft über 45 ms Bildabstand auf Niedrig. Deko bleibt unberührt. |
+| Inneneinrichtung außen | v103 | In Außenansichten werden Möbel und Deko in den Räumen erst nahe am Haus gezeichnet: Hoch bis 30 m, Auto 8 m, Niedrig 4 m (`LEIST.innen`, `innerSet`/`applyFurnDeco` in `schalter.js`). Fassadenteile bleiben. Im Einrichtungsmodus immer sichtbar. |
+
+Wirkung in der Startansicht (gleiche Messung wie oben): 1832 → 1054 Zeichenaufrufe, 303k → 148k Dreiecke, Bild 36 → etwa
+8 ms; im Stillstand 0 statt 60 Bilder/s. Auf Stufe Niedrig im Wohnzimmer 4 statt 20 Punktlichter.
+
+Noch offen aus der Liste: mehr zusammenfassen (Schritt 4 unten), Lichter auch auf den anderen Stufen begrenzen,
+Texturen/Geometrie (Schritt 5), Eingaben (Schritt 6), Startzeit (Schritt 7). Die Messwerte von Roberts PCs fehlen noch.
+
 ## 1. Befund (aus dem Code; Messwerte folgen in Schritt 0)
 
 | Punkt | Wo | Wirkung |

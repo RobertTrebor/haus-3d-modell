@@ -16,8 +16,19 @@ function buildFurn(){const SM=new Set([wallMat,glass,baseM,plinthM,rough]),FL=wi
     b.setFromObject(o);if(b.isEmpty())return;const h=b.max.y-b.min.y,dx=b.max.x-b.min.x,dz=b.max.z-b.min.z,w=Math.max(dx,dz),t=Math.min(dx,dz);
     if(h>2.3||(w>2.6&&t>1.2)||(h<0.03&&w>1.2)||(t<0.12&&h>1.8))return;if(m===white&&t<0.12)return;
     const c=b.getCenter(new THREE.Vector3());if(FL.some(f=>c.x>f.box[0]-0.15&&c.x<f.box[1]+0.15&&c.y>f.box[2]-0.2&&c.y<f.box[3]+1.2&&c.z>f.box[4]-0.15&&c.z<f.box[5]+0.15))return;out.push(o);});return out;}
-furnBtn.addEventListener('click',()=>{if(!furnList)furnList=buildFurn();const on=furnBtn.getAttribute('aria-pressed')!=='true';furnBtn.setAttribute('aria-pressed',String(on));furnBtn.textContent=on?'Möbel ein':'Möbel aus';furnList.forEach(m=>m.visible=!on);});
-decoBtn.addEventListener('click',()=>{const on=decoBtn.getAttribute('aria-pressed')!=='true';decoBtn.setAttribute('aria-pressed',String(on));decoMeshes.forEach(m=>m.visible=!on);});
+// ---- Inneneinrichtung in Außenansichten ----
+// Möbel und Deko im Haus machen von außen über die Hälfte der Zeichenlast aus, sind dort aber kaum zu sehen. In
+// Außenansichten werden sie deshalb erst nahe am Haus gezeichnet (Abstand je Leistungsstufe: LEIST.innen, Regel in
+// start.js). innerSet = die betroffenen Teile: Mittelpunkt in einem Raum aus ROOMS (also nicht Fensterrahmen, Rollläden,
+// Holzverkleidung an der Fassade und nichts in Garten oder Garage). INNER_BOX = Hausgrundriss für die Abstandsmessung.
+const INNER_BOX=[XW-0.45,Math.max(RX1,KX1)+0.45,-0.45,EDZ+0.1];let innerHidden=false;const innerSet=new Set();
+function innerCheck(m){if(!m||!m.isMesh||!m.geometry)return;let q=m;while(q){if(q===gRoof)return;q=q.parent;}m.updateWorldMatrix(true,false);if(!m.geometry.boundingBox)m.geometry.computeBoundingBox();
+  const c=m.geometry.boundingBox.getCenter(new THREE.Vector3()).applyMatrix4(m.matrixWorld);
+  if((window.__ROOMS||[]).some(r=>c.x>r[2]+0.02&&c.x<r[3]-0.02&&c.z>r[4]+0.02&&c.z<r[5]-0.02&&c.y>r[6]-0.1&&c.y<r[6]+2.7))innerSet.add(m);}
+function applyFurnDeco(){const fo=furnBtn.getAttribute('aria-pressed')==='true',dof=decoBtn.getAttribute('aria-pressed')==='true';
+  if(furnList)furnList.forEach(m=>{m.visible=!(fo||(innerHidden&&innerSet.has(m)));});decoMeshes.forEach(m=>{m.visible=!(dof||(innerHidden&&innerSet.has(m)));});}
+furnBtn.addEventListener('click',()=>{if(!furnList)furnList=buildFurn();const on=furnBtn.getAttribute('aria-pressed')!=='true';furnBtn.setAttribute('aria-pressed',String(on));furnBtn.textContent=on?'Möbel ein':'Möbel aus';applyFurnDeco();});
+decoBtn.addEventListener('click',()=>{const on=decoBtn.getAttribute('aria-pressed')!=='true';decoBtn.setAttribute('aria-pressed',String(on));applyFurnDeco();});
 
 // ---- Wände ein/aus ----
 const wallSet=new Set([wallMat,pvc,glass,sillM,trim,white,leaf,backing,hMat]);
