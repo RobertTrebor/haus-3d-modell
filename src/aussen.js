@@ -1,6 +1,9 @@
 // Außen: Dach, Gauben, Sockel, Fassaden, Garage, Hof, Vorgarten.
 // ---- Außenansicht: Hauptdach (Walmdach) mit Gauben + Schornstein, Natursteinsockel, Kellerfassade Gartenseite ----
 const gRoof=new THREE.Group();scene.add(gRoof);gRoof.visible=false;let facadeMode=false;
+// Füllplatten der Außenhülle (Geschossdecken ohne Treppenloch, damit man von außen nicht durchs Haus sieht). Sie bleiben
+// einzelne Teile (start.js fasst sie nicht zusammen) und werden im Laufmodus im Haus ausgeblendet (loop in start.js).
+const fuellPlatten=[];const fuell=m=>{m.userData.fuell=1;fuellPlatten.push(m);return m;};
 const rx0=-0.83,rx1=9.28,rz0=-0.83,rz1=8.83,ry=OGF+OGH+0.05,rh=4.3,rdz=(rz1-rz0)/2,ridgeZ=(rz0+rz1)/2;
 const roofTileT=canvasTex(256,256,(x,w,h)=>{x.fillStyle='#4E3A34';x.fillRect(0,0,w,h);for(let r=0;r<8;r++){x.fillStyle='rgba(20,12,8,0.6)';x.fillRect(0,r*32+26,w,6);for(let c=0;c<8;c++){x.fillStyle=`rgba(${100+rnd()*40},${74+rnd()*25},${62+rnd()*20},0.45)`;x.fillRect(c*32+(r%2)*16,r*32,28,26);}}},[1,1]);
 const roofM=new THREE.MeshStandardMaterial({map:roofTileT,roughness:0.85,side:THREE.DoubleSide});
@@ -10,7 +13,7 @@ const gut=M('#7A8084',0.4,{metalness:0.5});
  tris.forEach(t=>t.forEach(k=>{const p=P[k];pos.push(...p);uv.push((p[0]+p[2])*0.9,(p[1]-ry)*2.4);}));
  const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));g.setAttribute('uv',new THREE.Float32BufferAttribute(uv,2));g.computeVertexNormals();
  gRoof.add(new THREE.Mesh(g,roofM));
- B(rx0,rx1,ry-0.22,ry,rz0,rz1,M('#F2F0EA',0.8),gRoof);
+ fuell(B(rx0,rx1,ry-0.22,ry,rz0,rz1,M('#F2F0EA',0.8),gRoof));
  B(rx0-0.05,rx1+0.05,ry-0.12,ry+0.02,rz1,rz1+0.1,gut,gRoof);B(rx0-0.05,rx1+0.05,ry-0.12,ry+0.02,rz0-0.1,rz0,gut,gRoof);B(rx0-0.1,rx0,ry-0.12,ry+0.02,rz0,rz1,gut,gRoof);B(rx1,rx1+0.1,ry-0.12,ry+0.02,rz0,rz1,gut,gRoof);
  [[rx1-0.4,rz1+0.05],[rx0+0.5,rz1+0.05]].forEach(([x,z])=>cyl(x,z,0.04,-0.6,ry+0.6,gut,10,gRoof));
  cyl(4.55,-0.47,0.045,CF+0.22,ry-CF-0.22,gut,10,gRoof);{const e=cylZ(4.55,CF+0.16,-0.55,0.045,0.18,gut,gRoof);e.rotation.x=Math.PI/2.6;}
@@ -230,7 +233,7 @@ kWinN(ks0,ks1,CF+0.8,CF+2.0,0,1);kWinN(r5kw0,r5kw1,CF+0.8,CF+2.05,1);
  const t=pavT.clone();t.needsUpdate=true;t.wrapS=t.wrapT=THREE.RepeatWrapping;t.repeat.set(9,5);const m=new THREE.Mesh(new THREE.PlaneGeometry(10,6),new THREE.MeshStandardMaterial({map:t,roughness:0.9}));m.rotation.x=-Math.PI/2;m.position.set(4.3,CF-0.01,NF-3.0);gRoof.add(m);
  const gm=new THREE.Mesh(new THREE.PlaneGeometry(10.9,14),M('#6E8A4E',0.95));gm.rotation.x=-Math.PI/2;gm.scale.set(9.3/10.9,1,1);gm.position.set(-9.85,CF+0.85-0.055,0);gRoof.add(gm);}
 // Geschossdecke zwischen EG und OG als Außenband
-{const pl=M('#F4F2EC',0.85);B(-0.39,8.86,H,OGF+0.01,-0.39,8.41,pl,gRoof);B(XW-RV2,-0.38,H,OGF+0.01,Z0-0.38,S+0.39,pl,gRoof);B(HX0,KX1+0.38,H,OGF+0.01,KZ0,S+0.39,pl,gRoof);}
+{const pl=M('#F4F2EC',0.85);fuell(B(-0.39,8.86,H,OGF+0.01,-0.39,8.41,pl,gRoof));fuell(B(XW-RV2,-0.38,H,OGF+0.01,Z0-0.38,S+0.39,pl,gRoof));fuell(B(HX0,KX1+0.38,H,OGF+0.01,KZ0,S+0.39,pl,gRoof));}
 
 // ---- Vorgarten zur Straße: Natursteinmauer mit Pfeilern, Tor, Zaun, Briefkasten, Gehweg, Einfahrtstor ----
 {const yG=EF-0.4,wz=FZ+3.2,sandT=canvasTex(256,128,(x,w,h)=>{x.fillStyle='#8A7A62';x.fillRect(0,0,w,h);for(let r=0;r<5;r++)for(let c=0;c<7;c++){const v=rnd();x.fillStyle=v<0.35?'#C8B898':v<0.7?'#B0A080':'#D8C8A8';x.fillRect(c*40+(r%2)*18+rnd()*4,r*26+2,30+rnd()*8,22);}},[1,1]);

@@ -71,6 +71,9 @@ function loop(now){
   dgLabs.forEach(l=>l.visible=gDG.visible);if(gDG.visible)[jLab,wLab,lLab,gLab,aLab,obLab].forEach(l=>l.visible=false);
   if(kgMode){gCel.visible=true;gRoof.visible=true;(window.__garConf||[]).forEach(m=>m.visible=false);}
   gCelF.visible=gCel.visible||facadeMode; // Keller-Außenwand zur Straße: in Außenansichten immer sichtbar
+  // Laufmodus (laufen.js): im Haus die Füllplatten der Außenhülle ausblenden (sie verdecken die Treppenlöcher); an der
+  // Treppe zum Hauseingang den Keller ausblenden, weil Kellerdecke und -wände dort im Modell die Treppe überdecken.
+  {const li=!!window.__laufenAn&&camIn;fuellPlatten.forEach(m=>{m.visible=!li;});if(window.__laufenAn&&window.__laufenEingang){gCel.visible=false;gCelF.visible=false;}}
   // Inneneinrichtung in Außenansichten nur nahe am Haus zeichnen (Abstand je Leistungsstufe, 0,5 m Umschaltpuffer)
   {const d=Math.hypot(Math.max(INNER_BOX[0]-c.x,0,c.x-INNER_BOX[1]),Math.max(INNER_BOX[2]-c.z,0,c.z-INNER_BOX[3])),lim=LEIST.innen[LEIST.eff];
    const hide=facadeMode&&!kgMode&&!(window.HAUS&&HAUS.editMode)&&d>(innerHidden?lim-0.5:lim+0.5);if(hide!==innerHidden){innerHidden=hide;applyFurnDeco();__shF=0;}}
@@ -111,7 +114,7 @@ scene.traverse(o=>{if(o.isMesh&&o.geometry&&o.geometry.type==='PlaneGeometry'&&M
   furnList.concat(decoMeshes).forEach(innerCheck); // Inneneinrichtung für die Außenansichten merken (schalter.js); wird getrennt zusammengefasst
   const buckets=new Map();
   meshes.forEach(m=>{if(!m.parent)return;if(m.material===breadM)return;const par=targetOf(m.parent);if(!par)return;
-    if(fixed.has(m)||!m.visible||Array.isArray(m.material)||!m.material||m.material.transparent||m.userData.sash||m.userData.navPortal||m.isInstancedMesh)return;
+    if(fixed.has(m)||!m.visible||Array.isArray(m.material)||!m.material||m.material.transparent||m.userData.sash||m.userData.navPortal||m.userData.fuell||m.isInstancedMesh)return;
     const g=m.geometry;if(!g||!g.attributes||!g.attributes.position||(g.morphAttributes&&Object.keys(g.morphAttributes).length))return;
     const sig=(dS.has(m)?'d':'')+(fS.has(m)?'f':'')+(wS.has(m)?'w':'')+(gS.has(m)?'g':'')+(innerSet.has(m)?'i':'');
     const k=par.uuid+'|'+m.material.uuid+'|'+(m.castShadow?1:0)+(m.receiveShadow?1:0)+'|'+sig;let b=buckets.get(k);if(!b){b={par,mat:m.material,cs:m.castShadow,rs:m.receiveShadow,sig,list:[]};buckets.set(k,b);}b.list.push(m);});

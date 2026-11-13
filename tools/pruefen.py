@@ -3,7 +3,7 @@
 
 Aufruf:  python tools/pruefen.py fingerabdruck   -> Kennzahlen des Modells (vor und nach einem Umbau vergleichen)
          python tools/pruefen.py funktion        -> Drehen, Zoomen, Schalter, Doppelklick, Einrichtungsmodus
-         python tools/pruefen.py laufen          -> Laufmodus: Start, Wände halten, außen laufen
+         python tools/pruefen.py laufen          -> Laufmodus: Start, Wände halten, außen laufen, alle Treppen
          python tools/pruefen.py                 -> alles
 
 Fingerabdruck: Anzahl der Bauteile und je eine Prüfsumme über alle Bauteile (Lage, sämtliche Eckpunkte, Farbe,
@@ -78,13 +78,19 @@ LAUFEN = KOPF + r"""
  await ansicht('overview');L.start();await w(400);const d=L.stand();await geh('KeyW',3000);const e=L.stand();
  log('Start aussen: x='+f(d.x)+' z='+f(d.z)+' Fuss='+f(d.fuss)+'; 3 s geradeaus: '+f(Math.hypot(e.x-d.x,e.z-d.z))+' m, Fuss='+f(e.fuss));
  await geh('KeyW',5000);const g=L.stand();log('weiter aufs Haus zu (5 s): x='+f(g.x)+' z='+f(g.z)+' Fuss='+f(g.fuss)+' Raum='+raum(g));
- L.stop();await ansicht('hall');L.start();await w(400);const h0=L.stand();await geh('KeyW',6000);const h1=L.stand();
- log('Flur Richtung Treppe (nur zur Information, Schritt 2): Fuss '+f(h0.fuss)+' -> '+f(h1.fuss)+', x='+f(h1.x)+' z='+f(h1.z));
+ L.stop();await ansicht('hall');L.start();await w(400);
+ // Tür zur Kellertreppe öffnen (Klick-Teil vom Windfang aus suchen), dann jede Treppe hinauf und hinunter gehen
+ {const T3=W.THREE,rc=new T3.Raycaster(new T3.Vector3(3.5,0.2,8.75),new T3.Vector3(0,0,-1),0,1.5);rc.camera=H.camera;const h=rc.intersectObjects(H.scene.children,true).find(h=>h.object.userData.act||h.object.userData.door);if(h){const u=h.object.userData;if(u.act)u.act();else W.eval('toggleDoor')(u.door);}await w(1500);}
+ const weg=async(a,b)=>{L.setze(a[0],a[2],a[1],0);await w(150);L.taste('KeyW',true);let ok=false;
+  for(let i=0;i<45&&!ok;i++){const p=L.stand(),dx=b[0]-p.x,dz=b[2]-p.z;ok=Math.hypot(dx,dz)<0.3&&Math.abs(p.fuss-b[1])<0.2;if(!ok){L.setze(p.x,p.z,undefined,Math.atan2(-dx,-dz));await w(200);}}
+  L.taste('KeyW',false);return ok;};
+ const tr=[];for(const F of W.__FLIGHTS){const up=await weg(F.lo,F.hi),dn=await weg(F.hi,F.lo);tr.push(F.n+': '+(up?'hoch ok':'HOCH HAENGT')+', '+(dn?'runter ok':'RUNTER HAENGT'));}
+ log((tr.join('; ').includes('HAENGT')?'FEHLER ':'')+'Treppen: '+tr.join('; '));
  L.stop();log(fehler());
 }catch(e){log('FEHLER '+e.message+' '+errs.join(' ; '));}})();
 </script>"""
 
-TESTS = {"fingerabdruck": (FINGERABDRUCK, 14), "funktion": (FUNKTION, 34), "laufen": (LAUFEN, 75)}
+TESTS = {"fingerabdruck": (FINGERABDRUCK, 14), "funktion": (FUNKTION, 34), "laufen": (LAUFEN, 130)}
 
 
 class Langsam(BaseHTTPRequestHandler):

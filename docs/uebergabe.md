@@ -1,6 +1,6 @@
 # Übergabe 3D-Modell Haus Mühlstr. 46
 
-Stand: 13.11.2026 (v104). Repository am 09.11.2026 angelegt aus v82 (`v82_Performance.html`).
+Stand: 13.11.2026 (v105, Branch `laufmodus`; `main` steht auf v104). Repository am 09.11.2026 angelegt aus v82 (`v82_Performance.html`).
 
 ## Wichtige Maße (von Robert)
 - Raumhöhe EG und OG 2,59 m; Kellerräume 2,20 m; Bogen-Scheitel 1,81 m.
@@ -69,17 +69,31 @@ mehr beim Blick von oben, sondern über eine andere Ansicht oder die Etagenknöp
 Performance (v100–v103, siehe `docs/plan-performance.md`): Messanzeige (`?debug` oder dreimal auf den Titel klicken),
 Zeichnen nur bei Bedarf, Schalter „Leistung“ (Auto/Hoch/Niedrig), Inneneinrichtung in Außenansichten erst nahe am Haus.
 
-Laufmodus (v104, `src/laufen.js`, Schritt 1 von 2): Knopf „Laufen“ in der Leiste. Am PC W/A/S/D oder Pfeiltasten,
-Maus zum Umsehen (Klick ins Bild fängt die Maus, Esc gibt sie frei, zweites Esc beendet), Umschalt = schneller; am Handy
-Steuerkreis links unten und Wischen. Start am aktuellen Standpunkt, wenn die Kamera in einem Raum oder knapp über
-dem Boden steht, sonst auf dem Gehweg vor dem Haus. Wände, geschlossene Türen, Möbel und Zäune halten auf; Deko nicht.
-Im Laufmodus gilt die Außenansicht (Fassade, Dach, Garten sichtbar), die Etage folgt der Fußhöhe.
+Laufmodus (v104/v105, `src/laufen.js`, Branch `laufmodus`): Knopf „Laufen“ in der Leiste. Am PC W/A/S/D oder
+Pfeiltasten, Maus zum Umsehen (Klick ins Bild fängt die Maus, Esc gibt sie frei, zweites Esc beendet), Umschalt =
+schneller; am Handy Steuerkreis links unten und Wischen. Start am aktuellen Standpunkt, wenn die Kamera in einem Raum
+oder knapp über dem Boden steht, sonst auf dem Gehweg vor dem Haus. Wände, geschlossene Türen, Möbel und Zäune halten
+auf; Deko und dünne Rohre/Stangen nicht. Im Laufmodus gilt die Außenansicht (Fassade, Dach, Garten sichtbar).
+- v105 (Schritt 2): Alle fünf Treppen aus `FLIGHTS` gehen hinauf und hinunter, ebenso die Stufen vor der Haustür; die
+  nächste Etage erscheint schon auf der Treppe; unter niedrigen Decken senkt sich die Augenhöhe. Geprüft mit
+  `python tools/pruefen.py laufen` (geht jede Treppe in beide Richtungen ab).
+- Türen müssen wie sonst per Klick geöffnet werden (Gartentor, Haustür, Tür zur Kellertreppe).
 - Im Artifact lässt sich die Maus vermutlich nicht fangen (der Viewer erlaubt das nicht); dort mit gedrückter Maustaste
   umsehen. Lokal über `server.py` geht beides. Auf einem echten Handy noch nicht ausprobiert.
-- Treppen werden schon mitgenommen (Stufen bis 32 cm), sind aber noch nicht geprüft: Geländer, Kopfhöhe,
-  Kellertreppe, Dachbodentreppe, Etagenwechsel der Anzeige. Das ist Schritt 2.
-- Das Gartentor und die Haustür müssen wie sonst per Klick geöffnet werden, bevor man durchgehen kann.
 - Offen: fehlender Boden vorne links (Punkt 8 oben) – dort bleibt man auf der letzten Höhe stehen.
+- Der Fingerabdruck hat sich mit v105 geändert, weil vier Füllplatten der Außenhülle (`fuell(...)` in `aussen.js`,
+  Geschossdecken ohne Treppenloch) nicht mehr zusammengefasst werden; sie werden im Laufmodus im Haus ausgeblendet.
+
+Beim Laufmodus aufgefallene Unstimmigkeiten im Modell (nicht behoben, nur umgangen – bitte mit Fotos/Maßen klären):
+1. Treppe zum Hauseingang: Kellerdecke und Kellerwände (`eingang.js` Zeile 137, Keller-WC in `keller.js`) reichen bis
+   Höhe 0 und überdecken die Treppe und den Durchgang zum Windfang. In der Ansicht „Treppe zum Hauseingang“ sieht man
+   deshalb eine weiße Fläche statt der Stufen. Im Laufmodus wird der Keller dort ausgeblendet und nicht als Hindernis
+   gewertet. Frage: Wo liegen Keller-WC und Kriechkeller wirklich im Verhältnis zur Eingangstreppe?
+2. Treppenpodest: `vorbau.js` Zeile 53 enthält einen Quader mit vertauschter Höhe (`B(CX0,CL1,2.22,LY-0.03,…)`), der
+   nach innen gestülpt über dem ganzen Podest liegt. Insgesamt gibt es 25 solche Quader, die übrigen sind winzig.
+3. Tür zur Kellertreppe (im Windfang): Zwei Heizungsrohre (`eingang.js` Zeile 86) stehen 24 cm vor der Türmitte, und
+   ein Wandstück (x 2,92–3,42) verdeckt die linken 30 cm des Türblatts; frei bleiben rund 35 cm. Im Laufmodus zählen
+   dünne Rohre nicht, und die Figur ist mit 32 cm Breite schmal genug.
 
 Bewusste Einschränkungen der Navigation:
 - Durch offene Türen zoomen geht nicht mehr; Raumwechsel per Doppelklick/Doppeltipp.
@@ -88,7 +102,8 @@ Bewusste Einschränkungen der Navigation:
 
 Arbeitsweise:
 - Prüfen nach Umbauten: `python tools/pruefen.py` (braucht den laufenden `server.py`). Der Fingerabdruck muss bei
-  einer reinen Umsortierung gleich bleiben; Stand v103: `Bauteile=2232 Modell=2137936823 Raeume=-1893535870 Ansichten=-1918846762 Moebel=554 Tueren=22`.
+  einer reinen Umsortierung gleich bleiben; Stand v105: `Bauteile=2235 Modell=-1276393934 Raeume=-1893535870 Ansichten=-1918846762 Moebel=554 Tueren=22`
+  (bis v104: `Bauteile=2232 Modell=2137936823`; Änderung durch die einzeln geführten Füllplatten, siehe Laufmodus).
 - Git: Auf Roberts Rechner ist keine Git-Identität eingerichtet. Die Commits vom 13.11. wurden einzeln mit
   `git -c user.name="Robert Lengsfeld" -c user.email="RobertTrebor@users.noreply.github.com" commit …` erstellt.
   Seit dem 13.11.2026 (v103) ist `main` der aktuelle Stand und der Arbeitsbranch; `einrichtungsmodus-weiterarbeit`
