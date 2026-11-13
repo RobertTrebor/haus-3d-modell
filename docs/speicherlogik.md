@@ -1,6 +1,6 @@
 # Speicherlogik: Status quo und Designideen
 
-Stand: 13.11.2026 (v89). Es gibt zwei getrennte Ebenen.
+Stand: 13.11.2026 (v90). Es gibt zwei getrennte Ebenen.
 
 ## 1. Status quo des Hauses – fest im Projekt (`src/config/`)
 
@@ -10,19 +10,26 @@ Alles, was das Haus so beschreibt, wie es wirklich ist. Die Dateien liegen im Re
 |---|---|---|
 | `src/config/masse.js` → `konst` | Baumaße, an denen `main.js` hängt (Meter bzw. Stück) | Einrichten → Maßband → Maßregister → „Ins Modell übernehmen“ |
 | `src/config/masse.js` → `register` | Nachmessungen zum Maßregister (IDs wie in `src/masse/`) | Einrichten → Maßband → „Speichern“, „Nachmessen“, „Stimmt so“ |
+| `src/config/raeume.js` | Raummaße (Breite, Tiefe, feste Ecken) | Einrichten → Maßband → Maßregister → „Ins Modell übernehmen“ |
 | `src/config/bestand.js` → `pieces` | Korrekturen an vorhandenen Möbeln (Verschiebung `dx`/`dz`, Drehung `ry`, `hidden`) | Einrichten → Möbel → Stück wählen → „Fest übernehmen“ / „Aus Bestand entfernen“ |
 | `src/config/bestand.js` → `items` | zusätzliche Möbel, die wirklich dort stehen | Einrichten → Neu/Katalog → „Fest übernehmen“ |
 
 Schreiben geht nur am PC mit `python server.py` (http://localhost:8000). Der Server lauscht nur auf dem eigenen
-Rechner und schreibt ausschließlich diese beiden Dateien. Danach wie gewohnt committen und pushen.
+Rechner und schreibt ausschließlich diese drei Dateien. Danach wie gewohnt committen und pushen.
 Im Artifact und mit einem einfachen Dateiserver fehlen die Schaltflächen; dort bleiben Nachmessungen im Browser
 und wandern über „Exportieren“ ins Projekt.
 
-Bisher an `konst` angebunden: `W`, `D` (Wohnzimmer), `H`, `OGH` (Raumhöhen), `T` (Innenwand), `EWT` (Außenwand),
-`KST` (Stufen Kellertreppe), `VX0`, `VX1`, `VZ0`, `WKZ1` (Waschküche), `gx0`, `gx1` (Garage). Ein Registereintrag
-kann ins Modell übernommen werden, wenn sein Feld `konst` eine dieser Konstanten oder eine Differenz davon ist
-(z. B. `VX1-VX0`). Weitere Maße: Zahl in `main.js` durch `KONST.<Name>` ersetzen, Name und Wert in `masse.js`
-und in die Rückfallwerte in `main.js` eintragen, `konst` im Register setzen.
+Bisher an `konst` angebunden: `H`, `OGH` (Raumhöhen), `T` (Innenwand), `EWT` (Außenwand), `KST` (Stufen
+Kellertreppe). Ein Registereintrag kann ins Modell übernommen werden, wenn sein Feld `konst` eine dieser
+Konstanten ist. Weitere Maße: Zahl im Code durch `KONST.<Name>` ersetzen, Name und Wert in `masse.js` und in
+die Rückfallwerte eintragen, `konst` im Register setzen.
+
+Raummaße stehen seit v90 in `src/config/raeume.js` (`breite` = x, `tiefe` = z, je Raumschlüssel aus `ROOMS`;
+`x0`/`z0` nur, wo der Raum eine eigene feste Ecke hat). Der Code liest sie mit `rm('<raum>','<feld>',Rückfallwert)`.
+Im Maßregister erscheint „Ins Modell übernehmen“ automatisch bei `raum.<schlüssel>.breite` / `.tiefe`, wenn das
+Feld in `raeume.js` steht. Angebunden: Wohnzimmer, Esszimmer, Flur (Breite), Küche, Bad, Schlafzimmer,
+Bogenzimmer (Tiefe), Kellerbüro, Waschküche, Garage (Breite), Vorratsraum. Die Räume im OG folgen den Räumen
+darunter; DG, Windfang, WCs und Kellerflur sind noch nicht einzeln angebunden.
 
 Achtung: Teile mit festen Koordinaten in `main.js` wandern bei einer Maßänderung nicht automatisch mit.
 Die IDs der Möbel (`m<x>_<z>_<y>`) ergeben sich aus ihrer Lage in `main.js`; wird ein Möbelstück dort verschoben,

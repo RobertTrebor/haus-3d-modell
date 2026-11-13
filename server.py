@@ -5,6 +5,7 @@ Aufruf:  python server.py [Port]      -> http://localhost:8000
 
 Anders als `python -m http.server` kann dieser Server schreiben:
   POST /api/masse    -> src/config/masse.js    (Baumaße, Nachmessungen)
+  POST /api/raeume   -> src/config/raeume.js   (Raummaße)
   POST /api/bestand  -> src/config/bestand.js  (fest übernommene Möbelkorrekturen)
 Er lauscht nur auf dem eigenen Rechner (127.0.0.1) und schickt Dateien ohne Browser-Cache.
 """
@@ -15,6 +16,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent
 SRC = ROOT / "src"
 TARGETS = {"/api/masse": ("masse.js", "HAUS_MASSE", ("konst", "register")),
+           "/api/raeume": ("raeume.js", "HAUS_RAEUME", ("raeume",)),
            "/api/bestand": ("bestand.js", "HAUS_BESTAND", ("pieces", "items"))}
 
 

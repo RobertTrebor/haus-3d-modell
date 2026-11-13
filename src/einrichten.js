@@ -430,6 +430,9 @@ function massAuto(){const out=[];
 // Konstanten aus src/config/masse.js, die ein Registereintrag bestimmt: konst 'A' oder 'A-B' (z. B. 'VX1-VX0')
 const KV=H.konst||{};
 const kParse=s=>{const m=/^(\w+)(?:-(\w+))?$/.exec(s||'');return m&&typeof KV[m[1]]==='number'&&(!m[2]||typeof KV[m[2]]==='number')?m:null;};
+// Raummaße aus src/config/raeume.js: Registereintrag raum.<schlüssel>.breite / .tiefe -> [Raum, Feld]
+const RCFG=window.HAUS_RAEUME&&window.HAUS_RAEUME.raeume||{};
+const rmField=e=>{const m=/^raum\.([^.]+)\.(breite|tiefe)$/.exec(e.id||'');return m&&RCFG[m[1]]&&typeof RCFG[m[1]][m[2]]==='number'?[RCFG[m[1]],m[2]]:null;};
 function massMigrate(){const ids=Object.keys(massUser);if(!ids.length)return;ids.forEach(id=>{MCFG.register[id]=Object.assign({},MCFG.register[id]||{},massUser[id]);});
   saveMasse().then(ok=>{if(!ok)return;massUser={};massSave();H.toast(ids.length+' Nachmessungen ins Projekt übernommen');if(H.editMode&&tool==='measure')render();});}
 let massConfirm=null;
@@ -480,7 +483,7 @@ function renderMassList(){const list=$('eMList');if(!list)return;const q=massQ.t
   list.innerHTML=rows.length?rows.map(e=>{const qk=QUELLE[e.quelle]?e.quelle:'unbekannt',ed=massEdit===e.id;
     return '<div class="krow"><div class="kinfo"><b>'+esc(e.name||e.id)+'</b> <span class="badge '+qk+'">'+QUELLE[qk]+'</span><div class="muted">'+esc(MKAT[e.kat]||e.kat||'')+(e.raum?' · '+esc(e.raum):'')+' · Modell '+mFmt(e.modell,e)+(e.wert!=null?' · gemessen '+mFmt(e.wert,e)+esc(massDelta(e)):'')+(e.datum?' · '+esc(e.datum):'')+(e.notiz?' · '+esc(e.notiz):'')+'</div></div>'+
       '<div class="row">'+(ed?'<input type="number" step="1" min="0" id="eMEdV" aria-label="Gemessener Wert" value="'+(e.wert!=null?(mUnit(e)==='m'?cm(e.wert):e.wert):e.modell!=null?(mUnit(e)==='m'?cm(e.modell):e.modell):'')+'"><span class="muted">'+(mUnit(e)==='m'?'cm':esc(mUnit(e)))+'</span><button data-mok="'+esc(e.id)+'">OK</button><button data-mcancel="1">Abbrechen</button>'
-        :'<button data-mmess="'+esc(e.id)+'">Nachmessen</button>'+(e.modell!=null&&e.quelle!=='gemessen'?'<button data-mok2="'+esc(e.id)+'" title="Der Modellwert stimmt mit der Wirklichkeit überein">Stimmt so</button>':'')+(canWrite&&e.wert!=null&&kParse(e.konst)&&Math.abs(e.wert-e.modell)>0.0005?'<button data-mapply="'+esc(e.id)+'">'+(massConfirm===e.id?'Wirklich? Modell wird neu aufgebaut':'Ins Modell übernehmen')+'</button>':'')+(e.pts?'<button data-mshow="'+esc(e.id)+'">Zeigen</button>':'')+(e.eigen?'<button data-mdel="'+esc(e.id)+'" aria-label="Eigenen Eintrag löschen" title="Eigenen Eintrag löschen">✕</button>':''))+'</div></div>';}).join('')
+        :'<button data-mmess="'+esc(e.id)+'">Nachmessen</button>'+(e.modell!=null&&e.quelle!=='gemessen'?'<button data-mok2="'+esc(e.id)+'" title="Der Modellwert stimmt mit der Wirklichkeit überein">Stimmt so</button>':'')+(canWrite&&e.wert!=null&&(kParse(e.konst)||rmField(e))&&Math.abs(e.wert-e.modell)>0.0005?'<button data-mapply="'+esc(e.id)+'">'+(massConfirm===e.id?'Wirklich? Modell wird neu aufgebaut':'Ins Modell übernehmen')+'</button>':'')+(e.pts?'<button data-mshow="'+esc(e.id)+'">Zeigen</button>':'')+(e.eigen?'<button data-mdel="'+esc(e.id)+'" aria-label="Eigenen Eintrag löschen" title="Eigenen Eintrag löschen">✕</button>':''))+'</div></div>';}).join('')
     :'<div class="muted">Keine Einträge.</div>';
   const byId=new Map(rows.map(e=>[e.id,e]));const keep=e=>({name:e.name,kat:e.kat,raum:e.raum,modell:e.modell,einheit:e.einheit});
   list.querySelectorAll('[data-mmess]').forEach(b=>b.onclick=()=>{massEdit=b.dataset.mmess;renderMassList();const i=$('eMEdV');if(i){i.focus();i.select();}});
@@ -489,9 +492,10 @@ function renderMassList(){const list=$('eMList');if(!list)return;const q=massQ.t
   list.querySelectorAll('[data-mok2]').forEach(b=>b.onclick=()=>{const e=byId.get(b.dataset.mok2);massPut(e.id,Object.assign(keep(e),{wert:e.modell,quelle:'gemessen'}));renderMeasure();});
   list.querySelectorAll('[data-mshow]').forEach(b=>b.onclick=()=>massShow(byId.get(b.dataset.mshow)));
   list.querySelectorAll('[data-mdel]').forEach(b=>b.onclick=()=>{delete massUser[b.dataset.mdel];massSave();if(MCFG.register[b.dataset.mdel]){delete MCFG.register[b.dataset.mdel];saveMasse();}renderMeasure();});
-  list.querySelectorAll('[data-mapply]').forEach(b=>b.onclick=()=>{const e=byId.get(b.dataset.mapply),k=kParse(e.konst);if(!k)return;
+  list.querySelectorAll('[data-mapply]').forEach(b=>b.onclick=()=>{const e=byId.get(b.dataset.mapply),k=kParse(e.konst),rf=k?null:rmField(e);if(!k&&!rf)return;
     if(massConfirm!==e.id){massConfirm=e.id;renderMassList();setTimeout(()=>{if(massConfirm===e.id){massConfirm=null;renderMassList();}},5000);return;}
-    massConfirm=null;MCFG.konst=Object.assign({},KV,MCFG.konst,{[k[1]]:+(e.wert+(k[2]?KV[k[2]]:0)).toFixed(3)});saveMasse().then(ok=>{if(ok)location.reload();});});}
+    massConfirm=null;if(rf){rf[0][rf[1]]=+(+e.wert).toFixed(3);post('/api/raeume',{raeume:RCFG}).then(ok=>{if(ok)location.reload();});return;}
+    MCFG.konst=Object.assign({},KV,MCFG.konst,{[k[1]]:+(e.wert+(k[2]?KV[k[2]]:0)).toFixed(3)});saveMasse().then(ok=>{if(ok)location.reload();});});}
 
 // =====================================================================
 // Tippen im Einrichtungsmodus (Streichen, Maßband, Abwählen)

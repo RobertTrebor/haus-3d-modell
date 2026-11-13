@@ -67,10 +67,13 @@ function canvasTex(w,h,draw,rep){
 }
 let seed=11;const rnd=()=>{seed=(seed*16807)%2147483647;return seed/2147483647;};
 
-// Baumaße: Quelle ist src/config/masse.js (window.HAUS_MASSE.konst); die Zahlen hier sind nur Rückfallwerte.
-const KONST={W:3.9,D:3.54,H:2.59,T:0.18,OGH:2.59,EWT:0.38,KST:9,VX0:2.55,VX1:5.05,VZ0:0.0,WKZ1:3.63,gx0:5.3,gx1:8.2};
+// Baumaße (Raumhöhen, Wandstärken, Stufen): Quelle ist src/config/masse.js (window.HAUS_MASSE.konst); die Zahlen hier sind nur Rückfallwerte.
+const KONST={H:2.59,T:0.18,OGH:2.59,EWT:0.38,KST:9};
 {const k=(window.HAUS_MASSE&&window.HAUS_MASSE.konst)||{};Object.keys(KONST).forEach(n=>{if(typeof k[n]==='number'&&isFinite(k[n]))KONST[n]=k[n];});}
-const {W,D,H,T}=KONST;
+// Raummaße: Quelle ist src/config/raeume.js (window.HAUS_RAEUME.raeume); rm(Raum,Feld,Rückfallwert)
+const RAEUME=(window.HAUS_RAEUME&&window.HAUS_RAEUME.raeume)||{};
+const rm=(key,feld,fb)=>{const r=RAEUME[key],v=r&&r[feld];return typeof v==='number'&&isFinite(v)?v:fb;},r4=v=>Math.round(v*1e4)/1e4;
+const {H,T}=KONST,W=rm('slide','breite',3.9),D=rm('slide','tiefe',3.54);
 
 const ftA=canvasTex(2048,2048,(x,w,h)=>{
   const n=12,pw=w/n;
@@ -157,7 +160,7 @@ disk(1.98,1.47,0.045,D-0.102,D-0.1,M('#2A1A10',0.8));
 B(1.93,2.03,1.17,1.19,D-0.105,D-0.1,rosew,gBack);
 B(1.955,2.005,1.66,2.0,D-0.06,D-0.03,rosew,gBack);B(1.945,2.015,2.0,2.17,D-0.05,D-0.03,rosew,gBack);
 
-const TI=0.235,XW=-1.95,XE=XW+4.67,S=D+T+4.30,Z0=D+T,PI2=Math.PI;
+const TI=0.235,XW=rm('dining','x0',-1.95),XE=XW+rm('dining','breite',4.67),S=D+T+rm('dining','tiefe',4.30),Z0=D+T,PI2=Math.PI;
 const gDW=new THREE.Group(),gDS=new THREE.Group(),gDE=new THREE.Group();scene.add(gDW,gDS,gDE);
 const ftB=ftA.clone();ftB.needsUpdate=true;ftB.center.set(0.5,0.5);ftB.rotation=PI2/2;ftB.repeat.set((S-Z0)/2.4,(XE-XW+TI)/2.4);
 const dining=new THREE.Mesh(new THREE.PlaneGeometry(XE-XW+TI,S-Z0),new THREE.MeshStandardMaterial({map:ftB,roughness:0.42}));
@@ -357,7 +360,7 @@ for(let i=0;i<28;i++){
 
 
 // ---- Flur ----
-const HX0=XE+TI,HX1=HX0+2.2,HZ1=S,SUX=HX0+1.05,SDX=HX1-1.12,SD0=6.85,SD1=S,NST=8,STR=0.24,SRI=0.185,SU0=HZ1+0.3-NST*STR;
+const HX0=XE+TI,HX1=HX0+rm('hall','breite',2.2),HZ1=S,SUX=HX0+1.05,SDX=HX1-1.12,SD0=6.85,SD1=S,NST=8,STR=0.24,SRI=0.185,SU0=HZ1+0.3-NST*STR;
 const gHE=new THREE.Group(),gHS=new THREE.Group();scene.add(gHE,gHS);
 function hfloor(x0,x1,z0,z1,tex){const t=ftA.clone();t.needsUpdate=true;t.center.set(0.5,0.5);t.rotation=Math.PI/2;t.repeat.set((z1-z0)/2.4,(x1-x0)/2.4);
   const m=new THREE.Mesh(new THREE.PlaneGeometry(x1-x0,z1-z0),new THREE.MeshStandardMaterial({map:tex||t,roughness:0.42}));m.rotation.x=-Math.PI/2;m.position.set((x0+x1)/2,0.001,(z0+z1)/2);m.userData.noShadow=1;scene.add(m);return m;}
@@ -412,7 +415,7 @@ const shade=new THREE.Mesh(new THREE.SphereGeometry(0.22,24,12,0,Math.PI*2,0,Mat
 shade.position.set(3.95,2.0,5.2);shade.userData.noShadow=1;scene.add(shade);deco(cyl(3.95,5.2,0.004,2.0,0.5,M('#B8924A',0.3,{metalness:0.8}),6));
 const hLight=new THREE.PointLight(col('#FFD3A0'),0,6,2);hLight.position.set(3.95,1.9,5.2);scene.add(hLight);
 // ---- Küche ----
-const BZ1=3.47+0.12+1.21,KX0=EX+ET,KX1=KX0+3.08,KZ0=S-3.1,KZ1=S,KT=0.38;
+const BZ1=rm('bedroom','tiefe',3.47)+0.12+rm('bath','tiefe',1.21),KX0=EX+ET,KX1=KX0+rm('kitchen','breite',3.08),KZ0=S-rm('kitchen','tiefe',3.1),KZ1=S,KT=0.38;
 const gKE=new THREE.Group(),gKS=new THREE.Group(),gKN=new THREE.Group();scene.add(gKE,gKS,gKN);
 hfloor(KX0,KX1,KZ0,KZ1);
 const kFront=M('#F1ECE0',0.45),kPlinth=M('#DCD6C8',0.6),kTop=M('#2E2A28',0.35),kBar=M('#B9BCBE',0.3,{metalness:0.7}),kGap=M('#CFC8B8',0.6);
@@ -479,7 +482,7 @@ function win(o){const g=o.g,f=o.f,sg=o.s;
   if(!o.noSill)P(a0-0.04,a1+0.04,y0-0.035,y0,-0.05,0.2,sillM);
   if(!o.noBox)P(a0-0.1,a1+0.1,2.24,H,-0.14,0,pvc);}
 // ---- Bad ----
-const BX0=KX0,BX1=KX0+3.08,BZ0=BZ1-1.21,PW=0.37,PD=0.38;
+const BX0=KX0,BX1=KX0+rm('bath','breite',3.08),BZ0=BZ1-rm('bath','tiefe',1.21),PW=0.37,PD=0.38;
 const gBaE=new THREE.Group();scene.add(gBaE);
 function RXW(){return BX1+0.38;}
 const tf=new THREE.Mesh(new THREE.PlaneGeometry(BX1-BX0,BZ1-BZ0),new THREE.MeshStandardMaterial({map:(()=>{const t=tileTex.clone();t.needsUpdate=true;t.repeat.set((BX1-BX0)/0.6,(BZ1-BZ0)/0.6);return t;})(),roughness:0.3}));
@@ -523,7 +526,7 @@ blob(6.3,1.2,BZ1-0.08,0.18,0.48,0.07,M('#6E1F2E',0.9));blob(6.55,1.25,BZ1-0.08,0
 B(6.35,7.15,0.003,0.012,BZ0+0.84,BZ1-0.03,M('#4A4648',0.95));
 cyl(8.3,BZ1-0.2,0.1,0,0.3,M('#FAFAFA',0.3),20);
 // ---- Schlafzimmer ----
-const RX0=W+T,RX1=RX0+4.39,RZ0=0,RZ1=3.47;
+const RX0=W+T,RX1=RX0+rm('bedroom','breite',4.39),RZ0=0,RZ1=rm('bedroom','tiefe',3.47);
 const gBN=new THREE.Group(),gBE=new THREE.Group();scene.add(gBN,gBE);
 (function(){const t=ftA.clone();t.needsUpdate=true;t.repeat.set((RX1-RX0)/2.4,(RZ1-RZ0)/2.4);const m=new THREE.Mesh(new THREE.PlaneGeometry(RX1-RX0,RZ1-RZ0),new THREE.MeshStandardMaterial({map:t,roughness:0.42}));m.rotation.x=-Math.PI/2;m.position.set((RX0+RX1)/2,0.001,(RZ0+RZ1)/2);m.userData.noShadow=1;scene.add(m);})();
 const nw0=5.3,nw1=7.1;
@@ -1059,7 +1062,7 @@ function openWin(px,pz,ry,w,y0,y1,nS,mun,glM,wfM){const g=new THREE.Group();g.po
     const a=swing(pv,'y',-d*1.2);clickable(P,tog(a));}
   return g;}
 // ---- Bogenzimmer (Keller, links unten an der Kellertreppe) + Kellerbüro ----
-const KRX0=-1.65,KRX1=1.2,KRZ0=3.84,KRZ1=6.8,PZ0=4.15,PZ1=5.0,KCH=CF+2.2,KBX0=-1.95,KBX1=2.25,KBZ0=0.0,KBZ1=3.54;
+const KRX0=rm('kroom','x0',-1.65),KRX1=1.2,KRZ0=rm('kroom','z0',3.84),KRZ1=r4(KRZ0+rm('kroom','tiefe',2.96)),PZ0=4.15,PZ1=5.0,KCH=CF+2.2,KBX0=rm('kbuero','x0',-1.95),KBX1=r4(KBX0+rm('kbuero','breite',4.2)),KBZ0=rm('kbuero','z0',0.0),KBZ1=r4(KBZ0+rm('kbuero','tiefe',3.54));
 const lam=canvasTex(512,512,(x,w,h)=>{x.fillStyle='#C99A62';x.fillRect(0,0,w,h);for(let r=0;r<8;r++){const off=(r*173)%512;for(let k=-1;k<3;k++){const px=off+k*256;const g=x.createLinearGradient(px,0,px+256,0);const b=190+rnd()*30;g.addColorStop(0,`rgb(${b+15},${b-35},${b-95})`);g.addColorStop(1,`rgb(${b},${b-45},${b-105})`);x.fillStyle=g;x.fillRect(px,r*64,256,64);x.fillStyle='rgba(90,55,25,0.45)';x.fillRect(px,r*64,2,64);}x.fillStyle='rgba(90,55,25,0.35)';x.fillRect(0,r*64,w,1.5);for(let i=0;i<14;i++){x.strokeStyle='rgba(140,90,45,0.25)';x.beginPath();const yy=r*64+rnd()*64;x.moveTo(0,yy);x.bezierCurveTo(170,yy+rnd()*8-4,340,yy+rnd()*8-4,512,yy);x.stroke();}}});
 const lamFloor=(x0,x1,z0,z1)=>{const t=lam.clone();t.needsUpdate=true;t.wrapS=t.wrapT=THREE.RepeatWrapping;t.repeat.set((x1-x0)/2.0,(z1-z0)/1.4);const m=new THREE.Mesh(new THREE.PlaneGeometry(x1-x0,z1-z0),new THREE.MeshStandardMaterial({map:t,roughness:0.45}));m.rotation.x=-Math.PI/2;m.position.set((x0+x1)/2,CF+0.002,(z0+z1)/2);m.userData.noShadow=1;gCel.add(m);};
 lamFloor(KRX0,XE,KRZ0,KRZ1);lamFloor(KBX0,KBX1,KBZ0,KBZ1);lamFloor(0.0,0.85,KBZ1,KRZ0);
@@ -1200,7 +1203,7 @@ B(2.22,2.28,CF,CF+1.6,KRZ1-0.5,KRZ1-0.44,M('#1E1E20',0.4),gCel);B(2.3,2.36,CF,CF
 
 
 // ---- Keller: Waschküche mit Außentür, Flur, WC, Vorratsraum ----
-const WKZ1=KONST.WKZ1,WKD0=3.98,WKD1=4.58,VX0=KONST.VX0,VX1=KONST.VX1,VZ0=KONST.VZ0,VZ1=3.72,KFX1=5.8,KFZ0=2.3,WX0=5.95,WX1=7.95,WZ0=2.45,WZ1=3.42,PX0=6.25,PX1=8.41,PZ0b=4.83,PZ1b=6.7;
+const VX0=rm('kvest','x0',2.55),VX1=r4(VX0+rm('kvest','breite',2.5)),VZ0=rm('kvest','z0',0.0),WKZ1=r4(VZ0+rm('kvest','tiefe',3.63)),WKD0=3.98,WKD1=4.58,VZ1=3.72,KFX1=5.8,KFZ0=2.3,WX0=5.95,WX1=7.95,WZ0=2.45,WZ1=3.42,PX0=rm('kpantry','x0',6.25),PX1=r4(PX0+rm('kpantry','breite',2.16)),PZ0b=rm('kpantry','z0',4.83),PZ1b=r4(PZ0b+rm('kpantry','tiefe',1.87));
 const garageDoorZ0=2.35,garageDoorZ1=3.20,garageDoorH=2.05;
 const kTile=cellTile;
 const kfl=(x0,x1,z0,z1,tex,sz)=>gCel.add(tileFloor(x0,x1,z0,z1,CF,tex||kTile,sz||0.8));
@@ -1943,7 +1946,7 @@ const kPutzT=canvasTex(256,256,(x,w,h)=>{x.fillStyle='#F1EFE8';x.fillRect(0,0,w,
 const putzMat=(w,h)=>{const t=kPutzT.clone();t.needsUpdate=true;t.wrapS=t.wrapT=THREE.RepeatWrapping;t.repeat.set(w/1.3,h/1.3);return new THREE.MeshStandardMaterial({map:t,roughness:0.95});};
 const stoneMat=(w,h)=>{const t=nStoneT.clone();t.needsUpdate=true;t.wrapS=t.wrapT=THREE.RepeatWrapping;t.repeat.set(w/2.6,h/1.3);return new THREE.MeshStandardMaterial({map:t,roughness:0.9});};
 const NF=-0.39,bTop=0.06,r5fx0=-0.39,r5fx1=8.86;
-const gx0=KONST.gx0,gx1=KONST.gx1,kd0=3.55,kd1=4.4,ks0=3.08,ks1=3.45,r5kw0=0.03,r5kw1=1.77;
+const gx0=rm('garage','x0',5.3),gx1=r4(gx0+rm('garage','breite',2.9)),kd0=3.55,kd1=4.4,ks0=3.08,ks1=3.45,r5kw0=0.03,r5kw1=1.77;
 const nst=(a,b,y0,y1)=>B(a,b,y0,y1,NF-0.03,NF,stoneMat(b-a,y1-y0),gRoof);
 const SL=CF+2.25,pz=(a,b,y0,y1)=>B(a,b,y0,y1,NF-0.03,NF,putzMat(b-a,y1-y0),gRoof);
 nst(r5fx0,r5kw0,CF,SL);nst(r5kw1,ks0,CF,SL);nst(ks1,kd0,CF,SL);nst(kd1,gx0,CF,SL);nst(gx1,r5fx1,CF,SL);
@@ -2540,7 +2543,7 @@ scene.traverse(o=>{if(o.isMesh&&o.geometry&&o.geometry.type==='PlaneGeometry'&&M
   fix(decoMeshes,nd);fix(wallMeshes,nw);furnList=furnList.filter(m=>!rm.has(m)).concat(nf);if(window.__garConf)fix(window.__garConf,ng);
   window.__merged=merged;__shF=0;
   // Schnittstelle für den Einrichtungsmodus (einrichten.js)
-  window.HAUS={scene,camera,renderer,controls,col,M,Mu,H,OGF,DGF,CF,konst:KONST,editMode:false,furnSrc,decoSrc,srcRec,diningSet,dLight,wallMeshes,decoMeshes,
+  window.HAUS={scene,camera,renderer,controls,col,M,Mu,H,OGF,DGF,CF,konst:KONST,raeume:RAEUME,editMode:false,furnSrc,decoSrc,srcRec,diningSet,dLight,wallMeshes,decoMeshes,
     rooms:()=>window.__ROOMS||[],toast:t=>window.__toast&&window.__toast(t),dirty:()=>{__shF=0;},
     addFurn:a=>{furnList.push(...a);const hid=furnBtn.getAttribute('aria-pressed')==='true';a.forEach(m=>m.visible=!hid);},
     addDeco:a=>{decoMeshes.push(...a);const hid=decoBtn.getAttribute('aria-pressed')==='true';a.forEach(m=>m.visible=!hid);},
