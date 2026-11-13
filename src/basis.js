@@ -9,6 +9,7 @@ renderer.toneMapping=THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure=1.05;
 renderer.shadowMap.enabled=true;
 renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.shadowMap.autoUpdate=false;let __shF=0;
+let __frames=0,__avg=0; // Messanzeige (start.js): gezeichnete Bilder, mittlerer Bildabstand in ms
 stage.prepend(renderer.domElement);
 
 const scene=new THREE.Scene();

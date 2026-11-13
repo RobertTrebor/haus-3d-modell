@@ -38,9 +38,9 @@ function loop(now){
   if(!window.__pls){window.__pls=[];scene.traverse(o=>{if(o.isPointLight){let q=o,out=false;while(q){if(q===gRoof||q===gVS)out=true;q=q.parent;}window.__pls.push([o,out]);}});}
   {const fm=facadeMode||kgMode,key=fm?1:0;if(window.__plk!==key){window.__plk=key;window.__pls.forEach(([l,out])=>{l.visible=!fm||out||kgMode;});__shF=0;}}
   if(__shF<3||(__shF%20===0)){renderer.shadowMap.needsUpdate=true;}__shF++;
-  renderer.render(scene,camera);
+  renderer.render(scene,camera);__frames++;
   // Auflösung an die Geräteleistung anpassen (flüssig drehen hat Vorrang)
-  {const tn=performance.now();__ft+=tn-__fl;__fl=tn;if(++__fn>=45){const avg=__ft/__fn;__ft=0;__fn=0;let np=__pr;if(avg>30&&__pr>1)np=Math.max(1,__pr-0.25);else if(avg<17&&__pr<__prMax)np=Math.min(__prMax,__pr+0.25);if(np!==__pr){__pr=np;renderer.setPixelRatio(__pr);resize();}}}
+  {const tn=performance.now();__ft+=tn-__fl;__fl=tn;if(++__fn>=45){const avg=__ft/__fn;__ft=0;__fn=0;__avg=avg;let np=__pr;if(avg>30&&__pr>1)np=Math.max(1,__pr-0.25);else if(avg<17&&__pr<__prMax)np=Math.min(__prMax,__pr+0.25);if(np!==__pr){__pr=np;renderer.setPixelRatio(__pr);resize();}}}
   requestAnimationFrame(loop);
 }
 scene.traverse(o=>{if(o.isMesh&&o.geometry&&o.geometry.type==='PlaneGeometry'&&Math.abs(o.rotation.x+Math.PI/2)<1e-3){if(!Array.isArray(o.material)&&!o.material.polygonOffset)o.material=o.material.clone();(Array.isArray(o.material)?o.material:[o.material]).forEach(m=>{m.polygonOffset=true;m.polygonOffsetFactor=-1;m.polygonOffsetUnits=-4;});}});
@@ -92,5 +92,14 @@ scene.traverse(o=>{if(o.isMesh&&o.geometry&&o.geometry.type==='PlaneGeometry'&&M
     // Türen (Drehflügel, Einrichtungsmodus "Türen") und Garagentor
     anims,doors,toggleDoor,B,canvasTex,clickable,swing,tog,gRoof,NF,gx0,gx1,garPans:window.__garPans||[],white,
     isFacade:()=>facadeMode||kgMode};
+})();
+// ---- Messanzeige: mit ?debug in der Adresse oder durch dreimaliges schnelles Klicken auf den Titel (bleibt gemerkt) ----
+(function(){const box=document.getElementById('dbg'),K='haus3d-debug';if(!box)return;let timer=0,last=0;
+  const shown=o=>{while(o){if(!o.visible)return false;o=o.parent;}return true;};
+  function tick(){const f=__frames-last;last=__frames;let li=0;scene.traverse(o=>{if(o.isPointLight&&shown(o))li++;});const r=renderer.info.render;
+    box.textContent='Bilder/s '+f+' · Bildabstand '+(__avg?__avg.toFixed(0)+' ms':'–')+' · Zeichenaufrufe '+r.calls+' · Dreiecke '+Math.round(r.triangles/1000)+'k · Auflösung ×'+renderer.getPixelRatio()+' · Lichter '+li+(window.__dbgExtra?' · '+window.__dbgExtra():'');}
+  function set(on){box.hidden=!on;clearInterval(timer);if(on){last=__frames;timer=setInterval(tick,1000);tick();}try{localStorage.setItem(K,on?'1':'0');}catch(e){}}
+  let on=/[?&]debug(=|&|$)/.test(location.search);try{on=on||localStorage.getItem(K)==='1';}catch(e){}if(on)set(true);
+  let n=0,t=0;const h=document.querySelector('.head');if(h)h.addEventListener('click',()=>{const now=performance.now();n=now-t<500?n+1:1;t=now;if(n>=3){n=0;set(box.hidden);}});
 })();
 requestAnimationFrame(loop);
