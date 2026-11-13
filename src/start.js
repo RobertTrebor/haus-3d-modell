@@ -29,6 +29,7 @@ function loop(now){
   gMid.visible=facadeMode||floorOG||(c.x>HX0-0.1&&c.x<CL1&&c.z>Z0&&c.z<FZ&&c.y>1.2&&c.y<OGF+OGH);gRoof.visible=facadeMode;if(window.__atticRail)window.__atticRail.visible=!facadeMode;if(facadeMode){facadeGroups.forEach(g=>g.visible=true);gCel.visible=c.y<1.2&&Math.hypot(c.x-3,c.z-3)<16;}(window.__garConf||[]).forEach(m=>m.visible=!facadeMode);if(facadeMode){dimG.visible=false;}else dimG.visible=document.getElementById('dims').getAttribute('aria-pressed')==='true';
   dgLabs.forEach(l=>l.visible=gDG.visible);if(gDG.visible)[jLab,wLab,lLab,gLab,aLab,obLab].forEach(l=>l.visible=false);
   if(kgMode){gCel.visible=true;gRoof.visible=true;(window.__garConf||[]).forEach(m=>m.visible=false);}
+  gCelF.visible=gCel.visible||facadeMode; // Keller-Außenwand zur Straße: in Außenansichten immer sichtbar
   if(!window.__pls){window.__pls=[];scene.traverse(o=>{if(o.isPointLight){let q=o,out=false;while(q){if(q===gRoof||q===gVS)out=true;q=q.parent;}window.__pls.push([o,out]);}});}
   {const fm=facadeMode||kgMode,key=fm?1:0;if(window.__plk!==key){window.__plk=key;window.__pls.forEach(([l,out])=>{l.visible=!fm||out||kgMode;});__shF=0;}}
   if(__shF<3||(__shF%20===0)){renderer.shadowMap.needsUpdate=true;}__shF++;

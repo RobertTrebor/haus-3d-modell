@@ -50,6 +50,8 @@ Offen:
 2. Synchronisierung mit zwei echten Geräten ausprobieren (bisher nur mit nachgebildeter Datenbank getestet).
 3. „Exportieren“ (Varianten, Maße) lädt im Artifact keine Datei herunter, weil der Viewer das blockiert; der Text
    zum Kopieren funktioniert. Lösung: Artifact-Fähigkeit `downloads` einbauen.
+8. Außenansicht vorne links: Zwischen Haus und Vorgarten fehlt der Boden (man sieht von schräg oben Himmelsfarbe,
+   der Sockel des Vorbaus wirkt schwebend). Klären, wie es dort wirklich aussieht (Rasen, Weg, tiefer liegende Fläche?).
 4. Bei „Wände aus“ bleibt ein einzelnes Wandteil sichtbar (bestand schon vor dem Refactoring, nicht untersucht).
 5. `einrichten.js` (rund 600 Zeilen) ist noch nicht nach Reitern aufgeteilt.
 6. Weitere Maße anbinden: Fenster, Treppen, Räume im DG, Windfang, WCs, Kellerflur sind noch feste Zahlen im Code.
@@ -64,8 +66,7 @@ Bewusste Einschränkungen der Navigation:
 
 Arbeitsweise:
 - Prüfen nach Umbauten: `python tools/pruefen.py` (braucht den laufenden `server.py`). Der Fingerabdruck muss bei
-  einer reinen Umsortierung gleich bleiben; Stand v92: `Bauteile=2171 Modell=119753075 Raeume=-1893535870
-  Ansichten=-1918846762 Moebel=547 Tueren=22`.
+  einer reinen Umsortierung gleich bleiben; Stand v94: `Bauteile=2172 Modell=-722500702 Raeume=-1893535870 Ansichten=-1918846762 Moebel=547 Tueren=22`.
 - Git: Auf Roberts Rechner ist keine Git-Identität eingerichtet. Die Commits vom 13.11. wurden einzeln mit
   `git -c user.name="Robert Lengsfeld" -c user.email="RobertTrebor@users.noreply.github.com" commit …` erstellt.
   Gearbeitet wird auf dem Branch `einrichtungsmodus-weiterarbeit` (nicht `main`).

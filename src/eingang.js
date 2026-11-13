@@ -107,13 +107,15 @@ B(3.06,3.12,EF,EF+2.0,HZ1+EWT-0.01,HZ1+EWT+0.06,white);B(3.88,3.94,EF,EF+2.0,HZ1
 const KST=KONST.KST,KR0=0.15,CF=EF-KR0-0.19*(KST-1),CW0=3.05,CW1=3.95,cz0=HZ1-0.25;
 const cellTile=canvasTex(256,256,(x,w,h)=>{x.fillStyle='#E4DDD0';x.fillRect(0,0,w,h);for(let i=0;i<300;i++){x.fillStyle=`rgba(${160+rnd()*40},${150+rnd()*40},130,0.15)`;x.fillRect(rnd()*w,rnd()*h,6,2);}x.strokeStyle='rgba(110,105,95,0.7)';x.lineWidth=3;x.strokeRect(0,0,128,128);x.strokeRect(128,0,128,128);x.strokeRect(0,128,128,128);x.strokeRect(128,128,128,128);},[1,1]);
 const gCel=new THREE.Group();scene.add(gCel);
+// gCelF: Keller-Außenwände zur Straße. Bleiben in Außenansichten sichtbar, auch wenn der Keller (gCel) ausgeblendet ist (start.js).
+const gCelF=new THREE.Group();scene.add(gCelF);
 const cTop=new THREE.MeshStandardMaterial({map:cellTile,roughness:0.45}),nosM=M('#7C746A',0.5),rough=Mu('#F6F4EF',0.95);rough.userData.paintableWall=1;
 B(CW0,CW1,-0.8,EF,cz0,HZ1+EWT,baseM,gCel);tileFloor(CW0,CW1,cz0,HZ1+EWT,EF,cellTile,0.6);
 for(let i=1;i<KST;i++){const y=EF-KR0-0.19*(i-1),za=cz0-0.25*i,zb=za+0.25;B(CW0,CW1,y-0.19,y,za,zb,[baseM,baseM,cTop,baseM,baseM,cTop],gCel);B(CW0,CW1,y-0.012,y+0.006,za,za+0.035,nosM,gCel);}
 const cBot=cz0-0.25*KST;B(CW0,CW1,CF-0.2,CF,4.1,cBot+0.25,baseM,gCel);tileFloor(CW0,CW1,4.1,cBot+0.25,CF,cellTile,0.6);
 B(CW0+0.2,CW1-0.2,CF+0.001,CF+0.012,cBot-0.35,cBot+0.1,M('#3A3C3F',0.95),gCel);
 B(XE,CW0,CF-0.2,0,3.63,4.15,rough,gCel);
-B(2.97,CW0,CF-0.2,0,5.0,6.7,rough,gCel);B(XE,2.97,CF-0.2,CF,5.0,6.7,rough,gCel);B(XE,2.97,CF+1.15,0,5.0,6.05,rough,gCel);B(XE,2.97,CF+1.15,CF+1.25,6.05,6.7,rough,gCel);B(XE,2.97,CF+1.95,0,6.05,6.7,rough,gCel);B(XE,CW0,CF-0.2,0,6.7,HZ1,rough,gCel);B(XE,CW0,CF+2.0,0,4.15,5.0,rough,gCel);B(XE,CW0,CF-0.2,CF,4.15,5.0,baseM,gCel);B(CW1,SDX,CF-0.2,-0.8,Z0,HZ1,rough,gCel);B(CW1,SDX,-0.8,0,Z0,SD0,rough,gCel);B(CW1,SUX-0.02,-0.8,0,SD0,HZ1,rough,gCel);
+B(2.97,CW0,CF-0.2,0,5.0,6.7,rough,gCel);B(XE,2.97,CF-0.2,CF,5.0,6.7,rough,gCel);B(XE,2.97,CF+1.15,0,5.0,6.05,rough,gCel);B(XE,2.97,CF+1.15,CF+1.25,6.05,6.7,rough,gCel);B(XE,2.97,CF+1.95,0,6.05,6.7,rough,gCel);B(XE,CW0,CF-0.2,0,6.7,HZ1,rough,gCelF);B(XE,CW0,CF+2.0,0,4.15,5.0,rough,gCel);B(XE,CW0,CF-0.2,CF,4.15,5.0,baseM,gCel);B(CW1,SDX,CF-0.2,-0.8,Z0,HZ1,rough,gCel);B(CW1,SDX,-0.8,0,Z0,SD0,rough,gCel);B(CW1,SUX-0.02,-0.8,0,SD0,HZ1,rough,gCel);
 B(CW0,CW1,-0.3,0,Z0,SU0,rough,gCel);
 // Kellertür unten (Holz)
 const pineTx=canvasTex(128,256,(x,w,h)=>{x.fillStyle='#D68A45';x.fillRect(0,0,w,h);for(let i=0;i<w;i+=16){x.fillStyle='rgba(120,60,20,0.35)';x.fillRect(i,0,1.5,h);}for(let i=0;i<40;i++){x.strokeStyle='rgba(150,80,30,0.25)';x.beginPath();const px=rnd()*w;x.moveTo(px,0);x.lineTo(px+rnd()*6-3,h);x.stroke();}});

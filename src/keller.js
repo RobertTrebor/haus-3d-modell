@@ -18,7 +18,7 @@ B(-2.33,XE,CF-0.2,CF,-0.39,KRZ1+0.3,baseM,gCel);
 B(XE-0.02,XE+0.33,CF,CF+0.012,PZ0,PZ1,M('#B98A55',0.5),gCel);
 // Wände
 B(KRX0-0.3,0.0,CF,0,KBZ1,KRZ0,rough,gCel);B(0.85,1.55,CF,0,KBZ1,KRZ0,rough,gCel);B(2.65,XE,CF,0,KBZ1,KRZ0,rough,gCel);B(1.55,2.65,CF,0,KBZ1,KBZ1+0.06,rough,gCel);B(1.55,2.65,CF+1.04,CF+1.12,KBZ1+0.06,KRZ0+0.03,rough,gCel);B(1.55,1.6,CF+1.12,0,KBZ1+0.06,KRZ0,rough,gCel);B(1.6,1.95,CF+2.0,0,KBZ1+0.06,KRZ0,rough,gCel);B(1.95,2.03,CF+1.12,0,KBZ1+0.06,KRZ0,rough,gCel);B(2.03,2.62,CF+1.92,0,KBZ1+0.06,KRZ0,rough,gCel);B(2.62,2.65,CF+1.12,0,KBZ1+0.06,KRZ0,rough,gCel);B(0.0,0.85,CF+2.0,0,KBZ1,KRZ0,rough,gCel);B(0.0,0.85,CF,CF+0.012,KBZ1,KRZ0,M('#C8A050',0.3,{metalness:0.6}),gCel);
-B(-2.33,XE,CF,0,KRZ1,KRZ1+0.3,rough,gCel);
+B(-2.33,XE,CF,0,KRZ1,KRZ1+0.3,rough,gCelF); // Südwand zur Straße (gCelF, siehe eingang.js)
 B(-2.33,KRX0,CF,0,KRZ0,4.95,rough,gCel);B(-2.33,KRX0,CF,0,5.62,KRZ1,rough,gCel);B(-2.33,KRX0,CF,CF+1.38,4.95,5.62,rough,gCel);B(-2.33,KRX0,CF+2.05,0,4.95,5.62,rough,gCel);
 
 B(KRX0,XE,KCH,0,KRZ0,KRZ1,rough,gCel);
