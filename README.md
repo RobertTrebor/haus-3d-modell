@@ -28,6 +28,7 @@ src/
   assets/art/     Fotos/Bilder, die im Modell hängen
 build.py          baut dist/haus-3d-modell.html (eine Datei, alles eingebettet)
 server.py         lokaler Server; speichert feste Änderungen in src/config/
+tools/pruefen.py  prüft das Modell im unsichtbaren Chrome (Fingerabdruck, Funktionstest)
 docs/             Übergabe, Maße, offene Punkte
 ```
 

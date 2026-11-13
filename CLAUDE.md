@@ -8,6 +8,8 @@
   Möbelkorrekturen `bestand.js`; schreibbar nur über `python server.py`), Designideen im Browser.
   Raummaße in `raeume.js` (im Code `rm('<raum>','breite'|'tiefe',Rückfallwert)`). Neue Baumaße über
   `KONST.<Name>` bzw. `rm(...)` anbinden statt als feste Zahl.
+- Nach Umbauten prüfen: `python tools/pruefen.py` (Fingerabdruck + Funktionstest, braucht laufenden `server.py`).
+  Offene Punkte und Stand: `docs/uebergabe.md`.
 - Gearbeitet wird in `src/`. `dist/` ist generiert (`python build.py`) und nicht im Repo.
 - **Aktuelle Aufgabe: Einrichtungsmodus → `docs/aufgabe-einrichtungsmodus.md`.**
 - Nach jeder größeren Änderung: Commit mit aussagekräftiger Nachricht und push, `python build.py vNN_Kurzname`.
