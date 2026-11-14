@@ -35,7 +35,7 @@ function leavesRoom(a,b){const R=window.__ROOMS||[],ra=R.some(r=>inRoomBox(a,r))
     ['Windfang','vcorr',CX0,CL1,HZ1,EDZ,EF],
     ['Treppenpodest','landing',CX0,EX,HZ1+0.25,EDZ,LY],['WC (Zwischentreppe)','wcz',WCX0,CL1,WCZ0,WCZ1,LY],
     ['Janinas Zimmer','janina',JX0,JX1,JZ0,JZ1,OGF],['Wichtelzimmer','wichtel',KX0w,KX1w,KZ0w,KZ1w,OGF],['Lesezimmer','lese1',LX0,LX1,LZ0o,LZ1o,OGF],['Bastelzimmer','bastel1',GX0,GX1,LZ0o,LZ1o,OGF],['Au-pair-Zimmer','aupair1',AUX0,AUX1,AUZ0,AUZ1,OGF],['Bad oben','bathog',OBX0,OBX1,OBZ0,OBZ1,OGF],
-    ['Bogenzimmer','kroom',KRX0,XE,KRZ0,KRZ1,CF],['Kellerbüro','kbuero',KBX0,KBX1,KBZ0,KBZ1,CF],['Waschküche','kvest',VX0,VX1,VZ0,WKZ1,CF],['Garage','garage',gx0,gx1,NF+0.32,NF+4.92,CF],['Vorratsraum','kpantry',PX0,PX1,PZ0b,PZ1b,CF],['Keller-WC','kwc',WTX-WZ1,WTX-WZ0,WX0+WTZ,WX1+WTZ,CF],['Kellerflur','kcab',CW1,6.1,4.53,6.55,CF],
+    ['Bogenzimmer','kroom',KRX0,XE,KRZ0,KRZ1,CF],['Kellerbüro','kbuero',KBX0,KBX1,KBZ0,KBZ1,CF],['Waschküche','kvest',VX0,VX1,VZ0,WKZ1,CF],['Garage','garage',gx0,gx1,NF+0.32,NF+4.92,CF],['Vorratsraum','kpantry',PX0,PX1,PZ0b,PZ1b,CF],['Keller-WC','kwc',WTX-WZ1,WTX-WZ0,WX0+WTZ,WX1+WTZ,CF],['Kellerflur','kcab',CW1,PX0-0.15,4.53,5.81,CF],
     ['Yogazimmer','yoga',DKX0,DKX1,DKZ0,3.3,DGF],['Flur (DG)','dgflur',2.96,5.15,3.42,DKZ1,DGF],['Bad (DG)','dgbath',5.27,DKX1,3.42,DKZ1,DGF],['Abstellkammer','dgstore',DKX0,2.84,3.42,DKZ1,DGF]];
   window.__ROOMS=ROOMS;window.__toast=t=>toast(t);
   const roomAt=window.__roomAt=(x,y,z)=>ROOMS.find(r=>x>r[2]&&x<r[3]&&z>r[4]&&z<r[5]&&y>r[6]-0.35&&y<r[6]+(r[6]===0?H:2.45));

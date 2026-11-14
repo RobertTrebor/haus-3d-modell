@@ -19,5 +19,6 @@ window.MASSE.add('innenwaende',[
  {id:'raum.slide.tiefe',raum:'Wohnzimmer',quelle:'unbekannt',notiz:'3,54 m seit v1 im Modell – bitte bestätigen',konst:'raeume.js slide.tiefe'},
  {id:'raum.garage.breite',raum:'Garage',quelle:'geschaetzt',notiz:'nach Fotos; nachmessen (uebergabe.md Punkt 5)',konst:'raeume.js garage.breite'},
  {id:'raum.garage.tiefe',raum:'Garage',quelle:'geschaetzt',notiz:'nach Fotos; nachmessen'},
+ {id:'raum.kpantry.breite',raum:'Vorratsraum',quelle:'geschaetzt',notiz:'Westwand nach Foto vom Flur verschoben (v108); Breite und Lage nachmessen',konst:'raeume.js kpantry.breite'},
  {id:'raum.kcrawl.tiefe',name:'Kriechkeller – Tiefe',raum:'Kriechkeller',quelle:'geschaetzt',notiz:'nach Fotos; nachmessen (uebergabe.md Punkt 5)'},
 ]);

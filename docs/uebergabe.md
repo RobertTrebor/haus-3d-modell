@@ -1,6 +1,6 @@
 # Übergabe 3D-Modell Haus Mühlstr. 46
 
-Stand: 14.11.2026 (v107, Branch `laufmodus`; `main` steht auf v104). Repository am 09.11.2026 angelegt aus v82 (`v82_Performance.html`).
+Stand: 14.11.2026 (v108, Branch `laufmodus`; `main` steht auf v104). Repository am 09.11.2026 angelegt aus v82 (`v82_Performance.html`).
 
 ## Wichtige Maße (von Robert)
 - Raumhöhe EG und OG 2,59 m; Kellerräume 2,20 m; Bogen-Scheitel 1,81 m.
@@ -115,10 +115,28 @@ Korrekturen von Robert vom 14.11.2026 (v107, mit Foto vom Windfang):
   anfangs zu und schließen jetzt ohne Lücke. Die WC-Tür ist anfangs zu. Die Schuhkartons im Flur sind weggeräumt.
   Damit stimmt Roberts Beschreibung: links Bogenzimmer, am Schrank vorbei, umdrehen – links Vorratsraum, geradeaus WC,
   dahinter der Kriechkeller. Die Lage von WC und Kriechkeller aus v106 ist damit bestätigt.
-- Waschküche: Heizung, Ausdehnungsgefäß und Warmwasserspeicher stehen an der Westwand neben dem Regal (vorher Südwand
-  neben der Tür). Genaue Lage geschätzt.
+- Waschküche: (überholt durch v108, siehe Abgleich mit den Fotos unten) Heizung an die Westwand verlegt.
 - Gartentor und Einfahrtstor lassen sich per Klick öffnen (auch in der Ansicht von der Straße).
 - Offen: Foto vom Treppenfuß im Keller (Winkel des Wandschranks, Breite des Durchgangs) und von der Heizung.
+
+Fotos (seit 14.11.2026): Robert legt Fotos nach Räumen sortiert in `fotos\` ab. Verwendet werden nur Dateien, deren Name
+nicht mit `PXL` beginnt (Robert benennt um, was dran ist). `tools\fotos_verkleinern.ps1` legt davon verkleinerte Kopien
+in `fotos-klein\` an (1600 px); nur diese ansehen, und immer nur die des Raums, an dem gearbeitet wird. Beide Ordner
+sind von Git ausgenommen. Bisher angesehen: `keller-flur`, `keller-wc-kriechkeller`, `vorratsraum`, `waschküche`.
+
+Abgleich Keller mit den Fotos (v108, 14.11.2026; alle Lagen nach Foto geschätzt):
+- Waschküche: Die Heizung hängt an der Südwand (hinter dem Eckschrank), aber in der Ecke zur Westwand; im Modell saß sie
+  direkt neben der Tür zum Flur. Die Verlegung an die Westwand aus v107 war falsch und ist zurückgenommen. Ausdehnungsgefäß
+  links vom Gerät, Speicher davor, Regal an der Westwand neben der Ecke.
+- Eckschrank: steht stärker schräg (0,4 rad), sein rechtes Ende reicht bis zum Türrahmen der Waschküche.
+- Flur vor dem WC: nur etwa 1,3 m breit. Der Vorratsraum öffnet sich ohne Tür in der linken Wand direkt vor der WC-Wand.
+  Dafür ist die Westwand des Vorratsraums von x = 6,25 auf 5,50 gerückt (`raeume.js`, Breite 2,91 statt 2,16).
+  **Die 2,16 m waren nicht als gemessen belegt – bitte Breite des Vorratsraums und des Flurs nachmessen.**
+- Keller-WC: Lage unter der Treppe durch das Foto bestätigt (Fliesen und Waschbecken links, schräge Decke, Öffnung zum
+  Kriechkeller hinten rechts). Öffnung nach rechts gerückt.
+- Kriechkeller: Ziegelpfeiler rechts (Westen), Eimer links (Osten) wie auf den Fotos.
+- Offen: Die Tür zum Bogenzimmer liegt im Modell direkt links neben dem Eckschrank (frei bleiben rund 55 cm); auf dem Foto
+  ist links vom Schrank ein Stück Wand. Foto vom Treppenfuß mit Blick zum Bogenzimmer wäre hilfreich.
 
 Bewusste Einschränkungen der Navigation:
 - Durch offene Türen zoomen geht nicht mehr; Raumwechsel per Doppelklick/Doppeltipp.
@@ -127,7 +145,7 @@ Bewusste Einschränkungen der Navigation:
 
 Arbeitsweise:
 - Prüfen nach Umbauten: `python tools/pruefen.py` (braucht den laufenden `server.py`). Der Fingerabdruck muss bei
-  einer reinen Umsortierung gleich bleiben; Stand v107: `Bauteile=2279 Modell=-1471296353 Raeume=1324630632 Ansichten=-1862345366 Moebel=543 Tueren=22`
+  einer reinen Umsortierung gleich bleiben; Stand v108: `Bauteile=2277 Modell=1239366489 Raeume=-1275046457 Ansichten=-1418392598 Moebel=537 Tueren=22`
   (v105 änderte ihn durch die einzeln geführten Füllplatten, v106 und v107 durch die Umbauten in Keller und Windfang).
 - Git: Auf Roberts Rechner ist keine Git-Identität eingerichtet. Die Commits vom 13.11. wurden einzeln mit
   `git -c user.name="Robert Lengsfeld" -c user.email="RobertTrebor@users.noreply.github.com" commit …` erstellt.

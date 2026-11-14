@@ -36,4 +36,6 @@
 - Laufmodus (Knopf „Laufen“): `src/laufen.js`, lädt nach `einrichten.js`. Hindernisse und Boden werden beim Start aus
   den sichtbaren Flächen berechnet (Möbel aus `furnList` nur als Hindernis, Deko gar nicht, bewegliche Teile aus
   `HAUS.fixed`; Füllplatten der Außenhülle mit `fuell(...)` kennzeichnen). Test: `python tools/pruefen.py laufen`. Stand und offene Punkte: `docs/uebergabe.md`.
+- Fotos vom Haus: `fotos-klein\<raum>\` (verkleinerte Kopien, nicht im Repo; anlegen mit `tools\fotos_verkleinern.ps1`).
+  Nur die Fotos des Raums ansehen, an dem gearbeitet wird; Dateien mit `PXL…` in `fotos\` sind noch nicht freigegeben.
 - Bilder: Datei nach `src/assets/art/`, Eintrag in `src/art.js`, im Code `window.ART.<schlüssel>`.

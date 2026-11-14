@@ -122,8 +122,8 @@ B(CW0,3.13,CF,-0.3,Z0,3.95,rough,gCel);B(3.88,CW1,CF,-0.3,Z0,3.95,rough,gCel);B(
 // Wandschrank unten an der Kellertreppe (braune Türen, anfangs geschlossen)
 {const pm=new THREE.MeshStandardMaterial({map:pineTx,roughness:0.6}),wsh=M('#F2F0EA',0.7),bz=3.7;
  // Der Schrank steht schräg vor einem (Robert 14.11.2026): Gruppe gWS, um die linke vordere Ecke gedreht und etwas vorgezogen.
- // Winkel und Lage sind geschätzt. Die alte Nische dahinter ist mit einer dünnen Wand geschlossen.
- const gWS=new THREE.Group(),wsA=0.3,wsP=[3.13,4.14],wsQ=[3.12,4.42];gWS.rotation.y=wsA;gWS.position.set(wsQ[0]-(wsP[0]*Math.cos(wsA)+wsP[1]*Math.sin(wsA)),0,wsQ[1]-(-wsP[0]*Math.sin(wsA)+wsP[1]*Math.cos(wsA)));gCel.add(gWS);B(3.13,3.88,CF,CF+1.95,Z0,Z0+0.03,rough,gCel);
+ // Nach den Fotos keller-flur/* reicht sein rechtes Ende bis an den Türrahmen der Waschküche. Winkel und Lage sind geschätzt. Die alte Nische dahinter ist mit einer dünnen Wand geschlossen.
+ const gWS=new THREE.Group(),wsA=0.4,wsP=[3.13,4.14],wsQ=[3.12,4.45];gWS.rotation.y=wsA;gWS.position.set(wsQ[0]-(wsP[0]*Math.cos(wsA)+wsP[1]*Math.sin(wsA)),0,wsQ[1]-(-wsP[0]*Math.sin(wsA)+wsP[1]*Math.cos(wsA)));gCel.add(gWS);B(3.13,3.88,CF,CF+1.95,Z0,Z0+0.03,rough,gCel);
  B(3.13,4.08,CF,CF+1.95,bz,bz+0.05,M('#E2DED4',0.9),gWS);B(3.08,3.13,CF,CF+1.95,bz,3.92,rough,gWS);B(4.08,3.93,CF,CF+1.95,bz,3.92,rough,gWS);B(3.13,4.08,CF+1.95,CF+2.0,bz,3.92,rough,gWS);
  [0.42,0.8,1.17,1.52].forEach(y=>B(3.13,4.08,CF+y,CF+y+0.025,bz+0.05,4.1,wsh,gWS));[3.45,3.58].forEach(x=>cyl(x,bz+0.1,0.025,CF,1.95,M('#B8BCC0',0.5),10,gWS));
  B(3.2,3.42,CF,CF+0.22,3.80,4.08,M('#B88C5A',0.85),gWS);B(3.5,3.65,CF+0.02,CF+0.08,3.90,4.05,M('#D82A2A',0.6),gWS);
@@ -136,7 +136,8 @@ B(CW0,3.13,CF,-0.3,Z0,3.95,rough,gCel);B(3.88,CW1,CF,-0.3,Z0,3.95,rough,gCel);B(
  const gS=M('#B8BCC0',0.4,{metalness:0.5});cyl(3.35,4.32,0.09,CF+2.25,0.03,M('#C8A06A',0.6),16,gCel);[[-0.08,0],[0.08,0.04],[0,-0.08]].forEach(([dx,dz])=>{const sp=new THREE.Mesh(new THREE.CylinderGeometry(0.035,0.045,0.12,12),gS);sp.position.set(3.35+dx,CF+2.08,4.32+dz);sp.rotation.x=0.6;gCel.add(sp);const bl=new THREE.Mesh(new THREE.SphereGeometry(0.03,8,6),new THREE.MeshBasicMaterial({color:0xFFF4D8}));bl.position.set(3.35+dx,CF+2.02,4.36+dz);gCel.add(bl);});
  B(CW0,CW0+0.04,CF+1.0,CF+1.18,4.17,4.26,M('#E8E8E2',0.4),gCel);B(CW0,CW0+0.04,CF+1.62,CF+1.72,4.17,4.26,M('#E8E8E2',0.4),gCel);}
 // Flur vom Treppenfuß zur Waschküche (östlich der Treppe)
-gCel.add(tileFloor(CW1,4.6,3.72,5.02,CF,cellTile,0.8));B(4.6,4.75,CF,0,3.72,4.53,rough,gCel);gCel.add(tileFloor(CW1,6.1,4.53,5.81,CF,cellTile,0.8));gCel.add(tileFloor(5.46,6.1,5.81,6.55,CF,cellTile,0.8));B(CW1,CW1+0.1,CF,0,5.02,8.0,rough,gCel);B(CW1,6.1,CF+2.2,0,3.72,5.81,rough,gCel);B(5.46,6.1,CF+2.2,0,5.81,6.55,rough,gCel);B(5.46,6.1,CF,0,6.55,6.85,rough,gCel);
+gCel.add(tileFloor(CW1,4.6,3.72,5.02,CF,cellTile,0.8));B(4.6,4.75,CF,0,3.72,4.53,rough,gCel);{const KFE=rm('kpantry','x0',5.5)-0.15; // Ostwand des Flurs = Westwand des Vorratsraums
+ gCel.add(tileFloor(CW1,KFE,4.53,5.81,CF,cellTile,0.8));B(CW1,CW1+0.1,CF,0,5.02,8.0,rough,gCel);B(CW1,KFE,CF+2.2,0,3.72,5.81,rough,gCel);}
 // Kellerwand unter der Hauswand zum Vorbau: zwischen SDX und EX (unter der Treppe zum Hauseingang) steht stattdessen die
 // niedrige Südwand des Keller-WCs mit der Öffnung zum Kriechkeller (keller.js)
 B(CW1,SDX,CF,0,7.96,8.4,rough,gCel);B(EX,6.25,CF,0,7.96,8.4,rough,gCel);

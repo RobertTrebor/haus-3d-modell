@@ -15,6 +15,6 @@ window.HAUS_RAEUME={
   "kbuero": {"name": "Kellerbüro", "etage": "KG", "x0": -1.95, "z0": 0.0, "breite": 4.2, "tiefe": 3.54},
   "kvest": {"name": "Waschküche", "etage": "KG", "x0": 2.55, "z0": 0.0, "breite": 2.5, "tiefe": 3.63},
   "garage": {"name": "Garage", "etage": "KG", "x0": 5.3, "breite": 2.9},
-  "kpantry": {"name": "Vorratsraum", "etage": "KG", "x0": 6.25, "z0": 4.83, "breite": 2.16, "tiefe": 1.87}
+  "kpantry": {"name": "Vorratsraum", "etage": "KG", "x0": 5.5, "z0": 4.83, "breite": 2.91, "tiefe": 1.87}
  }
 };

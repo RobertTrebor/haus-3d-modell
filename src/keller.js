@@ -151,7 +151,7 @@ B(2.22,2.28,CF,CF+1.6,KRZ1-0.5,KRZ1-0.44,M('#1E1E20',0.4),gCel);B(2.3,2.36,CF,CF
 
 
 // ---- Keller: Waschküche mit Außentür, Flur, WC, Vorratsraum ----
-const VX0=rm('kvest','x0',2.55),VX1=r4(VX0+rm('kvest','breite',2.5)),VZ0=rm('kvest','z0',0.0),WKZ1=r4(VZ0+rm('kvest','tiefe',3.63)),WKD0=3.98,WKD1=4.58,VZ1=3.72,KFX1=5.8,KFZ0=2.3,WX0=5.95,WX1=7.95,WZ0=2.45,WZ1=3.42,PX0=rm('kpantry','x0',6.25),PX1=r4(PX0+rm('kpantry','breite',2.16)),PZ0b=rm('kpantry','z0',4.83),PZ1b=r4(PZ0b+rm('kpantry','tiefe',1.87));
+const VX0=rm('kvest','x0',2.55),VX1=r4(VX0+rm('kvest','breite',2.5)),VZ0=rm('kvest','z0',0.0),WKZ1=r4(VZ0+rm('kvest','tiefe',3.63)),WKD0=3.98,WKD1=4.58,VZ1=3.72,KFX1=5.8,KFZ0=2.3,WX0=5.95,WX1=7.95,WZ0=2.45,WZ1=3.42,PX0=rm('kpantry','x0',5.5),PX1=r4(PX0+rm('kpantry','breite',2.91)),PZ0b=rm('kpantry','z0',4.83),PZ1b=r4(PZ0b+rm('kpantry','tiefe',1.87));
 const garageDoorZ0=2.35,garageDoorZ1=3.20,garageDoorH=2.05;
 const kTile=cellTile;
 const kfl=(x0,x1,z0,z1,tex,sz)=>gCel.add(tileFloor(x0,x1,z0,z1,CF,tex||kTile,sz||0.8));
@@ -201,18 +201,21 @@ B(VX0,VX1+0.15,CF+2.2,0,VZ0,VZ1,rough,gCel);
  [[1.8,CF+1.15],[2.0,CF+1.0]].forEach(([z,y])=>B(4.93,5.01,y,y+0.04,z-0.02,z+0.02,M('#C8CCD0',0.3,{metalness:0.8}),gCel));
  [['#F2E0A0',0.75,CF+1.45,0.4,0.35],['#F4F4F0',0.25,CF+1.3,0.28,0.38]].forEach(([c,z,y,w,h])=>{const t=canvasTex(64,64,(x,W,H)=>{x.fillStyle=c;x.fillRect(0,0,W,H);['#E8303A','#2A8AD8','#F2C02A','#3AB04A','#C83AC8'].forEach((cc,i)=>{x.strokeStyle=cc;x.lineWidth=4;x.beginPath();x.arc(W/2,H*0.7,8+i*4,Math.PI,0);x.stroke();});},null);const pl=new THREE.Mesh(new THREE.PlaneGeometry(w,h),new THREE.MeshStandardMaterial({map:t,roughness:0.9}));pl.rotation.y=-Math.PI/2;pl.position.set(VX1-0.005,y,z);gCel.add(pl);});
  B(4.97,5.03,CF+1.35,CF+1.65,0.5,0.62,M('#2A3A5A',0.7),gCel);B(4.99,5.03,CF+0.9,CF+1.6,2.18,2.24,M('#A8283A',0.7),gCel);}
-// Schuhregal (schwarzes Metall) an der Westwand: Schuhe, Helme, Schlafsack, Decke, Gummistiefel
-{const mk=M('#1E1E20',0.5),rx0=VX0+0.02,rx1=VX0+0.4,rz0=0.3,rz1=1.5;[[rx0,rz0],[rx1-0.02,rz0],[rx0,rz1-0.02],[rx1-0.02,rz1-0.02]].forEach(([x,z])=>B(x,x+0.02,CF,CF+1.0,z,z+0.02,mk,gCel));
- [0.15,0.5,0.98].forEach(y=>B(rx0,rx1,CF+y,CF+y+0.015,rz0,rz1,mk,gCel));
- [['#2A2A3A',0.4],['#E84A6A',0.6],['#2A6AA8',0.8],['#3A3A3A',1.05],['#2AA0A8',1.25]].forEach(([c,z])=>B(rx0+0.05,rx1-0.05,CF+0.165,CF+0.27,z,z+0.17,M(c,0.6),gCel));
- [['#6AA8D8',0.55],['#D83A3A',0.85]].forEach(([c,z])=>{const h=new THREE.Mesh(new THREE.SphereGeometry(0.14,16,10,0,6.3,0,1.6),M(c,0.4));h.position.set(rx0+0.2,CF+0.515,z);gCel.add(h);});
- gCel.add(blob(rx0+0.18,CF+1.09,1.2,0.13,0.09,0.22,M('#E8701E',0.7)));gCel.add(blob(rx0+0.18,CF+1.2,1.3,0.12,0.05,0.16,M('#B82A3A',0.9)));
- B(rx0+0.05,rx0+0.25,CF+1.0,CF+1.25,0.4,0.62,M('#F4F4F0',0.6),gCel);cyl(rx0+0.14,0.5,0.06,CF+1.25,0.08,M('#E8303A',0.5),12,gCel);
- [[0.15,'#E8A8B8'],[0.32,'#2A2A2E']].forEach(([z,c])=>cyl(VX0+0.6,z+0.05,0.06,CF,0.38,M(c,0.6),12,gCel));}
-// Heizung: Gas-Wandgerät, Ausdehnungsgefäß, Warmwasserspeicher, Abgasrohr, Leitungen – an der Westwand neben dem Regal
-// (Robert 14.11.2026; vorher an der Südwand neben der Tür). Die Teile sind wie bisher gebaut und als Gruppe gHz um 90° gedreht.
-{const gHz=new THREE.Group();gHz.rotation.y=-Math.PI/2;gHz.position.set(VX0+WKZ1,0,-1.6);gCel.add(gHz);const gr=M('#8A8E92',0.35,{metalness:0.4});B(3.35,3.85,CF+1.0,CF+1.85,WKZ1-0.38,WKZ1,gr,gHz);
- {const ev=new THREE.Mesh(new THREE.CylinderGeometry(0.17,0.17,0.32,20),M('#F2F2F0',0.4));ev.rotation.z=Math.PI/2;ev.position.set(3.18,CF+1.65,WKZ1-0.2);gHz.add(ev);}
+// Schuhregal (schwarzes Metall) an der Westwand: Schuhe, Helme, Schlafsack, Decke, Gummistiefel. Nach den Fotos steht es
+// neben der Heizungsecke; die Gruppe gSR schiebt das Regal dafür 1,5 m nach Süden (Lage geschätzt).
+{const gSR=new THREE.Group();gSR.position.set(0,0,1.5);gCel.add(gSR);const mk=M('#1E1E20',0.5),rx0=VX0+0.02,rx1=VX0+0.4,rz0=0.3,rz1=1.5;[[rx0,rz0],[rx1-0.02,rz0],[rx0,rz1-0.02],[rx1-0.02,rz1-0.02]].forEach(([x,z])=>B(x,x+0.02,CF,CF+1.0,z,z+0.02,mk,gSR));
+ [0.15,0.5,0.98].forEach(y=>B(rx0,rx1,CF+y,CF+y+0.015,rz0,rz1,mk,gSR));
+ [['#2A2A3A',0.4],['#E84A6A',0.6],['#2A6AA8',0.8],['#3A3A3A',1.05],['#2AA0A8',1.25]].forEach(([c,z])=>B(rx0+0.05,rx1-0.05,CF+0.165,CF+0.27,z,z+0.17,M(c,0.6),gSR));
+ [['#6AA8D8',0.55],['#D83A3A',0.85]].forEach(([c,z])=>{const h=new THREE.Mesh(new THREE.SphereGeometry(0.14,16,10,0,6.3,0,1.6),M(c,0.4));h.position.set(rx0+0.2,CF+0.515,z);gSR.add(h);});
+ gSR.add(blob(rx0+0.18,CF+1.09,1.2,0.13,0.09,0.22,M('#E8701E',0.7)));gSR.add(blob(rx0+0.18,CF+1.2,1.3,0.12,0.05,0.16,M('#B82A3A',0.9)));
+ B(rx0+0.05,rx0+0.25,CF+1.0,CF+1.25,0.4,0.62,M('#F4F4F0',0.6),gSR);cyl(rx0+0.14,0.5,0.06,CF+1.25,0.08,M('#E8303A',0.5),12,gSR);
+ [[0.15,'#E8A8B8'],[0.32,'#2A2A2E']].forEach(([z,c])=>cyl(VX0+0.6,z+0.05,0.06,CF,0.38,M(c,0.6),12,gSR));}
+// Heizung: Gas-Wandgerät, Ausdehnungsgefäß, Warmwasserspeicher, Abgasrohr, Leitungen – an der Südwand in der Ecke zur
+// Westwand, links daneben (zur Tür hin) das Ausdehnungsgefäß, davor der Speicher (Fotos waschküche/waschküche-heizung und
+// eingang-waschküche-von-außen, 14.11.2026). Die Gruppe gHz ist gegenüber der ersten Fassung 0,5 m zur Ecke geschoben;
+// vorher saß alles direkt neben der Tür zum Flur. Lage nach Foto geschätzt.
+{const gHz=new THREE.Group();gHz.position.set(-0.5,0,0);gCel.add(gHz);const gr=M('#8A8E92',0.35,{metalness:0.4});B(3.35,3.85,CF+1.0,CF+1.85,WKZ1-0.38,WKZ1,gr,gHz);
+ {const ev=new THREE.Mesh(new THREE.CylinderGeometry(0.17,0.17,0.32,20),M('#F2F2F0',0.4));ev.rotation.z=Math.PI/2;ev.position.set(4.05,CF+1.65,WKZ1-0.2);gHz.add(ev);}
  const wp=M('#F4F4F2',0.4);cyl(3.62,WKZ1-0.2,0.06,CF+1.85,0.25,wp,14,gHz);{const fl=new THREE.Mesh(new THREE.CylinderGeometry(0.06,0.06,0.3,14),wp);fl.rotation.x=Math.PI/2;fl.position.set(3.62,CF+2.12,WKZ1-0.1);gHz.add(fl);}
  cyl(3.6,WKZ1-0.75,0.3,CF,1.2,M('#F6F6F4',0.35),28,gHz);cyl(3.6,WKZ1-0.75,0.31,CF+1.2,0.06,M('#1E1E20',0.4),28,gHz);B(3.52,3.7,CF+0.75,CF+1.0,WKZ1-1.06,WKZ1-1.05,M('#3A6AC8',0.5),gHz);
  {const hat=new THREE.Mesh(new THREE.CylinderGeometry(0.18,0.2,0.05,20),M('#E8D0A0',0.8));hat.position.set(3.5,CF+1.28,WKZ1-0.7);gHz.add(hat);}B(3.7,3.78,CF+1.26,CF+1.34,WKZ1-0.82,WKZ1-0.74,M('#1E1E20',0.4),gHz);
@@ -223,10 +226,10 @@ B(VX0,VX1+0.15,CF+2.2,0,VZ0,VZ1,rough,gCel);
  [3.3,3.95,4.05].forEach(x=>cyl(x,WKZ1-0.05,0.014,CF+0.35,1.85,cu,8,gHz));px(3.3,4.05,CF+0.35,WKZ1-0.05,0.014,cu,gHz);
  [[3.97,CF+1.45],[4.07,CF+1.5]].forEach(([x,y])=>{const v=new THREE.Mesh(new THREE.TorusGeometry(0.04,0.008,6,12),M('#2E7A3A',0.5));v.position.set(x,y,WKZ1-0.12);gHz.add(v);});
  B(4.35,4.48,CF+1.45,CF+1.65,WKZ1-0.02,WKZ1,M('#1E1E20',0.3),gCel);
- cyl(VX0+0.05,2.75,0.035,CF,2.3,M('#F0F0EE',0.5),10,gCel);B(VX0,VX0+0.02,CF+1.4,CF+1.5,1.3,1.38,M('#E8E8E6',0.4),gCel);
+ cyl(VX0+0.05,1.6,0.035,CF,2.3,M('#F0F0EE',0.5),10,gCel);B(VX0,VX0+0.02,CF+1.4,CF+1.5,3.25,3.33,M('#2A2A2E',0.4),gCel);
  [['#F2D020'],['#E83A3A'],['#F4F4F0']].forEach(([c],i)=>gCel.add(blob(3.3,CF+2.0-i*0.12,WKZ1-0.45,0.04,0.03,0.04,M(c,0.6))));cyl(3.3,WKZ1-0.45,0.003,CF+1.8,0.5,M('#8A5AC8',0.6),4,gCel);
  // weißer Gartenstuhl mit Kissen, Wäschekorb
- const wc=M('#F4F4F2',0.5),cx0=3.4,cz0=WKZ1-0.5;B(cx0-0.22,cx0+0.22,CF+0.42,CF+0.46,cz0-0.2,cz0+0.2,wc,gCel);B(cx0-0.22,cx0+0.22,CF+0.46,CF+0.95,cz0+0.18,cz0+0.22,wc,gCel);[[-0.2,-0.18],[0.2,-0.18],[-0.2,0.18],[0.2,0.18]].forEach(([a,b])=>B(cx0+a-0.02,cx0+a+0.02,CF,CF+0.44,cz0+b-0.02,cz0+b+0.02,wc,gCel));
+ const wc=M('#F4F4F2',0.5),cx0=3.72,cz0=WKZ1-0.95;B(cx0-0.22,cx0+0.22,CF+0.42,CF+0.46,cz0-0.2,cz0+0.2,wc,gCel);B(cx0-0.22,cx0+0.22,CF+0.46,CF+0.95,cz0+0.18,cz0+0.22,wc,gCel);[[-0.2,-0.18],[0.2,-0.18],[-0.2,0.18],[0.2,0.18]].forEach(([a,b])=>B(cx0+a-0.02,cx0+a+0.02,CF,CF+0.44,cz0+b-0.02,cz0+b+0.02,wc,gCel));
  B(cx0-0.18,cx0+0.18,CF+0.46,CF+0.5,cz0-0.16,cz0+0.16,M('#4A7A4A',0.8),gCel);B(VX0+0.05,VX0+0.5,CF,CF+0.25,WKZ1-0.45,WKZ1-0.05,M('#6A6E74',0.7),gCel);
  const wl=new THREE.PointLight(col('#FFF6E8'),0.55,5,2);wl.position.set(3.8,CF+2.0,1.0);gCel.add(wl);}
 // Flur am Treppenfuß: Garderobenhaken mit Jacken an der Ostwand (die Schuhkartons am Boden sind weggeräumt, damit der Durchgang frei ist)
@@ -234,12 +237,14 @@ B(4.57,4.6,CF+1.72,CF+1.76,3.95,4.75,white,gCel);
 [['#E0288A',0.95],['#F06A9A',0.9],['#D8A8B8',0.85],['#2A3050',0.85],['#E83A30',0.8],['#2E5A8A',0.55]].forEach(([c,h],i)=>{const z=3.98+i*0.12;B(4.44,4.58,CF+1.75-h,CF+1.75,z,z+0.1,M(c,0.9),gCel);});
 // Flur zum WC
 
-// Vorratsraum (hinter der Garage, Fenster in der Ostwand)
+// Vorratsraum (hinter der Garage, Fenster in der Ostwand). Nach dem Foto vom Flur liegt seine Öffnung (ohne Tür) in der
+// linken Flurwand direkt vor der WC-Wand; der Raum reicht deshalb weiter nach Westen als zuerst angenommen (x0 und Breite
+// in raeume.js geschätzt, Ostwand unverändert).
 const parq=canvasTex(256,256,(x,w,h)=>{x.fillStyle='#A8683A';x.fillRect(0,0,w,h);for(let i=0;i<4;i++)for(let j=0;j<4;j++){x.fillStyle=(i+j)%2?'#B87842':'#A0643A';x.fillRect(i*64,j*64,64,64);x.strokeStyle='rgba(240,220,190,0.85)';x.lineWidth=5;x.beginPath();x.moveTo(i*64+22,j*64+26);x.lineTo(i*64+32,j*64+18);x.lineTo(i*64+42,j*64+26);x.stroke();x.beginPath();x.moveTo(i*64+22,j*64+46);x.lineTo(i*64+32,j*64+38);x.lineTo(i*64+42,j*64+46);x.stroke();}},[1,1]);
 kfl(PX0,PX1,PZ0b,PZ1b,parq,0.7);
-{const pd0=5.15,pd1=5.85,wn0=5.25,wn1=5.8,wy0=CF+1.75,wy1=CF+2.2;
+{const pd0=5.0,pd1=5.8,wn0=5.25,wn1=5.8,wy0=CF+1.75,wy1=CF+2.2;
  B(PX0-0.15,PX0,CF,0,PZ0b,pd0,rough,gCel);B(PX0-0.15,PX0,CF,0,pd1,PZ1b,rough,gCel);B(PX0-0.15,PX0,CF+1.95,0,pd0,pd1,rough,gCel);
- [[pd0-0.04,pd0],[pd1,pd1+0.04]].forEach(([a,b])=>B(PX0-0.17,PX0+0.01,CF,CF+1.97,a,b,M('#C89A62',0.6),gCel));B(PX0-0.17,PX0+0.01,CF+1.95,CF+1.99,pd0-0.04,pd1+0.04,M('#C89A62',0.6),gCel);
+ B(PX0-0.16,PX0+0.01,CF,CF+0.012,pd0,pd1,M('#B89A4A',0.4,{metalness:0.5}),gCel); // Übergangsschiene statt Türrahmen
  B(4.75,8.86,CF,0,PZ0b-0.3,PZ0b,rough,gCel);B(PX0-0.15,8.86,CF,0,PZ1b,PZ1b+0.3,rough,gCel);
  B(PX1,8.86,CF,0,PZ0b,wn0,rough,gCel);B(PX1,8.86,CF,0,wn1,PZ1b,rough,gCel);B(PX1,8.86,CF,wy0,wn0,wn1,rough,gCel);B(PX1,8.86,wy1,0,wn0,wn1,rough,gCel);
  B(8.72,8.75,wy0,wy1,wn0,wn1,new THREE.MeshStandardMaterial({color:col('#E8F0E8'),emissive:col('#D8E8D8'),emissiveIntensity:0.8}),gCel);B(8.68,8.74,wy0,wy1,wn0,wn0+0.06,white,gCel);B(8.68,8.74,wy0,wy1,wn1-0.06,wn1,white,gCel);B(8.68,8.74,wy0,wy0+0.06,wn0,wn1,white,gCel);B(8.68,8.74,wy1-0.06,wy1,wn0,wn1,white,gCel);B(8.66,8.68,wy0+0.12,wy0+0.22,wn1-0.1,wn1-0.08,M('#E8E8E8',0.3),gCel);
@@ -268,7 +273,7 @@ const wcTex=canvasTex(128,256,(x,w,h)=>{x.fillStyle='#F6F4EE';x.fillRect(0,0,w,h
 (function(){const pv=new THREE.Group();pv.position.set(KFX1-0.01,CF,2.6);gW.add(pv);const P=[];const dm=new THREE.MeshStandardMaterial({map:wcTex,roughness:0.5});
   P.push(B(-0.035,0.005,0,1.98,0,0.8,[white,dm,white,white,white,white],pv));const hm=M('#D8C888',0.3,{metalness:0.7});P.push(B(-0.08,-0.035,0.97,0.99,0.62,0.74,hm,pv));P.push(B(-0.045,-0.035,0.9,1.1,0.72,0.76,hm,pv));
   const sw=swing(pv,'y',-1.35);clickable(P,tog(sw));})(); // WC-Tür anfangs zu, damit der Flur zum Vorratsraum frei ist
-B(WX0,WSX,CF,0,WZ0-0.3,WZ0,rough,gW);B(WSX,WX1,CF,WTOP,WZ0-0.3,WZ0,rough,gW);B(WX0,WSX,CF,0,WZ1,WZ1+0.14,rough,gW);B(WSX,WX1,CF,WTOP,WZ1,WZ1+0.14,rough,gW);const CRO0=WZ0+0.2,CRO1=WZ0+0.95;B(WX1,WX1+0.44,CF,WTOP,WZ0,CRO0,rough,gW);B(WX1,WX1+0.44,CF,WTOP,CRO1,WZ1+0.16,rough,gW);B(WX1,WX1+0.44,CF+0.95,WTOP,CRO0,CRO1,rough,gW);B(WX1-0.01,WX1+0.44,CF,CF+0.04,CRO0,CRO1,M('#8A6A48',0.7),gW);
+B(WX0,WSX,CF,0,WZ0-0.3,WZ0,rough,gW);B(WSX,WX1,CF,WTOP,WZ0-0.3,WZ0,rough,gW);B(WX0,WSX,CF,0,WZ1,WZ1+0.14,rough,gW);B(WSX,WX1,CF,WTOP,WZ1,WZ1+0.14,rough,gW);const CRO0=WZ0+0.3,CRO1=WZ1-0.05;B(WX1,WX1+0.44,CF,WTOP,WZ0,CRO0,rough,gW);B(WX1,WX1+0.44,CF,WTOP,CRO1,WZ1+0.16,rough,gW);B(WX1,WX1+0.44,CF+0.95,WTOP,CRO0,CRO1,rough,gW);B(WX1-0.01,WX1+0.44,CF,CF+0.04,CRO0,CRO1,M('#8A6A48',0.7),gW);
 B(WX0,WSX,CF+2.2,0,WZ0,WZ1,rough,gW);
 // schräge Decke unter der Treppe zum Hauseingang: Oberkante von −0,34 (unter der ersten Stufe) auf −0,86 an der Südwand
 (function(){const L=WX1-WSX,dy=0.52,len=Math.hypot(L,dy);const m=new THREE.Mesh(new THREE.BoxGeometry(len,0.12,WZ1+0.14-WZ0),rough);m.position.set(WSX+L/2,-0.34-dy/2-0.06,(WZ0+WZ1+0.14)/2);m.rotation.z=-Math.atan2(dy,L);gW.add(m);
@@ -294,7 +299,7 @@ const cwM=concM(2,1.2),cfM=M('#8E887E',0.95),brickM=new THREE.MeshStandardMateri
 // und Erdreich dort, wo WC und Kriechkeller bisher lagen
 [B(CRX0,CRX1,CF-0.2,CF,CRZ0,CRZ1,cfM,gCel),B(CRX1,CRX1+0.3,CF,-0.8,CRZ0,CRZ1+0.3,cwM,gCel),B(CRX0-0.3,CRX0,CF,-0.8,CRZ0,CRZ1+0.3,cwM,gCel),B(CRX0,CRX1,CF,-0.8,CRZ1,CRZ1+0.3,cwM,gCel),B(CRX0,CW1,CF,-0.8,CRZ0-0.06,CRZ0,cwM,gCel),
  B(8.41,8.86,CF,0,6.7,8.36,cwM,gCel),B(5.46,8.41,CF,0,7.0,7.96,rough,gCel),B(CRX0,CRX1,CRH,-0.8,CRZ0,CRZ1,concM(4,1),gCel),
- B(CRX0+0.7,CRX0+1.0,CRH-0.18,CRH,CRZ0,CRZ1,cwM,gCel),B(CRX1-0.5,CRX1,CF,CRH,CRZ1-0.4,CRZ1,brickM,gCel)].forEach(m=>{m.userData.struct=1;});
+ B(CRX0+0.7,CRX0+1.0,CRH-0.18,CRH,CRZ0,CRZ1,cwM,gCel),B(CRX0+0.3,CRX0+0.8,CF,CRH,CRZ1-0.4,CRZ1,brickM,gCel)].forEach(m=>{m.userData.struct=1;});
 const pipe=(x0,z0,x1,z1,y,r,m)=>{const L=Math.hypot(x1-x0,z1-z0);const p=new THREE.Mesh(new THREE.CylinderGeometry(r,r,L,12),m);p.position.set((x0+x1)/2,y,(z0+z1)/2);p.rotation.z=Math.PI/2;p.rotation.y=-Math.atan2(z1-z0,x1-x0);gCel.add(p);return p;};
 pipe(CRX0,CRZ0+0.2,CRX1,CRZ0+0.2,CRH-0.12,0.07,M('#D8CFB8',0.8));pipe(CRX0,CRZ0+0.4,CRX1,CRZ0+0.4,CRH-0.06,0.025,M('#8A9096',0.4,{metalness:0.3}));pipe(CRX0,CRZ0+0.5,CRX1,CRZ0+0.5,CRH-0.08,0.015,white);
 // Hausanschluss Wasser an der Ostwand
@@ -305,7 +310,7 @@ cyl(CRX1-0.09,wz+0.3,0.045,CF+0.5,0.25,M('#B87A2A',0.4,{transparent:true,opacity
 const blM=new THREE.MeshStandardMaterial({color:col('#FFF2D8'),emissive:col('#FFE0A8'),emissiveIntensity:0.9});const bl=new THREE.Mesh(new THREE.SphereGeometry(0.08,16,8),blM);bl.scale.set(1.3,0.8,0.5);bl.position.set(CRX0+1.4,CRH-0.06,CRZ1-0.05);gCel.add(bl);
 const crl=new THREE.PointLight(col('#FFD8A0'),0.5,4,2);crl.position.set(CRX0+1.3,CRH-0.3,CRZ0+0.4);gCel.add(crl);
 // Farbeimer, Gartenschlauch, Platte, Rolle
-[[CRX0+0.35,CRZ0+0.3,0.15,0.22,'#1E1E22'],[CRX0+0.7,CRZ0+0.55,0.13,0.2,'#F2F2F0','#2A5AC8'],[CRX0+1.05,CRZ0+0.35,0.17,0.2,'#F2F2F0','#2A5AC8'],[CRX1-0.7,CRZ0+0.3,0.12,0.2,'#F2F2F0','#D83A2A']].forEach(([x,z,r,h,c,lid])=>{cyl(x,z,r,CF,h,M(c,0.5),20,gCel);if(lid)cyl(x,z,r+0.01,CF+h,0.02,M(lid,0.5),20,gCel);});
+[[CRX1-0.85,CRZ1-0.3,0.15,0.22,'#1E1E22'],[CRX1-0.5,CRZ1-0.25,0.13,0.2,'#F2F2F0','#2A5AC8'],[CRX1-0.2,CRZ1-0.45,0.17,0.2,'#F2F2F0','#2A5AC8'],[CRX1-1.0,CRZ1-0.6,0.12,0.2,'#F2F2F0','#D83A2A']].forEach(([x,z,r,h,c,lid])=>{cyl(x,z,r,CF,h,M(c,0.5),20,gCel);if(lid)cyl(x,z,r+0.01,CF+h,0.02,M(lid,0.5),20,gCel);});
 for(let k=0;k<5;k++){const t=new THREE.Mesh(new THREE.TorusGeometry(0.16+k*0.03,0.012,6,32),M('#1E8A4A',0.5));t.rotation.x=Math.PI/2;t.position.set(CRX0+1.55,CF+0.015+k*0.02,CRZ0+0.4);gCel.add(t);}
 {const ninco=new THREE.Mesh(new THREE.BoxGeometry(0.55,1.3,0.02),M('#B8BCC0',0.3,{metalness:0.6}));ninco.position.set(CRX0+0.6,CF+0.64,CRZ1-0.06);ninco.rotation.x=0.1;gCel.add(ninco);}
 cyl(CRX0+1.0,CRZ1-0.15,0.06,CF+0.1,0.6,M('#E8DCC0',0.8),14,gCel);B(CRX1-0.3,CRX1-0.05,CF,CF+0.55,CRZ1-0.04,CRZ1,M('#D8303A',0.5),gCel);
