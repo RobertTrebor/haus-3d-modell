@@ -21,8 +21,8 @@ const FZ=EDZ+EWT;
 // Natursteinsockel
 const stoneT=canvasTex(512,128,(x,w,h)=>{x.fillStyle='#5A4A3E';x.fillRect(0,0,w,h);for(let r=0;r<3;r++)for(let c=0;c<10;c++){const v=rnd();x.fillStyle=v<0.3?'#8A6A4E':v<0.6?'#6E5646':v<0.8?'#A08870':'#4E3E36';const ww=40+rnd()*30;x.fillRect(c*56+r*18-10+rnd()*6,r*42+3,ww,37);}},[4,1]);
 const stoneM=new THREE.MeshStandardMaterial({map:stoneT,roughness:0.9});
-B(CX0-EWT-0.02,dx0-0.06,-1.3,EF+0.02,FZ,FZ+0.025,stoneM);B(dx1+0.06,CL1+EWT+0.02,-1.3,EF+0.02,FZ,FZ+0.025,stoneM);
-B(CX0-EWT-0.025,CX0-EWT,-1.3,EF+0.02,HZ1,FZ+0.025,stoneM);B(CL1+EWT,CL1+EWT+0.025,-1.3,EF+0.02,HZ1,FZ+0.025,stoneM);
+B(CX0-VWT-0.02,dx0-0.06,-1.3,EF+0.02,FZ,FZ+0.025,stoneM);B(dx1+0.06,CL1+VWT+0.02,-1.3,EF+0.02,FZ,FZ+0.025,stoneM);
+B(CX0-VWT-0.025,CX0-VWT,-1.3,EF+0.02,HZ1,FZ+0.025,stoneM);B(CL1+VWT,CL1+VWT+0.025,-1.3,EF+0.02,HZ1,FZ+0.025,stoneM);
 B(dx0-0.06,dx1+0.06,-1.3,EF-0.02,FZ,FZ+0.02,M('#B8B4A8',0.85));
 // Rahmen-Putzfasche um die Tür
 B(dx0-0.1,dx0-0.04,EF,EF+dH+0.1,FZ,FZ+0.02,M('#C8C4BA',0.8));B(dx1+0.04,dx1+0.1,EF,EF+dH+0.1,FZ,FZ+0.02,M('#C8C4BA',0.8));B(dx0-0.1,dx1+0.1,EF+dH+0.04,EF+dH+0.1,FZ,FZ+0.02,M('#C8C4BA',0.8));
@@ -60,13 +60,13 @@ B(HX0,EX,U1-0.25,U1-0.035,U1Z-1.3,U1Z,M('#F4F1EA',0.9),gUp);B(HX0,EX,U1-0.03,U1,
 // Geländer oben am Treppenloch
 B(HX0+0.9,SDX,U1+0.95,U1+1.0,U1Z-0.04,U1Z,stairTop,gUp);B(HX0+0.9,SDX,U1,U1+0.3,U1Z-0.04,U1Z,stairM,gUp);for(let x=HX0+1.0;x<SDX;x+=0.22)B(x,x+0.035,U1,U1+0.95,U1Z-0.035,U1Z-0.005,stairTop,gUp);
 // Obergeschoss des Vorbaus: Wände, Podestfenster, Walmdach
-const lpw0=8.36,lpw1=8.8,lpy0=LY+0.95,lpy1=LY+1.8;B(CX0-EWT,CX0,LY,UE,HZ1,lpw0,wallMat,gUp);B(CX0-EWT,CX0,LY,UE,lpw1,FZ,wallMat,gUp);B(CX0-EWT,CX0,LY,lpy0,lpw0,lpw1,wallMat,gUp);B(CX0-EWT,CX0,lpy1,UE,lpw0,lpw1,wallMat,gUp);const wcw0=8.55,wcw1=9.1,wcy0=LY+0.9,wcy1=LY+1.65;B(CL1,CL1+EWT,LY,UE,HZ1,wcw0,wallMat,gUp);B(CL1,CL1+EWT,LY,UE,wcw1,FZ,wallMat,gUp);B(CL1,CL1+EWT,LY,wcy0,wcw0,wcw1,wallMat,gUp);B(CL1,CL1+EWT,wcy1,UE,wcw0,wcw1,wallMat,gUp);
+const lpw0=8.36,lpw1=8.8,lpy0=LY+0.95,lpy1=LY+1.8;B(CX0-VWT,CX0,LY,UE,HZ1,lpw0,wallMat,gUp);B(CX0-VWT,CX0,LY,UE,lpw1,FZ,wallMat,gUp);B(CX0-VWT,CX0,LY,lpy0,lpw0,lpw1,wallMat,gUp);B(CX0-VWT,CX0,lpy1,UE,lpw0,lpw1,wallMat,gUp);const wcw0=8.55,wcw1=9.1,wcy0=LY+0.9,wcy1=LY+1.65;B(CL1,CL1+VWT,LY,UE,HZ1,wcw0,wallMat,gUp);B(CL1,CL1+VWT,LY,UE,wcw1,FZ,wallMat,gUp);B(CL1,CL1+VWT,LY,wcy0,wcw0,wcw1,wallMat,gUp);B(CL1,CL1+VWT,wcy1,UE,wcw0,wcw1,wallMat,gUp);
 const lw0=exc-0.5,lw1=exc+0.5,ly0=LY+0.85,ly1=LY+1.7;
-B(CX0-EWT,lw0,LY,UE,EDZ,FZ,wallMat,gUp);B(lw1,CL1+EWT,LY,UE,EDZ,FZ,wallMat,gUp);B(lw0,lw1,LY,ly0,EDZ,FZ,wallMat,gUp);B(lw0,lw1,ly1,UE,EDZ,FZ,wallMat,gUp);
+B(CX0-VWT,lw0,LY,UE,EDZ,FZ,wallMat,gUp);B(lw1,CL1+VWT,LY,UE,EDZ,FZ,wallMat,gUp);B(lw0,lw1,LY,ly0,EDZ,FZ,wallMat,gUp);B(lw0,lw1,ly1,UE,EDZ,FZ,wallMat,gUp);
 win({ax:'z',f:EDZ,s:1,a0:lw0,a1:lw1,y0:ly0,y1:ly1,g:gUp,rows:[],frost:1,noBox:1});
 B(lw0-0.03,lw1+0.03,ly0-0.04,ly0,FZ,FZ+0.06,sillM,gUp);
-B(CX0-EWT,CL1+EWT,UE-0.2,UE,HZ1,FZ,M('#F4F1EA',0.9),gUp);
-(function(){const x0=CX0-EWT-0.3,x1=CL1+EWT+0.3,zf=FZ+0.3,zb=HZ1,run=zf-zb,rh=0.2,y0=UE;
+B(CX0-VWT,CL1+VWT,UE-0.2,UE,HZ1,FZ,M('#F4F1EA',0.9),gUp);
+(function(){const x0=CX0-VWT-0.3,x1=CL1+VWT+0.3,zf=FZ+0.3,zb=HZ1,run=zf-zb,rh=0.2,y0=UE;
   const A=[x0,y0,zf],Bv=[x1,y0,zf],C=[x1,y0,zb],D=[x0,y0,zb],R1=[x0+run,y0+rh,zb],R2=[x1-run,y0+rh,zb];
   const tri=[A,Bv,R2, A,R2,R1, D,A,R1, Bv,C,R2];const pos=[],uv=[];tri.forEach(p=>{pos.push(...p);uv.push(p[0]*1.2,(p[1]-y0)*3+p[2]*0.4);});
   const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));g.setAttribute('uv',new THREE.Float32BufferAttribute(uv,2));g.computeVertexNormals();

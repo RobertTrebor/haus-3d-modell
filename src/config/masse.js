@@ -8,7 +8,9 @@ window.HAUS_MASSE={
   "T": 0.18,
   "OGH": 2.59,
   "EWT": 0.38,
-  "KST": 9
+  "KST": 9,
+  "VBA": 4.1,
+  "VBI": 3.5
  },
  "register": {}
 };

@@ -1,11 +1,11 @@
 # Übergabe 3D-Modell Haus Mühlstr. 46
 
-Stand: 14.11.2026 (v106, Branch `laufmodus`; `main` steht auf v104). Repository am 09.11.2026 angelegt aus v82 (`v82_Performance.html`).
+Stand: 14.11.2026 (v107, Branch `laufmodus`; `main` steht auf v104). Repository am 09.11.2026 angelegt aus v82 (`v82_Performance.html`).
 
 ## Wichtige Maße (von Robert)
 - Raumhöhe EG und OG 2,59 m; Kellerräume 2,20 m; Bogen-Scheitel 1,81 m.
 - Kellertreppe 9 Stufen à 19 cm, oberste etwas niedriger.
-- Vorbau 4,10 m breit; Außenwände 38 cm; Innenwände ca. 18 cm (inkl. Türrahmen).
+- Vorbau außen 4,10 m breit, innen 3,50 m (14.11.2026); Außenwände 38 cm; Innenwände ca. 18 cm (inkl. Türrahmen).
 - Waschküche 2,50 × 3,63 m; Keller-WC 0,97 × 2,00 m (Ausrichtung im Modell seit v106: längs Nord–Süd, geschätzt).
 - Kellerbüro: von der Terrassenfensterwand 1,50 m bis Balken (38,5 cm breit, 15 cm tief), dann ca. 2,30 m
   bis zur Waschküchenwand; 3 + 6 Spots; beide Fenster 1,74 × 1,25 m, Fensterbank 30 cm,
@@ -98,11 +98,27 @@ Umbau Keller-WC, Kriechkeller und Kellertür (v106, 14.11.2026, nach Angaben von
 - Kellertür im Windfang: Der Wandvorsprung links endet jetzt am Türrahmen (verdeckte vorher 30 cm der Tür), die zwei
   Heizungsrohre stehen in der Ecke daneben statt vor der Türmitte. **Der Windfang wurde nicht verbreitert:** Der Vorbau
   ist außen 4,10 m breit (gemessen), mit 38 cm Außenwänden ergibt das innen 3,34 m; die Tür (76 cm) liegt darin frei.
-  Offen: Innenbreite des Windfangs und Abstand der Kellertür zur linken Wand messen.
+  (Überholt durch v107: innen 3,50 m gemessen.)
 - Offen: Stimmt die Tür des Keller-WCs im Norden (zum Kellerflur)? Wie weit reicht der Kriechkeller? Der Kellerflur ist
   durch das gedrehte WC im Süden schmaler geworden (Nische östlich der WC-Tür).
 - Noch im Modell: `vorbau.js` Zeile 53 enthält einen Quader mit vertauschter Höhe (`B(CX0,CL1,2.22,LY-0.03,…)`), der nach
   innen gestülpt über dem Treppenpodest liegt (insgesamt 25 solche Quader, die übrigen winzig). Der Laufmodus ignoriert sie.
+
+Korrekturen von Robert vom 14.11.2026 (v107, mit Foto vom Windfang):
+- **Vorbau innen 3,50 m breit (gemessen).** Mit 4,10 m außen (gemessen) sind die Seitenwände des Vorbaus 30 cm dick statt
+  38 cm. Neu in `KONST`/`src/config/masse.js`: `VBA` (außen) und `VBI` (innen); `VWT` ist die Wanddicke daraus.
+- Windfang aufgeräumt (zwei Jacken, Schuhe unter dem Regal; Rucksack, Hocker und Eimer entfernt). Das Fenster ist frei
+  und lässt sich öffnen (Klick auf den Griff). Wandvorsprung und Heizungsrohre in der Ecke wie auf dem Foto.
+- Tür zur Kellertreppe: Bänder links, öffnet in den Windfang zum Fenster hin.
+- Keller: Vom Treppenfuß gibt es jetzt einen Durchgang nach Osten (vorher war dort eine Wand; der Flur war nur über die
+  Waschküche erreichbar). Der Wandschrank mit den braunen Türen steht schräg (Winkel und Lage geschätzt), die Türen sind
+  anfangs zu und schließen jetzt ohne Lücke. Die WC-Tür ist anfangs zu. Die Schuhkartons im Flur sind weggeräumt.
+  Damit stimmt Roberts Beschreibung: links Bogenzimmer, am Schrank vorbei, umdrehen – links Vorratsraum, geradeaus WC,
+  dahinter der Kriechkeller. Die Lage von WC und Kriechkeller aus v106 ist damit bestätigt.
+- Waschküche: Heizung, Ausdehnungsgefäß und Warmwasserspeicher stehen an der Westwand neben dem Regal (vorher Südwand
+  neben der Tür). Genaue Lage geschätzt.
+- Gartentor und Einfahrtstor lassen sich per Klick öffnen (auch in der Ansicht von der Straße).
+- Offen: Foto vom Treppenfuß im Keller (Winkel des Wandschranks, Breite des Durchgangs) und von der Heizung.
 
 Bewusste Einschränkungen der Navigation:
 - Durch offene Türen zoomen geht nicht mehr; Raumwechsel per Doppelklick/Doppeltipp.
@@ -111,8 +127,8 @@ Bewusste Einschränkungen der Navigation:
 
 Arbeitsweise:
 - Prüfen nach Umbauten: `python tools/pruefen.py` (braucht den laufenden `server.py`). Der Fingerabdruck muss bei
-  einer reinen Umsortierung gleich bleiben; Stand v106: `Bauteile=2235 Modell=1109079264 Raeume=1533978958 Ansichten=1401573121 Moebel=560 Tueren=22`
-  (v105 änderte ihn durch die einzeln geführten Füllplatten, v106 durch den Umbau von Keller-WC und Kriechkeller).
+  einer reinen Umsortierung gleich bleiben; Stand v107: `Bauteile=2279 Modell=-1471296353 Raeume=1324630632 Ansichten=-1862345366 Moebel=543 Tueren=22`
+  (v105 änderte ihn durch die einzeln geführten Füllplatten, v106 und v107 durch die Umbauten in Keller und Windfang).
 - Git: Auf Roberts Rechner ist keine Git-Identität eingerichtet. Die Commits vom 13.11. wurden einzeln mit
   `git -c user.name="Robert Lengsfeld" -c user.email="RobertTrebor@users.noreply.github.com" commit …` erstellt.
   Seit dem 13.11.2026 (v103) ist `main` der aktuelle Stand und der Arbeitsbranch; `einrichtungsmodus-weiterarbeit`

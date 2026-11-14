@@ -244,7 +244,14 @@ kWinN(ks0,ks1,CF+0.8,CF+2.0,0,1);kWinN(r5kw0,r5kw1,CF+0.8,CF+2.05,1);
  const iron=M('#2E4A3A',0.5,{metalness:0.4});
  const fence=(a,b,y0,y1)=>{B(a,b,y1-0.03,y1,wz+0.16,wz+0.19,iron,gRoof);B(a,b,y0,y0+0.03,wz+0.16,wz+0.19,iron,gRoof);for(let x=a+0.06;x<b;x+=0.12)B(x,x+0.015,y0,y1,wz+0.165,wz+0.185,iron,gRoof);};
  fence(wx0,g0-0.45,yG+0.55,yG+1.08);fence(g1+0.45,dr0-0.45,yG+0.55,yG+1.08);
- fence(g0,g1,yG+0.05,yG+1.0);fence(dr0,dr1,yG-0.35,yG+1.25);B((dr0+dr1)/2-0.03,(dr0+dr1)/2+0.03,yG-0.35,yG+1.25,wz+0.15,wz+0.2,iron,gRoof);
+ // Gartentor (ein Flügel) und Einfahrtstor (zwei Flügel): Drehgruppen, Klick öffnet nach innen. Eine unsichtbare Fläche je
+ // Flügel ist Klickfläche (die Stäbe sind zu dünn zum Treffen) und Hindernis im Laufmodus.
+ {const gateHit=new THREE.MeshBasicMaterial({colorWrite:false,depthWrite:false,side:THREE.DoubleSide});
+  const gate=(hx,len,dir,y0,y1)=>{const pv=new THREE.Group();pv.position.set(hx,0,wz+0.175);gRoof.add(pv);const P=[],a=dir>0?0:-len,b=dir>0?len:0;
+   P.push(B(a,b,y1-0.03,y1,-0.015,0.015,iron,pv),B(a,b,y0,y0+0.03,-0.015,0.015,iron,pv),B(dir>0?b-0.03:a,dir>0?b:a+0.03,y0,y1,-0.015,0.015,iron,pv));for(let x=a+0.06;x<b-0.04;x+=0.12)P.push(B(x,x+0.015,y0,y1,-0.01,0.01,iron,pv));
+   const h=B(a,b,y0,y1,-0.004,0.004,gateHit,pv);h.userData.noShadow=1;h.castShadow=false;P.push(h);return {P,a:swing(pv,'y',dir*1.4)};};
+  const gt=gate(g0,g1-g0,1,yG+0.05,yG+1.0);clickable(gt.P,tog(gt.a));
+  const eL=gate(dr0,(dr1-dr0)/2,1,yG-0.35,yG+1.25),eR=gate(dr1,(dr1-dr0)/2,-1,yG-0.35,yG+1.25);clickable([...eL.P,...eR.P],()=>{const t=eL.a.target?0:eL.a.open;eL.a.target=t;eR.a.target=t?eR.a.open:0;});}
  B(g1+0.06,g1+0.4,yG+0.75,yG+1.0,wz+0.4,wz+0.5,M('#5A5E62',0.4,{metalness:0.4}),gRoof);B(g1+0.43,g1+0.45,yG+0.85,yG+0.95,wz+0.42,wz+0.48,M('#2A4AA8',0.5),gRoof);
  B(g0+0.05,g1-0.05,yG-0.02,yG+0.02,FZ+1.0,wz,M('#9A968E',0.85),gRoof);
  B(wx0,dr0,yG-0.1,yG,FZ,wz,M('#5A6A44',0.95),gRoof);

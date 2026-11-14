@@ -371,7 +371,7 @@ const obl=new THREE.PointLight(col('#FFF4EC'),0.45,5,2);obl.position.set((OBX0+O
 const obLab=label('Bad (OG)',(OBX0+OBX1)/2,OGF+2.75,(OBZ0+OBZ1)/2);
 // ---- WC auf der Zwischentreppe (im Vorbau, östlich vom Podest) ----
 const WCX0=EX+0.12,WCZ0=HZ1+0.3,WCZ1=EDZ;
-B(EX,CL1,LY-0.03,LY-0.002,HZ1,EDZ,stairTop,gUp);B(EX,CL1,LY-0.2,LY-0.03,HZ1,HZ1+0.3,wallMat,gUp);B(EX,CL1+EWT,LY,UE,HZ1,HZ1+0.3,wallMat,gUp);
+B(EX,CL1,LY-0.03,LY-0.002,HZ1,EDZ,stairTop,gUp);B(EX,CL1,LY-0.2,LY-0.03,HZ1,HZ1+0.3,wallMat,gUp);B(EX,CL1+VWT,LY,UE,HZ1,HZ1+0.3,wallMat,gUp);
 win({ax:'x',f:CX0,s:-1,a0:lpw0,a1:lpw1,y0:lpy0,y1:lpy1,g:gUp,sashes:1,rows:[],noBox:1});
 {const L=LY,x0=CX0;
  B(x0,x0+0.16,lpy0-0.04,lpy0,lpw0-0.03,lpw1+0.03,white,gUp);B(x0,x0+0.14,lpy0-0.32,lpy0-0.04,lpw0-0.05,lpw1+0.15,M('#E8E6E0',0.6),gUp);

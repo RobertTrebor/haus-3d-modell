@@ -77,7 +77,7 @@ function canvasTex(w,h,draw,rep){
 let seed=11;const rnd=()=>{seed=(seed*16807)%2147483647;return seed/2147483647;};
 
 // Baumaße (Raumhöhen, Wandstärken, Stufen): Quelle ist src/config/masse.js (window.HAUS_MASSE.konst); die Zahlen hier sind nur Rückfallwerte.
-const KONST={H:2.59,T:0.18,OGH:2.59,EWT:0.38,KST:9};
+const KONST={H:2.59,T:0.18,OGH:2.59,EWT:0.38,KST:9,VBA:4.1,VBI:3.5}; // VBA/VBI: Vorbau Breite außen/innen
 {const k=(window.HAUS_MASSE&&window.HAUS_MASSE.konst)||{};Object.keys(KONST).forEach(n=>{if(typeof k[n]==='number'&&isFinite(k[n]))KONST[n]=k[n];});}
 // Raummaße: Quelle ist src/config/raeume.js (window.HAUS_RAEUME.raeume); rm(Raum,Feld,Rückfallwert)
 const RAEUME=(window.HAUS_RAEUME&&window.HAUS_RAEUME.raeume)||{};
