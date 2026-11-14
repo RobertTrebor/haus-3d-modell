@@ -3,10 +3,10 @@
 const EF=-0.68,NSD=4,SDT=0.25,EDZ=SD0+2.5,EWT=KONST.EWT,exc=(SDX+EX)/2;
 const gVS=new THREE.Group();scene.add(gVS);
 const stepWood=M('#C9955A',0.5),treadM=M('#55585C',0.95),panelWood=M('#5A3A22',0.55);
-for(let i=0;i<NSD;i++){const z0=SD0+i*SDT,y=-(0.17*(i+1));B(SDX,EX,-0.8,y,z0,z0+SDT,stepWood);
+for(let i=0;i<NSD;i++){const z0=SD0+i*SDT,y=-(0.17*(i+1));B(SDX,EX,Math.max(-0.8,y-0.18),y,z0,z0+SDT,stepWood);
   const tr=new THREE.Mesh(new THREE.CylinderGeometry(0.42,0.42,0.012,40,1,false,0,Math.PI),treadM);tr.scale.set(1,1,0.55);tr.rotation.y=Math.PI/2;tr.position.set(exc,y+0.006,z0+SDT-0.02);
   const tb=B(exc-0.42,exc+0.42,y,y+0.012,z0+0.02,z0+SDT-0.02,treadM);scene.add(tr);}
-B(SDX,EX,-0.8,0,SD0-0.04,SD0,stepWood);
+B(SDX,EX,-0.46,0,SD0-0.04,SD0,stepWood);
 const entryTile=canvasTex(256,256,(x,w,h)=>{x.fillStyle='#E3D9C6';x.fillRect(0,0,w,h);for(let i=0;i<8;i++)for(let j=0;j<8;j++){x.fillStyle=`rgba(${190+((i*7+j*3)%5)*6},${178+((i+j)%4)*5},${150+((i*3+j)%5)*5},0.55)`;x.fillRect(i*32+2,j*32+2,28,28);}x.strokeStyle='rgba(120,110,95,0.6)';x.lineWidth=2;for(let k=0;k<=256;k+=32){x.beginPath();x.moveTo(k,0);x.lineTo(k,256);x.stroke();x.beginPath();x.moveTo(0,k);x.lineTo(256,k);x.stroke();}},[1,1]);
 const etz0=SD0+NSD*SDT;entryTile.repeat.set((EX-SDX)/0.8,(EDZ-etz0)/0.8);
 const ef=new THREE.Mesh(new THREE.PlaneGeometry(EX-SDX,EDZ-etz0),new THREE.MeshStandardMaterial({map:entryTile,roughness:0.5}));ef.rotation.x=-Math.PI/2;ef.position.set(exc,EF+0.001,(etz0+EDZ)/2);ef.userData.noShadow=1;scene.add(ef);
@@ -75,7 +75,7 @@ tileFloor(CX0,SDX,HZ1+EWT,EDZ,EF);B(CX0,SDX,-0.8,EF,HZ1+EWT,EDZ,baseM);
 B(CX0-EWT,3.12,-0.8,0,HZ1,HZ1+EWT,wallMat);B(3.88,SDX,-0.8,0,HZ1,HZ1+EWT,wallMat);B(3.12,3.88,-0.8,EF,HZ1,HZ1+EWT,baseM);
 B(CX0-EWT,XE,0,LY,HZ1,HZ1+EWT,wallMat);
 B(CX0-EWT,SDX,-0.8,LY,EDZ,EDZ+EWT,wallMat,gVS);
-B(CX0,CX0+0.5,EF,LY,HZ1+EWT,HZ1+EWT+0.2,wallMat);
+B(CX0,3.06,EF,LY,HZ1+EWT,HZ1+EWT+0.2,wallMat); // Wandvorsprung endet am Rahmen der Kellertür (geschätzt; vorher verdeckte er 30 cm der Tür)
 const gVW=new THREE.Group();scene.add(gVW);
 const vw0=8.68,vw1=9.2;
 B(CX0-EWT,CX0,-0.8,LY,HZ1+EWT,vw0,wallMat,gVW);B(CX0-EWT,CX0,-0.8,LY,vw1,EDZ+EWT,wallMat,gVW);B(CX0-EWT,CX0,-0.8,EF+1.0,vw0,vw1,wallMat,gVW);B(CX0-EWT,CX0,EF+1.9,LY,vw0,vw1,wallMat,gVW);
@@ -83,9 +83,9 @@ win({ax:'x',f:CX0,s:-1,a0:vw0,a1:vw1,y0:EF+1.0,y1:EF+1.9,g:gVW,sashes:1,rows:[],
 // Heizkörper + Rohre
 B(CX0+0.02,CX0+0.1,EF+0.15,EF+0.75,vw0+0.02,vw1-0.02,white);
 for(let z=vw0+0.05;z<vw1-0.03;z+=0.035)B(CX0+0.1,CX0+0.11,EF+0.17,EF+0.73,z,z+0.012,white);
-cyl(CX0+0.55,HZ1+EWT+0.24,0.018,EF,2.9,white,8);cyl(CX0+0.6,HZ1+EWT+0.24,0.012,EF,2.9,white,8);
+cyl(CX0+0.04,HZ1+EWT+0.24,0.018,EF,2.9,white,8);cyl(CX0+0.09,HZ1+EWT+0.24,0.012,EF,2.9,white,8); // Heizungsrohre in der Ecke neben der Kellertür (Lage geschätzt)
 // Sockelleisten
-B(CX0,SDX,EF,EF+0.08,EDZ-0.012,EDZ,plinthM);B(CX0+0.5,3.12,EF,EF+0.08,HZ1+EWT,HZ1+EWT+0.012,plinthM);
+B(CX0,SDX,EF,EF+0.08,EDZ-0.012,EDZ,plinthM);
 // Garderobenregal an der Südwand
 const rackX0=CX0+0.18,rackX1=rackX0+0.72,wrM=M('#3B3B3E',0.4,{metalness:0.6}),shelfW=M('#4E3A2A',0.6);
 B(rackX0,rackX1,EF+1.95,EF+1.98,EDZ-0.3,EDZ,shelfW);
@@ -134,7 +134,10 @@ B(CW0,3.13,CF,-0.3,Z0,3.95,rough,gCel);B(3.88,CW1,CF,-0.3,Z0,3.95,rough,gCel);B(
  const gS=M('#B8BCC0',0.4,{metalness:0.5});cyl(3.35,4.32,0.09,CF+2.25,0.03,M('#C8A06A',0.6),16,gCel);[[-0.08,0],[0.08,0.04],[0,-0.08]].forEach(([dx,dz])=>{const sp=new THREE.Mesh(new THREE.CylinderGeometry(0.035,0.045,0.12,12),gS);sp.position.set(3.35+dx,CF+2.08,4.32+dz);sp.rotation.x=0.6;gCel.add(sp);const bl=new THREE.Mesh(new THREE.SphereGeometry(0.03,8,6),new THREE.MeshBasicMaterial({color:0xFFF4D8}));bl.position.set(3.35+dx,CF+2.02,4.36+dz);gCel.add(bl);});
  B(CW0,CW0+0.04,CF+1.0,CF+1.18,4.17,4.26,M('#E8E8E2',0.4),gCel);B(CW0,CW0+0.04,CF+1.62,CF+1.72,4.17,4.26,M('#E8E8E2',0.4),gCel);}
 // Flur vom Treppenfuß zur Waschküche (östlich der Treppe)
-gCel.add(tileFloor(CW1,4.6,3.72,5.02,CF,cellTile,0.8));B(4.6,4.75,CF,0,3.72,4.53,rough,gCel);gCel.add(tileFloor(CW1,6.1,4.53,6.55,CF,cellTile,0.8));gCel.add(tileFloor(CW1+0.1,4.6,6.55,7.96,CF,cellTile,0.8));B(CW1,CW1+0.1,CF,0,5.02,8.0,rough,gCel);B(CW1,6.1,CF+2.2,0,3.72,6.55,rough,gCel);B(CW1+0.1,4.6,CF+2.2,0,6.55,7.96,rough,gCel);B(CW1,6.25,CF,0,7.96,8.4,rough,gCel);
+gCel.add(tileFloor(CW1,4.6,3.72,5.02,CF,cellTile,0.8));B(4.6,4.75,CF,0,3.72,4.53,rough,gCel);gCel.add(tileFloor(CW1,6.1,4.53,5.81,CF,cellTile,0.8));gCel.add(tileFloor(5.46,6.1,5.81,6.55,CF,cellTile,0.8));B(CW1,CW1+0.1,CF,0,5.02,8.0,rough,gCel);B(CW1,6.1,CF+2.2,0,3.72,5.81,rough,gCel);B(5.46,6.1,CF+2.2,0,5.81,6.55,rough,gCel);B(5.46,6.1,CF,0,6.55,6.85,rough,gCel);
+// Kellerwand unter der Hauswand zum Vorbau: zwischen SDX und EX (unter der Treppe zum Hauseingang) steht stattdessen die
+// niedrige Südwand des Keller-WCs mit der Öffnung zum Kriechkeller (keller.js)
+B(CW1,SDX,CF,0,7.96,8.4,rough,gCel);B(EX,6.25,CF,0,7.96,8.4,rough,gCel);
 // Handlauf links (Westwand) + Kabelkanal
 const hlen=Math.hypot(0.25*(KST-1),EF-CF);const hr=new THREE.Mesh(new THREE.CylinderGeometry(0.022,0.022,hlen,10),M('#9A5E30',0.45));hr.position.set(CW0+0.07,(EF+CF)/2+0.9,cz0-0.25*KST/2);hr.rotation.x=Math.atan2(0.25*(KST-1),EF-CF);gCel.add(hr);
 for(let k=0;k<3;k++){const z=cz0-0.3-k*0.8,y=EF-(EF-CF)*((cz0-z)/(0.25*KST))+0.9;B(CW0,CW0+0.07,y-0.01,y+0.01,z,z+0.02,M('#BFC3C6',0.3,{metalness:0.7}),gCel);}

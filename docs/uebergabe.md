@@ -1,12 +1,12 @@
 # Übergabe 3D-Modell Haus Mühlstr. 46
 
-Stand: 13.11.2026 (v105, Branch `laufmodus`; `main` steht auf v104). Repository am 09.11.2026 angelegt aus v82 (`v82_Performance.html`).
+Stand: 14.11.2026 (v106, Branch `laufmodus`; `main` steht auf v104). Repository am 09.11.2026 angelegt aus v82 (`v82_Performance.html`).
 
 ## Wichtige Maße (von Robert)
 - Raumhöhe EG und OG 2,59 m; Kellerräume 2,20 m; Bogen-Scheitel 1,81 m.
 - Kellertreppe 9 Stufen à 19 cm, oberste etwas niedriger.
 - Vorbau 4,10 m breit; Außenwände 38 cm; Innenwände ca. 18 cm (inkl. Türrahmen).
-- Waschküche 2,50 × 3,63 m; Keller-WC 0,97 × 2,00 m.
+- Waschküche 2,50 × 3,63 m; Keller-WC 0,97 × 2,00 m (Ausrichtung im Modell seit v106: längs Nord–Süd, geschätzt).
 - Kellerbüro: von der Terrassenfensterwand 1,50 m bis Balken (38,5 cm breit, 15 cm tief), dann ca. 2,30 m
   bis zur Waschküchenwand; 3 + 6 Spots; beide Fenster 1,74 × 1,25 m, Fensterbank 30 cm,
   gelb-orange Vertikallamellen.
@@ -14,8 +14,9 @@ Stand: 13.11.2026 (v105, Branch `laufmodus`; `main` steht auf v104). Repository 
 
 ## Kellerräume (Namen)
 Bogenzimmer, Kellerbüro, Waschküche (früher „Vorraum mit Außentür“), Vorratsraum (mit Fenster zur
-Einfahrt), Keller-WC und Kriechkeller (zwischen Vorratsraum und Kellertreppe), Wandschrank am Fuß der
-Kellertreppe, Garage (Sektionaltor per Klick).
+Einfahrt), Keller-WC (unter dem EG, im Modell längs unter der Treppe zum Hauseingang), Kriechkeller (laut Robert
+vermutlich unter dem Windfang, daher die niedrige Decke), Wandschrank am Fuß der Kellertreppe, Garage
+(Sektionaltor per Klick).
 
 ## Offene Punkte / nächste Schritte
 1. **Performance**: Robert meldet (09.11.) v82 auf Handy *und* PC noch zäh. Messung im Test (Überblick):
@@ -78,22 +79,30 @@ auf; Deko und dünne Rohre/Stangen nicht. Im Laufmodus gilt die Außenansicht (F
   nächste Etage erscheint schon auf der Treppe; unter niedrigen Decken senkt sich die Augenhöhe. Geprüft mit
   `python tools/pruefen.py laufen` (geht jede Treppe in beide Richtungen ab).
 - Türen müssen wie sonst per Klick geöffnet werden (Gartentor, Haustür, Tür zur Kellertreppe).
+- Seit v106 ist die Figur wieder ohne Sonderregel an der Eingangstreppe unterwegs (der Keller überdeckt sie nicht mehr).
 - Im Artifact lässt sich die Maus vermutlich nicht fangen (der Viewer erlaubt das nicht); dort mit gedrückter Maustaste
   umsehen. Lokal über `server.py` geht beides. Auf einem echten Handy noch nicht ausprobiert.
 - Offen: fehlender Boden vorne links (Punkt 8 oben) – dort bleibt man auf der letzten Höhe stehen.
 - Der Fingerabdruck hat sich mit v105 geändert, weil vier Füllplatten der Außenhülle (`fuell(...)` in `aussen.js`,
   Geschossdecken ohne Treppenloch) nicht mehr zusammengefasst werden; sie werden im Laufmodus im Haus ausgeblendet.
 
-Beim Laufmodus aufgefallene Unstimmigkeiten im Modell (nicht behoben, nur umgangen – bitte mit Fotos/Maßen klären):
-1. Treppe zum Hauseingang: Kellerdecke und Kellerwände (`eingang.js` Zeile 137, Keller-WC in `keller.js`) reichen bis
-   Höhe 0 und überdecken die Treppe und den Durchgang zum Windfang. In der Ansicht „Treppe zum Hauseingang“ sieht man
-   deshalb eine weiße Fläche statt der Stufen. Im Laufmodus wird der Keller dort ausgeblendet und nicht als Hindernis
-   gewertet. Frage: Wo liegen Keller-WC und Kriechkeller wirklich im Verhältnis zur Eingangstreppe?
-2. Treppenpodest: `vorbau.js` Zeile 53 enthält einen Quader mit vertauschter Höhe (`B(CX0,CL1,2.22,LY-0.03,…)`), der
-   nach innen gestülpt über dem ganzen Podest liegt. Insgesamt gibt es 25 solche Quader, die übrigen sind winzig.
-3. Tür zur Kellertreppe (im Windfang): Zwei Heizungsrohre (`eingang.js` Zeile 86) stehen 24 cm vor der Türmitte, und
-   ein Wandstück (x 2,92–3,42) verdeckt die linken 30 cm des Türblatts; frei bleiben rund 35 cm. Im Laufmodus zählen
-   dünne Rohre nicht, und die Figur ist mit 32 cm Breite schmal genug.
+Umbau Keller-WC, Kriechkeller und Kellertür (v106, 14.11.2026, nach Angaben von Robert; Lage und Ausrichtung geschätzt):
+- Vorher überdeckten Kellerdecke und Kellerwände die Treppe zum Hauseingang (in der Ansicht „Treppe zum Hauseingang“
+  war statt der Stufen eine weiße Fläche zu sehen). Das Keller-WC lag quer (Ost–West) neben der Treppe, der Kriechkeller
+  östlich davon unter der Küche.
+- Jetzt: Das Keller-WC (0,97 × 2,00 m, gemessen) liegt längs unter der Treppe zum Hauseingang; Tür im Norden zum
+  Kellerflur, Decke fällt unter der Treppe von 2,20 m auf etwa 1,37 m. In der Südwand führt die niedrige Öffnung in den
+  Kriechkeller unter dem Windfang (Höhe 1,45 m, Ausdehnung Windfang bis Garderobe, geschätzt). Der alte Platz ist Erdreich.
+  Code: `keller.js` (Gruppe `gW`, um 90° gedreht eingesetzt: `WTX`, `WTZ`, `WSX`, `WTOP`) und `eingang.js`.
+- Die Stufen der Eingangstreppe sind unten nur noch 18 cm dick statt bis −0,8 m massiv.
+- Kellertür im Windfang: Der Wandvorsprung links endet jetzt am Türrahmen (verdeckte vorher 30 cm der Tür), die zwei
+  Heizungsrohre stehen in der Ecke daneben statt vor der Türmitte. **Der Windfang wurde nicht verbreitert:** Der Vorbau
+  ist außen 4,10 m breit (gemessen), mit 38 cm Außenwänden ergibt das innen 3,34 m; die Tür (76 cm) liegt darin frei.
+  Offen: Innenbreite des Windfangs und Abstand der Kellertür zur linken Wand messen.
+- Offen: Stimmt die Tür des Keller-WCs im Norden (zum Kellerflur)? Wie weit reicht der Kriechkeller? Der Kellerflur ist
+  durch das gedrehte WC im Süden schmaler geworden (Nische östlich der WC-Tür).
+- Noch im Modell: `vorbau.js` Zeile 53 enthält einen Quader mit vertauschter Höhe (`B(CX0,CL1,2.22,LY-0.03,…)`), der nach
+  innen gestülpt über dem Treppenpodest liegt (insgesamt 25 solche Quader, die übrigen winzig). Der Laufmodus ignoriert sie.
 
 Bewusste Einschränkungen der Navigation:
 - Durch offene Türen zoomen geht nicht mehr; Raumwechsel per Doppelklick/Doppeltipp.
@@ -102,8 +111,8 @@ Bewusste Einschränkungen der Navigation:
 
 Arbeitsweise:
 - Prüfen nach Umbauten: `python tools/pruefen.py` (braucht den laufenden `server.py`). Der Fingerabdruck muss bei
-  einer reinen Umsortierung gleich bleiben; Stand v105: `Bauteile=2235 Modell=-1276393934 Raeume=-1893535870 Ansichten=-1918846762 Moebel=554 Tueren=22`
-  (bis v104: `Bauteile=2232 Modell=2137936823`; Änderung durch die einzeln geführten Füllplatten, siehe Laufmodus).
+  einer reinen Umsortierung gleich bleiben; Stand v106: `Bauteile=2235 Modell=1109079264 Raeume=1533978958 Ansichten=1401573121 Moebel=560 Tueren=22`
+  (v105 änderte ihn durch die einzeln geführten Füllplatten, v106 durch den Umbau von Keller-WC und Kriechkeller).
 - Git: Auf Roberts Rechner ist keine Git-Identität eingerichtet. Die Commits vom 13.11. wurden einzeln mit
   `git -c user.name="Robert Lengsfeld" -c user.email="RobertTrebor@users.noreply.github.com" commit …` erstellt.
   Seit dem 13.11.2026 (v103) ist `main` der aktuelle Stand und der Arbeitsbranch; `einrichtungsmodus-weiterarbeit`

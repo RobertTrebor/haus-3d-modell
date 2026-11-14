@@ -8,8 +8,8 @@
 // Möbel liegen in eigenen Rastern: Sie sind schon ab LOF über dem Boden ein Hindernis und zählen nie als Boden, damit
 // man nicht auf Sofas und Betten steigt. Deko ist kein Hindernis; Möbel und Wände nur, solange sie sichtbar sind.
 // Auf Treppen (FLIGHTS) wird nur bis HIS geprüft, weil dort Deckenkanten tief hängen; unter niedrigen Decken senkt
-// sich die Augenhöhe. Sonderfälle des Modells: Füllplatten der Außenhülle (userData.fuell) zählen nie; die Kellerhülle
-// (eigenes Raster) zählt nicht, solange man an der Treppe zum Hauseingang steht, weil sie dort die Treppe überdeckt.
+// sich die Augenhöhe. Sonderfall des Modells: Füllplatten der Außenhülle (userData.fuell) zählen nie. Die Kellerhülle hat
+// ein eigenes Raster (noCel könnte sie abschalten; seit dem Umbau des Keller-WCs in v106 nicht mehr nötig).
 // Muss nach einrichten.js laden.
 (function(){
   const H=window.HAUS,btn=document.getElementById('walkBtn'),stageEl=document.getElementById('stage');if(!H||!btn||!stageEl)return;
@@ -91,7 +91,6 @@
   // ---- Bewegung je Bild (läuft anstelle von controls.update) ----
   function tick(){const now=performance.now(),dt=Math.min(0.05,Math.max(0,(now-lastT)/1000));lastT=now;if(tween)tween=null;
     if(__animPrev)dynDirty=true;if(dynDirty&&now-dynT>120){build(true);dynT=now;if(!__animPrev)dynDirty=false;}
-    noCel=px>SDX-0.15&&px<EX+0.15&&pz>SD0-0.8&&pz<EDZ+0.05&&feet>EF-0.1&&feet<1;window.__laufenEingang=noCel;
     const K=c=>keys.has(c)?1:0;
     yaw+=(K('ArrowLeft')-K('ArrowRight'))*1.9*dt;
     let mf=K('KeyW')+K('ArrowUp')-K('KeyS')-K('ArrowDown')-jy,ms=K('KeyD')-K('KeyA')+jx;const ml=Math.hypot(mf,ms);
@@ -118,7 +117,7 @@
     controls.enabled=false;fov0=camera.fov;near0=camera.near;camera.fov=FOV;camera.near=0.06;camera.updateProjectionMatrix();facadeMode=true;
     document.body.classList.add('walking');btn.setAttribute('aria-pressed','true');if(window.__setViewLabel)window.__setViewLabel('Laufmodus');H.toast('Laufmodus');H.dirty();
     if(window.matchMedia('(pointer: fine)').matches)lock();}
-  function stop(){if(!on)return;on=false;window.__laufenAn=false;window.__laufenEingang=false;if(document.pointerLockElement===cv)document.exitPointerLock();setLocked(false);
+  function stop(){if(!on)return;on=false;window.__laufenAn=false;if(document.pointerLockElement===cv)document.exitPointerLock();setLocked(false);
     controls.enabled=true;camera.fov=fov0;camera.near=near0;camera.updateProjectionMatrix();const p=Math.min(pitch,0.3),cp=Math.cos(p);
     camera.position.set(px,eyeY,pz);controls.target.set(px-Math.sin(yaw)*cp*1.5,eyeY+Math.sin(p)*1.5,pz-Math.cos(yaw)*cp*1.5);
     const room=window.__roomAt&&window.__roomAt(px,eyeY-0.5,pz);facadeMode=!(room||camIn);

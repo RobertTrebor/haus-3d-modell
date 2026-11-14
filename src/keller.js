@@ -256,35 +256,44 @@ shelfUnit(PX0+0.75,PX1-0.15,PZ0b+0.02,PZ0b+0.42,spine,5,2.2);shelfUnit(PX0+0.75,
 [[PX1-0.45,PZ1b-0.5,0],[PX1-0.45,PZ1b-0.9,0],[PX1-0.45,PZ1b-0.5,0.29],[PX1-0.45,PZ1b-0.9,0.29]].forEach(([x,z,y],k)=>B(x,x+0.4,CF+y,CF+y+0.29,z-0.2,z+0.13,M('#1C1C22',0.5),gCel));
 cyl(PX0+1.1,PZ0b+1.2,0.2,CF,0.3,M('#1A1A1A',0.5),20,gCel);[[PX0+0.95,PZ0b+0.6,'#F2F2EE'],[PX0+0.95,PZ0b+0.6,'#F2F2EE']].forEach(([x,z,c],k)=>cyl(x,z,0.15,CF+k*0.3,0.3,M(c,0.6),16,gCel));
 [[PX1-0.9,PZ0b+0.75,'#C8B880',0.5],[PX1-0.5,PZ0b+0.75,'#E8EEF0',0.55],[PX1-1.3,PZ0b+0.6,'#C89A62',0.35]].forEach(([x,z,c,h])=>gCel.add(blob(x,CF+h*0.55,z,0.2,h*0.55,0.15,M(c,0.85))));B(PX1-1.0,PX1-0.8,CF,CF+0.3,PZ0b+1.2,PZ0b+1.4,M('#F2B830',0.6),gCel);
-// WC (zwischen Kellertreppe und Vorratsraum)
-const gW=new THREE.Group();gW.position.set(-1.2,0,4.55);gCel.add(gW);gW.add(tileFloor(WX0-0.15,WX1,WZ0,WZ1,CF,cellTile,0.8));
-B(KFX1,WX0,CF,0,KFZ0-0.3,2.6,rough,gW);B(KFX1,WX0,CF,0,3.4,VZ1+0.23,rough,gW);B(KFX1,WX0,CF+2.0,0,2.6,3.4,rough,gW);
+// WC: liegt längs (Nord–Süd) unter der Treppe zum Hauseingang, Tür im Norden zum Kellerflur, im Süden die Öffnung zum
+// Kriechkeller unter dem Windfang (Angabe Robert 14.11.2026; genaue Lage und Ausrichtung geschätzt, Maße 0,97 × 2,00 gemessen).
+// Die Teile sind im eigenen Rahmen der Gruppe gW gebaut (x = Länge, z = Breite) und um 90° gedreht eingesetzt:
+// Welt-x = WTX − z, Welt-z = x + WTZ. Ab WSX (unter der Treppe) fällt die Decke; Wände dort nur bis WTOP.
+const WTX=EX+WZ0,WTZ=7.96-WX1,WSX=SD0-WTZ,WTOP=EF-0.12;
+const gW=new THREE.Group();gW.position.set(WTX,0,WTZ);gW.rotation.y=-Math.PI/2;gCel.add(gW);gW.add(tileFloor(WX0-0.15,WX1,WZ0,WZ1,CF,cellTile,0.8));
+B(KFX1,WX0,CF,0,WZ0-0.3,2.6,rough,gW);B(KFX1,WX0,CF,0,3.4,WZ1+0.14,rough,gW);B(KFX1,WX0,CF+2.0,0,2.6,3.4,rough,gW);
 [[2.56,2.6],[3.4,3.44]].forEach(([a,b])=>B(KFX1-0.02,WX0+0.02,CF,CF+2.03,a,b,white,gW));B(KFX1-0.02,WX0+0.02,CF+2.0,CF+2.04,2.56,3.44,white,gW);
 const wcTex=canvasTex(128,256,(x,w,h)=>{x.fillStyle='#F6F4EE';x.fillRect(0,0,w,h);x.fillStyle='#B8BCC0';[70,78,86].forEach(px=>x.fillRect(px,20,3,h-40));for(let yy=60;yy<h-30;yy+=48){x.fillRect(66,yy,26,4);}});
 (function(){const pv=new THREE.Group();pv.position.set(KFX1-0.01,CF,2.6);gW.add(pv);const P=[];const dm=new THREE.MeshStandardMaterial({map:wcTex,roughness:0.5});
   P.push(B(-0.035,0.005,0,1.98,0,0.8,[white,dm,white,white,white,white],pv));const hm=M('#D8C888',0.3,{metalness:0.7});P.push(B(-0.08,-0.035,0.97,0.99,0.62,0.74,hm,pv));P.push(B(-0.045,-0.035,0.9,1.1,0.72,0.76,hm,pv));
   const sw=swing(pv,'y',-1.35);sw.target=sw.open;pv.rotation.y=sw.open;clickable(P,tog(sw));})();
-B(WX0,WX1,CF,0,WZ0-0.3,WZ0,rough,gW);B(WX0,WX1,CF,0,WZ1,WZ1+0.3,rough,gW);const CRO0=WZ0+0.2,CRO1=WZ0+0.95;B(WX1,WX1+0.3,CF,0,WZ0-0.3,CRO0,rough,gW);B(WX1,WX1+0.3,CF,0,CRO1,WZ1+0.3,rough,gW);B(WX1,WX1+0.3,CF+0.95,0,CRO0,CRO1,rough,gW);B(WX1-0.01,WX1+0.3,CF,CF+0.04,CRO0,CRO1,M('#8A6A48',0.7),gW);
-B(WX0,7.15,CF+2.2,0,WZ0,WZ1,rough,gW);
-(function(){const L=WX1-7.15,dy=0.95,len=Math.hypot(L,dy);const m=new THREE.Mesh(new THREE.BoxGeometry(len,0.12,WZ1-WZ0),rough);m.position.set(7.15+L/2,CF+2.3-dy/2+0.06,(WZ0+WZ1)/2);m.rotation.z=-Math.atan2(dy,L);gW.add(m);
-  B(7.15,WX1,CF+2.36,0,WZ0,WZ1,rough,gW);})();
+B(WX0,WSX,CF,0,WZ0-0.3,WZ0,rough,gW);B(WSX,WX1,CF,WTOP,WZ0-0.3,WZ0,rough,gW);B(WX0,WSX,CF,0,WZ1,WZ1+0.14,rough,gW);B(WSX,WX1,CF,WTOP,WZ1,WZ1+0.14,rough,gW);const CRO0=WZ0+0.2,CRO1=WZ0+0.95;B(WX1,WX1+0.44,CF,WTOP,WZ0,CRO0,rough,gW);B(WX1,WX1+0.44,CF,WTOP,CRO1,WZ1+0.16,rough,gW);B(WX1,WX1+0.44,CF+0.95,WTOP,CRO0,CRO1,rough,gW);B(WX1-0.01,WX1+0.44,CF,CF+0.04,CRO0,CRO1,M('#8A6A48',0.7),gW);
+B(WX0,WSX,CF+2.2,0,WZ0,WZ1,rough,gW);
+// schräge Decke unter der Treppe zum Hauseingang: Oberkante von −0,34 (unter der ersten Stufe) auf −0,86 an der Südwand
+(function(){const L=WX1-WSX,dy=0.52,len=Math.hypot(L,dy);const m=new THREE.Mesh(new THREE.BoxGeometry(len,0.12,WZ1+0.14-WZ0),rough);m.position.set(WSX+L/2,-0.34-dy/2-0.06,(WZ0+WZ1+0.14)/2);m.rotation.z=-Math.atan2(dy,L);gW.add(m);
+  B(WSX-0.065,WSX-0.045,-0.47,CF+2.2,WZ0,WZ1,rough,gW);})(); // Putzstreifen am Deckensprung vor dem Stufenbrett
 const wtile=M('#E8E8E6',0.3);B(WX0,7.55,CF,CF+1.5,WZ0,WZ0+0.01,wtile,gW);
 for(let x=WX0;x<7.55;x+=0.25)B(x,x+0.004,CF,CF+1.5,WZ0+0.01,WZ0+0.012,M('#BBBBBB',0.5),gW);for(let y=0.25;y<1.5;y+=0.25)B(WX0,7.55,CF+y,CF+y+0.004,WZ0+0.01,WZ0+0.012,M('#BBBBBB',0.5),gW);
 B(6.9,7.4,CF+0.78,CF+0.88,WZ0,WZ0+0.38,M('#FAFAFA',0.2),gW);cyl(7.15,WZ0+0.08,0.012,CF+0.88,0.14,M('#D0D4D8',0.2,{metalness:0.9}),10,gW);
-B(7,7.25,CF+0.35,CF+0.72,WZ0,WZ0+0.18,M('#F2EEE4',0.4),gW);B(6.75,7.6,CF+1.55,CF+2.1,WZ0,WZ0+0.25,white,gW);
+B(7,7.25,CF+0.35,CF+0.72,WZ0,WZ0+0.18,M('#F2EEE4',0.4),gW);B(6.0,6.8,CF+1.55,CF+2.1,WZ0,WZ0+0.25,white,gW);
 B(7.5,7.83,CF,CF+0.4,WZ0+0.16,WZ0+0.58,M('#FAFAFA',0.25),gW);B(7.49,7.84,CF+0.4,CF+0.43,WZ0+0.16,WZ0+0.6,M('#F0F0F0',0.3),gW);B(7.51,7.82,CF+0.55,CF+0.95,WZ0,WZ0+0.16,M('#FAFAFA',0.25),gW);
 const k2brd=new THREE.Mesh(new THREE.BoxGeometry(0.02,1.6,0.7),M('#D8B888',0.6));k2brd.position.set(7.55,CF+0.8,WZ1-0.08);k2brd.rotation.x=-0.12;gW.add(k2brd);
-cyl(WX1-0.1,WZ1-0.08,0.02,CF,2.3,M('#9AB4B0',0.4),8,gW);
-const wl=new THREE.PointLight(col('#FFF6E8'),0.35,3,2);wl.position.set(7.05,CF+2.0,3.0);gW.add(wl);
+cyl(WX1-0.1,WZ1-0.08,0.02,CF,1.35,M('#9AB4B0',0.4),8,gW);
+const wl=new THREE.PointLight(col('#FFF6E8'),0.35,3,2);wl.position.set(6.4,CF+2.0,2.93);gW.add(wl);
 
 
-// ---- Kriechkeller hinter dem WC (Einstieg durch die Öffnung in der WC-Wand) ----
-const CRX0=7.05,CRX1=8.41,CRZ0=7.0,CRZ1=7.96,CRH=CF+1.45;
+// ---- Kriechkeller unter dem Windfang (Einstieg durch die Öffnung in der Südwand des WCs) ----
+// Lage nach Angabe Robert 14.11.2026 („vermutlich unterhalb des Windfangs“); Ausdehnung geschätzt: Windfang bis zur Garderobe.
+const CRX0=CX0,CRX1=EX,CRZ0=HZ1+EWT,CRZ1=EDZ,CRH=CF+1.45;
 const conc=canvasTex(512,256,(x,w,h)=>{x.fillStyle='#A8A49A';x.fillRect(0,0,w,h);for(let i=0;i<900;i++){const v=120+rnd()*90;x.fillStyle=`rgba(${v},${v-4},${v-12},0.35)`;x.fillRect(rnd()*w,rnd()*h,2+rnd()*8,1+rnd()*3);}for(let y=0;y<h;y+=32){x.fillStyle='rgba(60,55,50,0.35)';x.fillRect(0,y+rnd()*3,w,2);}},[1,1]);
 const concM=(r1,r2)=>{const t=conc.clone();t.needsUpdate=true;t.wrapS=t.wrapT=THREE.RepeatWrapping;t.repeat.set(r1,r2);return new THREE.MeshStandardMaterial({map:t,roughness:0.95});};
 const cwM=concM(2,1.2),cfM=M('#8E887E',0.95),brickM=new THREE.MeshStandardMaterial({map:canvasTex(128,128,(x,w,h)=>{x.fillStyle='#C8C0B0';x.fillRect(0,0,w,h);for(let r=0;r<8;r++)for(let c=-1;c<3;c++){x.fillStyle=`rgb(${190+rnd()*40},${130+rnd()*40},${80+rnd()*30})`;x.fillRect(c*56+(r%2)*28+2,r*16+2,52,12);}},[1,1]),roughness:0.9});
 // Rohbau des Kriechkellers als Bauteil kennzeichnen (struct), damit er nicht als Möbel gilt und in Außenansichten stehen bleibt
-[B(CRX0,CRX1,CF-0.2,CF,CRZ0,CRZ1,cfM,gCel),B(CRX1,8.86,CF,0,CRZ0-0.3,CRZ1+0.4,cwM,gCel),B(CRX0,CRX1,CRH,0,CRZ0,CRZ1,concM(4,1),gCel),
+// Wände unter den Vorbau-Wänden bis Unterkante Windfangboden (−0,8), Abschluss zur Kellertreppe, Hauswand Ost (wie bisher)
+// und Erdreich dort, wo WC und Kriechkeller bisher lagen
+[B(CRX0,CRX1,CF-0.2,CF,CRZ0,CRZ1,cfM,gCel),B(CRX1,CRX1+0.3,CF,-0.8,CRZ0,CRZ1+0.3,cwM,gCel),B(CRX0-0.3,CRX0,CF,-0.8,CRZ0,CRZ1+0.3,cwM,gCel),B(CRX0,CRX1,CF,-0.8,CRZ1,CRZ1+0.3,cwM,gCel),B(CRX0,CW1,CF,-0.8,CRZ0-0.06,CRZ0,cwM,gCel),
+ B(8.41,8.86,CF,0,6.7,8.36,cwM,gCel),B(5.46,8.41,CF,0,7.0,7.96,rough,gCel),B(CRX0,CRX1,CRH,-0.8,CRZ0,CRZ1,concM(4,1),gCel),
  B(CRX0+0.7,CRX0+1.0,CRH-0.18,CRH,CRZ0,CRZ1,cwM,gCel),B(CRX1-0.5,CRX1,CF,CRH,CRZ1-0.4,CRZ1,brickM,gCel)].forEach(m=>{m.userData.struct=1;});
 const pipe=(x0,z0,x1,z1,y,r,m)=>{const L=Math.hypot(x1-x0,z1-z0);const p=new THREE.Mesh(new THREE.CylinderGeometry(r,r,L,12),m);p.position.set((x0+x1)/2,y,(z0+z1)/2);p.rotation.z=Math.PI/2;p.rotation.y=-Math.atan2(z1-z0,x1-x0);gCel.add(p);return p;};
 pipe(CRX0,CRZ0+0.2,CRX1,CRZ0+0.2,CRH-0.12,0.07,M('#D8CFB8',0.8));pipe(CRX0,CRZ0+0.4,CRX1,CRZ0+0.4,CRH-0.06,0.025,M('#8A9096',0.4,{metalness:0.3}));pipe(CRX0,CRZ0+0.5,CRX1,CRZ0+0.5,CRH-0.08,0.015,white);
